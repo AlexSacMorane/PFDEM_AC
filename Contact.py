@@ -61,9 +61,9 @@ class Contact:
     #Here a pontual spring is considered
 
     #looking for the nearest nodes
-    ij_min = [0,0]
-    d_ij_min = 1000 #Large
     d_virtual = max(self.g1.r_max,self.g2.r_max) #virtual distance
+    ij_min = [0,0]
+    d_ij_min = 100*d_virtual #Large
     for i in range(len(self.g1.l_border[:-1])):
       for j in range(len(self.g2.l_border[:-1])):
           d_ij = np.linalg.norm(self.g2.l_border[:-1][j]-self.g1.l_border[:-1][i]+d_virtual*(self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center))
