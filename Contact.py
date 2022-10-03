@@ -170,7 +170,7 @@ class Contact:
         F_2_1_damp = F_2_1_damp_n *PC_normal
         self.F_2_1_damp = F_2_1_damp_n
         self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1])
-        g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1])
+        self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1])
 
     #no contact finally
     else :
