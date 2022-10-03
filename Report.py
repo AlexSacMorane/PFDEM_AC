@@ -63,7 +63,7 @@ class Report:
         #write Text_to_write (a string) in the report and print Text_to_print (a string)
 
         file_to_write = open(self.name,'a')
-        file_to_write.write(Text)
+        file_to_write.write(Text_to_write)
         file_to_write.close()
         print(Text_to_print)
 
