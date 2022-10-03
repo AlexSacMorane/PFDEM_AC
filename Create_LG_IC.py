@@ -379,7 +379,7 @@ def LG_tempo(x_min,x_max,y_min,N_grain,L_radius,L_percentage_radius,rho_surf,Y,n
     simulation_report.write_and_print('Compute for an initial steady state after loading\n','Loading of the sample')
     L_g_tempo, L_contact_gg, L_contact_ij, L_contact_gw, L_contact_gw_ij, id_contact, y_max, i_DEM = DEM_loading(L_g_tempo, L_contact_gg, L_contact_ij, L_contact_gw, L_contact_gw_ij, id_contact, mu_gg, e_gg, mu_gw, e_gw, x_min, x_max, y_min, y_max, dt_DEM, Force_target, gravity, i_DEM_stop, i_DEM, simulation_report)
     #Plot_Config_Loaded_End(L_g_tempo,x_min,x_max,y_min,y_max)
-    simulation_report.write_and_printe(str(len(L_g_tempo))+' / '+str(N_grain)+' grains have been created\n','\n'+str(len(L_g_tempo))+' / '+str(N_grain)+' grains have been created\n')
+    simulation_report.write_and_print(str(len(L_g_tempo))+' / '+str(N_grain)+' grains have been created\n','\n'+str(len(L_g_tempo))+' / '+str(N_grain)+' grains have been created\n')
 
     return L_g_tempo, y_max
 
