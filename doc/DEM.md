@@ -1,1 +1,1 @@
-![test](../image/DEM_Modele)
+![test](../image/DEM_Modele.png)
