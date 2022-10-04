@@ -344,18 +344,16 @@ while not Criteria_StopSimulation(i_PF,n_t_PF):
 
           if i_DEM >= i_DEM_stop :
               DEM_loop_statut = False
-              print("DEM loop stopped by too many iterations.")
               simulation_report.tac_tempo(datetime.now(),'DEM loop '+str(i_PF))
-              simulation_report.write('/!\ End of DEM steps with '+str(i_DEM+1)+' iterations / '+str(i_DEM_stop+1)+'/!\ \n')
+              simulation_report.write_and_print('/!\ End of DEM steps with '+str(i_DEM+1)+' iterations / '+str(i_DEM_stop+1)+'/!\ \n',"DEM loop stopped by too many iterations.")
           if Ecin < Ecin_stop and i_DEM > n_window_stop and (Vertical_Confinement_Force*0.95<F_on_ymax and F_on_ymax<Vertical_Confinement_Force*1.05):
               k0_xmin_window = k0_xmin_tracker[i_DEM+1-n_window_stop:i_DEM+1]
               k0_xmax_window = k0_xmax_tracker[i_DEM+1-n_window_stop:i_DEM+1]
               y_box_max_window = y_box_max_tracker[i_DEM+1-n_window_stop:i_DEM+1]
               if max(k0_xmin_window) - min(k0_xmin_window) < dk0_stop and max(k0_xmax_window) - min(k0_xmax_window) < dk0_stop and max(y_box_max_window) - min(y_box_max_window) < dy_box_max_stop:
                   DEM_loop_statut = False
-                  print("DEM loop stopped by steady state reached.")
                   simulation_report.tac_tempo(datetime.now(),'DEM loop '+str(i_PF))
-                  simulation_report.write("DEM loop stopped by steady state reached with "+str(i_DEM+1)+' iterations / '+str(i_DEM_stop+1)+"\n")
+                  simulation_report.write_and_print("DEM loop stopped by steady state reached with "+str(i_DEM+1)+' iterations / '+str(i_DEM_stop+1)+"\n","DEM loop stopped by steady state reached.")
 
       #-----------------------------------------------------------------------------
       # Computing rigid body motion

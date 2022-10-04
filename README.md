@@ -2,7 +2,7 @@
 Phase-Field Discrete Element Modelisation applied to granular material.
 
 ## Simulation presentation
-This simulation is about a test under oedometrical conditions with an acid injection.
+This simulation is about a 2D test under oedometrical conditions with an acid injection.
 The chain force and the k0 (= sigma1/sigma2) evolves with the material dissolution.
 
 ## Technical description
