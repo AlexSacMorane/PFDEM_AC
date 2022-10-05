@@ -23,3 +23,4 @@ Some next releases are presented here.
 - increase the user experience (add some files with all parameters to define a simulation)
 - create a database of initial condition
 - change the initial shape of grain
+- add some quick tests to check the script
