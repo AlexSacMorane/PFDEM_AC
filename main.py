@@ -92,6 +92,7 @@ coeff_restitution = 0.2 #1 is perfect elastic
 Spring_type = 'Ponctual' #Ponctual or Surface
 #DEM parameters
 dt_DEM = 1*10**(-6) #s
+i_update_neighbouroods = 100
 #Creation of the grain (without PF)
 print('\nCREATION OF THE GRAINS\n')
 L_g_tempo, y_box_max  = LG_tempo(x_box_min,x_box_max,y_box_min,N_grain,L_R,L_percentage_R,rho_surf,Y,nu,0,coeff_restitution,0,coeff_restitution,\
@@ -156,14 +157,16 @@ Debug_DEM = True
 i_print_plot = 50
 if Debug or Debug_DEM :
     simulation_report.write('This simulation can be debugged\n')
-SaveData = True
+SaveData = False
 if SaveData :
+    if not Path('../Data_MG_Box_AC_M').exists():
+        os.mkdir('../Data_MG_Box_AC_M')
     simulation_report.write('This simulation is saved\n')
     i_run = 1
-    folderpath = Path('../Data_MG_Box_AC_M_v6/Run_'+str(i_run))
+    folderpath = Path('../Data_MG_Box_AC_M/Run_'+str(i_run))
     while folderpath.exists():
         i_run = i_run + 1
-        folderpath = Path('../Data_MG_Box_AC_M_v6/Run_'+str(i_run))
+        folderpath = Path('../Data_MG_Box_AC_M/Run_'+str(i_run))
     name_folder = 'Run_'+str(i_run)
 if SaveData or Debug or Debug_DEM:
     simulation_report.write('\n')
@@ -265,9 +268,15 @@ while not Criteria_StopSimulation(i_PF,n_t_PF):
               grain.init_f_control(gravity)
 
           # Detection of contacts between grains
-          L_contact, L_ij_contact, id_contact = Contact.Grains_Polyhedral_contact(L_g,L_ij_contact,L_contact,id_contact,mu_friction,coeff_restitution)
+          #L_contact, L_ij_contact, id_contact = Contact.Grains_Polyhedral_contact(L_g,L_ij_contact,L_contact,id_contact,mu_friction,coeff_restitution)
+          if i_DEM % i_update_neighbouroods  == 0:
+              Contact.Update_Neighbouroods(L_g,1.5)
+          L_contact, L_ij_contact, id_contact = Contact.Grains_Polyhedral_contact_Neighbouroods(L_g,L_ij_contact,L_contact,id_contact,mu_friction,coeff_restitution)
           # Detection of contacts between grain and walls
-          L_contact_gw, L_ij_contact_gw, id_contact_gw = Contact_gw.Grains_Polyhedral_Wall_contact(L_g,L_contact_gw,L_ij_contact_gw,id_contact_gw,x_box_min,x_box_max,y_box_min,y_box_max,0,coeff_restitution)
+          #L_contact_gw, L_ij_contact_gw, id_contact_gw = Contact_gw.Grains_Polyhedral_Wall_contact(L_g,L_contact_gw,L_ij_contact_gw,id_contact_gw,x_box_min,x_box_max,y_box_min,y_box_max,0,coeff_restitution)
+          if i_DEM % i_update_neighbouroods  == 0:
+              Contact_gw.Update_wall_Neighbouroods(L_g,1.5,x_box_min,x_box_max,y_box_min,y_box_max)
+          L_contact_gw, L_ij_contact_gw, id_contact_gw = Contact_gw.Grains_Polyhedral_Wall_contact_Neighbourood(L_g,L_contact_gw,L_ij_contact_gw,id_contact_gw,x_box_min,x_box_max,y_box_min,y_box_max,0,coeff_restitution)
 
           #Compute contact interactions (g-g and g-w)
           for contact in L_contact:
@@ -492,7 +501,7 @@ while not Criteria_StopSimulation(i_PF,n_t_PF):
       #-----------------------------------------------------------------------------
 
       if SaveData :
-        outfile = open('../Data_MG_Box_AC_M_v6/'+name_folder+'_save_tempo','wb')
+        outfile = open('../Data_MG_Box_AC_M/'+name_folder+'_save_tempo','wb')
         dict = {}
         dict['k0_xmin_L'] = k0_xmin_L
         dict['k0_xmax_L'] = k0_xmax_L
@@ -546,11 +555,11 @@ if Debug :
 
 if SaveData :
 
-    shutil.copytree('../Simu_MG_Box_AC_M_v6', '../Data_MG_Box_AC_M_v6/'+name_folder)
+    shutil.copytree('../Simu_MG_Box_AC_M', '../Data_MG_Box_AC_M/'+name_folder)
 
-    os.remove('../Data_MG_Box_AC_M_v6/'+name_folder+'_save_tempo')
+    os.remove('../Data_MG_Box_AC_M/'+name_folder+'_save_tempo')
 
-    outfile = open('../Data_MG_Box_AC_M_v6/'+name_folder+'_save','wb')
+    outfile = open('../Data_MG_Box_AC_M/'+name_folder+'_save','wb')
     dict = {}
     dict['k0_xmin_L'] = k0_xmin_L
     dict['k0_xmax_L'] = k0_xmax_L

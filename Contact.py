@@ -579,3 +579,71 @@ def Grains_Polyhedral_contact(L_g,L_ij_contact,L_contact,id_contact,mu_friction,
                        L_ij_contact.remove((i_grain,j_grain))
 
      return L_contact, L_ij_contact, id_contact
+
+#-------------------------------------------------------------------------------
+# New features !!
+#-------------------------------------------------------------------------------
+
+def Grains_Polyhedral_contact_Neighbouroods_f(g1,g2):
+  #detect contact grain-grain
+
+  #-----------------------------------------------------------------------------
+  # Computing the distance between vertex
+  #-----------------------------------------------------------------------------
+
+  #looking for the nearest nodes
+  d_virtual = max(g1.r_max,g2.r_max)
+  ij_min = [0,0]
+  d_ij_min = 100*d_virtual #Large
+  for i in range(len(g1.l_border[:-1])):
+    for j in range(len(g2.l_border[:-1])):
+        d_ij = np.linalg.norm(g2.l_border[:-1][j]-g1.l_border[:-1][i]+d_virtual*(g2.center-g1.center)/np.linalg.norm(g2.center-g1.center))
+        if d_ij < d_ij_min :
+            d_ij_min = d_ij
+            ij_min = [i,j]
+
+  d_ij_min = np.dot(g2.l_border[:-1][ij_min[1]]-g1.l_border[:-1][ij_min[0]],-(g2.center-g1.center)/np.linalg.norm(g2.center-g1.center))
+  return d_ij_min > 0
+
+#-------------------------------------------------------------------------------
+
+def Update_Neighbouroods(L_g,factor):
+    #determine a neighbouroods for each grain. This function is called every x time step
+    #grain contact is determined by Grains_Polyhedral_contact_Neighbouroods
+    #
+    #notice that if there is a potential contact between grain_i and grain_j
+    #grain_i is not in the neighbourood of grain_j
+    #whereas grain_j is in the neighbourood of grain_i
+    #with i_grain < j_grain
+    #
+    #factor determines the size of the neighbourood window
+
+    for i_grain in range(len(L_g)-1) :
+        neighbourood = []
+        for j_grain in range(i_grain+1,len(L_g)):
+            if np.linalg.norm(L_g[i_grain].center-L_g[j_grain].center) < factor*(L_g[i_grain].r_max+L_g[j_grain].r_max):
+                neighbourood.append(L_g[j_grain])
+        L_g[i_grain].neighbourood = neighbourood
+
+#-------------------------------------------------------------------------------
+
+def Grains_Polyhedral_contact_Neighbouroods(L_g,L_ij_contact,L_contact,id_contact,mu_friction,coeff_restitution):
+    #detect contact between a grain and grains from its neighbourood
+    #the neighbourood is updated with Update_Neighbouroods()
+
+    for i_grain in range(len(L_g)-1) :
+        for neighbour in L_g[i_grain].neighbourood:
+            j_grain = neighbour.id
+            if Grains_Polyhedral_contact_Neighbouroods_f(L_g[i_grain],L_g[j_grain]):
+                if (i_grain,j_grain) not in L_ij_contact:  #contact not detected previously
+                   #creation of contact
+                   L_ij_contact.append((i_grain,j_grain))
+                   L_contact.append(Contact(id_contact, L_g[i_grain], L_g[j_grain], mu_friction, coeff_restitution))
+                   id_contact = id_contact + 1
+
+            else :
+                if (i_grain,j_grain) in L_ij_contact : #contact detected previously is not anymore
+                       L_contact.pop(L_ij_contact.index((i_grain,j_grain)))
+                       L_ij_contact.remove((i_grain,j_grain))
+
+    return L_contact, L_ij_contact, id_contact
