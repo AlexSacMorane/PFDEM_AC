@@ -33,6 +33,7 @@ def Write_txt(L_g,L_contact,L_contact_gw,i_PF,i_DEM):
         file_to_write.write('\tCenter : ['+str(int(grain.center[0]))+', '+str(int(grain.center[1]))+']\n')
         file_to_write.write('\tSpeed : ['+str(round(grain.v[0],2))+', '+str(round(grain.v[1],2))+']\n')
         file_to_write.write('\tForce applied : ['+str(round(grain.f[0],1))+', '+str(round(grain.f[1],1))+']\n')
+        file_to_write.write('\tOmega : '+str(grain.w)+'\n')
         file_to_write.write('\tSurface : '+str(int(grain.surface))+'\n')
         file_to_write.write('\tCoordinate X of the border : '+str(grain.l_border_x)+'\n')
         file_to_write.write('\tCoordinate Y of the border : '+str(grain.l_border_y)+'\n')
