@@ -3,7 +3,7 @@ Phase-Field Discrete Element Modelisation applied to granular material.
 
 ## Simulation presentation
 This simulation is about a 2D test under oedometrical conditions with an acid injection.
-The chain force and the k0 (= sigma1/sigma2) evolves with the material dissolution.
+The chain force and the k0 (= &sigma;<sub>1</sub>/&sigma;<sub>2</sub>) evolves with the material dissolution.
 
 ## Technical description
 A back and forth is done between phase-field (PF) simulation and discrete element modelisation (DEM). PF approach is computed with [MOOSE](https://github.com/idaholab/moose) and DEM is computed with an own script based on python 3.9.6. The launch of this project is done by executing the python script <i>main.py</i>.
@@ -20,6 +20,6 @@ Some next releases are presented here.
 
 - add rolling resistance
 - optimize the code (contact detection inside a neighbourood + use of nearest vertices)
-- increase the user experience (add some file with all parameters to define a simulation)
+- increase the user experience (add some files with all parameters to define a simulation)
 - create a database of initial condition
 - change the initial shape of grain
