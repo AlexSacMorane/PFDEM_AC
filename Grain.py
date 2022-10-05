@@ -336,7 +336,7 @@ class Grain:
                 elif r>R+w/2:
                     etai_M_new[i_y][i_x] = 0
                 else :
-                    etai_M_new[i_y][i_x] = 0.5*(1 + np.cos(pi*(r-R+w/2)/w))
+                    etai_M_new[i_y][i_x] = 0.5*(1 + np.cos(math.pi*(r-R+w/2)/w))
 
         self.etai_M = etai_M_new.copy()
 

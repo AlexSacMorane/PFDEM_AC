@@ -881,7 +881,7 @@ def IC(x_L,y_L,R,w,C):
       elif r>R+w/2:
         etai_M_IC[len(y_L)-1-y_L.index(y)][x_L.index(x)] = 0
       else :
-        etai_M_IC[len(y_L)-1-y_L.index(y)][x_L.index(x)] = 0.5*(1 + np.cos(pi*(r-R+w/2)/w))
+        etai_M_IC[len(y_L)-1-y_L.index(y)][x_L.index(x)] = 0.5*(1 + np.cos(math.pi*(r-R+w/2)/w))
 
   return etai_M_IC
 
