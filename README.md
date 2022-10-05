@@ -8,7 +8,7 @@ The chain force and the k0 (= &sigma;<sub>1</sub>/&sigma;<sub>2</sub>) evolves w
 ## Technical description
 A back and forth is done between phase-field (PF) simulation and discrete element modelisation (DEM). The following scheme illustrated the algorithm.
 
-![scheme of grain-grain interaction](../image/General_plan.png)
+![scheme of grain-grain interaction](image/General_plan.png)
 
  PF approach is computed with [MOOSE](https://github.com/idaholab/moose) and DEM is computed with an own script based on python 3.9.6. The launch of this project is done by executing the python script <i>main.py</i>.
 
