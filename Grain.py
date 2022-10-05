@@ -13,7 +13,6 @@ The new class is about the grains
 
 import numpy as np
 import math
-from IC import Cosine_Profile
 from PIL import Image as im
 import random
 import matplotlib.pyplot as plt
@@ -56,7 +55,7 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def update_v_a_geometry(self, V, A, W, DT):
+  def update_geometry_kinetic(self, V, A, W, DT):
     #update the acceleration and the velocity of a grain
     #update geometrical parameters as border and center nodes
 
@@ -72,6 +71,16 @@ class Grain:
     #rotation
     self.w = W
     self.theta = self.theta + self.w*DT
+
+    for i_theta_r in range(len(self.l_theta_r)) :
+        theta_r = self.l_theta_r[i_theta_r]
+        theta_r = theta_r + self.w*DT
+        while theta_r >= 2*math.pi:
+            theta_r = theta_r - 2*math.pi
+        while theta_r < 0 :
+            theta_r = theta_r + 2*math.pi
+        self.l_theta_r[i_theta_r] = theta_r
+
     for i in range(len(self.l_border)):
         p = self.l_border[i] - self.center
         Rot_Matrix = np.array([[math.cos(self.w*DT), -math.sin(self.w*DT)],
@@ -313,7 +322,7 @@ class Grain:
         for i_x in range(len(x_L)):
             for i_y in range(len(y_L)):
                 p = np.array([x_L[i_x], y_L[len(y_L)-1-i_y]])
-                r = np.linalg.norm(self.center- p)
+                r = np.linalg.norm(self.center - p)
                 if p[1]>self.center[1]:
                     theta = math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
                 else :
@@ -321,7 +330,13 @@ class Grain:
 
                 L_theta_R_i = list(abs(np.array(L_theta_R)-theta))
                 R = L_R[L_theta_R_i.index(min(L_theta_R_i))]
-                etai_M_new[i_y][i_x] = Cosine_Profile(R,w,r)
+                #Cosine_Profile
+                if r<R-w/2:
+                    etai_M_new[i_y][i_x] = 1
+                elif r>R+w/2:
+                    etai_M_new[i_y][i_x] = 0
+                else :
+                    etai_M_new[i_y][i_x] = 0.5*(1 + np.cos(pi*(r-R+w/2)/w))
 
         self.etai_M = etai_M_new.copy()
 

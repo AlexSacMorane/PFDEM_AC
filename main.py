@@ -25,7 +25,6 @@ from Write_txt import Write_txt
 from PFtoDEM_Multi import PFtoDEM_Multi
 from Create_i_AC import Create_i_AC
 from Create_LG_IC import LG_tempo, From_LG_tempo_to_usable, Grain_Tempo
-from Make_MP4 import make_mp4
 import Owntools
 import Grain
 import Etai
@@ -306,7 +305,7 @@ while not Criteria_StopSimulation(i_PF,n_t_PF):
               v_i = grain.v + a_i*dt_DEM
               dw_i = grain.mz/grain.inertia
               w_i = grain.w + dw_i*dt_DEM
-              grain.update_v_a_geometry(v_i,a_i,w_i,dt_DEM) #Move grains
+              grain.update_geometry_kinetic(v_i,a_i,w_i,dt_DEM) #Move grains
               Ecin = Ecin + 0.5*grain.m*np.linalg.norm(grain.v)**2/len(L_g)
               Force_applied = Force_applied + np.linalg.norm(grain.f)/len(L_g)
           Ecin_tracker.append(Ecin)
@@ -524,7 +523,7 @@ simulation_report.end(datetime.now())
 if Debug :
 
     #Making movies
-    make_mp4(int(2*i_PF))
+    Owntools.make_mp4(int(2*i_PF))
 
     #Trackers
     fig = plt.figure(1,figsize=(16,9.12))

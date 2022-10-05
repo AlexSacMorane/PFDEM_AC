@@ -16,7 +16,6 @@ import math
 import random
 import pickle
 import matplotlib.pyplot as plt
-from IC import IC
 import Grain
 
 #-------------------------------------------------------------------------------
@@ -385,120 +384,6 @@ def LG_tempo(x_min,x_max,y_min,N_grain,L_radius,L_percentage_radius,rho_surf,Y,n
 
 #-------------------------------------------------------------------------------
 
-def error_on_ymax_f(dy,overlap_L,k_L,Force_target) :
-    #compute the function f to control the upper wall
-    #difference between the force applied and the target value
-
-    f = Force_target
-    for i in range(len(overlap_L)):
-        f = f - k_L[i]*(max(overlap_L[i]-dy,0))**(3/2)
-    return f
-
-#-------------------------------------------------------------------------------
-
-def error_on_ymax_df(dy,overlap_L,k_L) :
-    #compute the derivative function df to control the upper wall
-
-    df = 0
-    for i in range(len(overlap_L)):
-        df = df + 3/2*k_L[i]*(max(overlap_L[i]-dy,0))**(1/2)
-    return df
-
-#-------------------------------------------------------------------------------
-
-def Control_y_max_NR(y_max,Force_target,L_contact_gw,L_g):
-    #Control the upper wall to apply force
-    #a Newton-Raphson method is applied
-
-    F = 0
-    overlap_L = []
-    k_L = []
-    for contact in L_contact_gw:
-        if contact.nature == 'gwy_max':
-            F = F + contact.Fwg_n
-            overlap_L.append(contact.overlap)
-            k_L.append(contact.k)
-            #compute force applied, save contact overlap and spring
-
-    if overlap_L != []:
-        i_NR = 0
-        dy = 0
-        ite_criteria = True
-        #control the upper wall
-        if -0.01*Force_target<error_on_ymax_f(dy,overlap_L,k_L,Force_target) and error_on_ymax_f(dy,overlap_L,k_L,Force_target)<0.01*Force_target:
-            ite_criteria = False
-        while ite_criteria :
-            i_NR = i_NR + 1
-            dy = dy - error_on_ymax_f(dy,overlap_L,k_L,Force_target)/error_on_ymax_df(dy,overlap_L,k_L)
-            if i_NR > 100: #Maximum try
-                ite_criteria = False
-            if -0.01*Force_target<error_on_ymax_f(dy,overlap_L,k_L,Force_target) and error_on_ymax_f(dy,overlap_L,k_L,Force_target)<0.01*Force_target:
-                ite_criteria = False
-        y_max = y_max + dy
-
-    else :
-        #if there is no contact with the upper wall, the wall is reset
-        y_max = Reset_y_max(L_g,Force_target)
-
-    for contact in L_contact_gw:
-        if contact.nature == 'gwy_max':
-            #reactualisation
-            contact.limit = y_max
-
-    return y_max, F
-
-#-------------------------------------------------------------------------------
-
-def Debug_Control_y_max_NR(L_g, mu_gw, e_gw, y_max):
-    #recompute the force applied on upper wall after the control step
-    #debug function
-
-    L_g_tempo = []
-    for element in L_g:
-        L_g_tempo.append(Grain_Tempo(element.id, element.center, element.radius, element.y, element.nu, element.rho_surf))
-
-    L_contact_gw = []
-    for i_grain in range(len(L_g_tempo)):
-          # contact grain-wall y_max
-          if L_g_tempo[i_grain].center[1] > y_max - L_g_tempo[i_grain].radius:
-              L_contact_gw.append(Contact_Tempo(None, L_g_tempo[i_grain], mu_gw, e_gw, 'gwy_max', None, y_max))
-
-    #Sollicitation computation
-    for grain in L_g_tempo:
-         grain.init_F_control(0)
-    F = 0
-    for contact in L_contact_gw:
-        contact.normal()
-        F = F + contact.Fwg_n
-
-    return F
-
-#-------------------------------------------------------------------------------
-
-def Reset_y_max(L_g,Force):
-    #the upper wall is located as a single contact verify the target value
-
-    y_max = None
-    id_grain_max = None
-    for id_grain in range(len(L_g)):
-        grain = L_g[id_grain]
-        y_max_grain = max(grain.l_border_y)
-
-        if y_max != None and y_max_grain > y_max:
-            y_max = y_max_grain
-            id_grain_max = id_grain
-        elif y_max == None:
-            y_max = y_max_grain
-            id_grain_max = id_grain
-
-    factor = 5
-    k = factor*4/3*L_g[id_grain_max].y/(1-L_g[id_grain_max].nu*L_g[id_grain_max].nu)*math.sqrt(L_g[id_grain_max].radius)
-    y_max = y_max - (Force/k)**(2/3)
-
-    return y_max
-
-#-------------------------------------------------------------------------------
-
 def DEM_init(L_g_tempo, L_contact_gg, L_contact_ij, L_contact_gw, L_contact_gw_ij, id_contact, mu_gg, e_gg, mu_gw, e_gw, x_min, x_max, y_min, dt_DEM, i_DEM_stop, i_DEM, gravity, simulation_report):
     #settlement granular particle
 
@@ -762,22 +647,119 @@ def Create_grains(L_g_tempo,L_n_grain_radius,L_n_grain_radius_done,L_radius,x_mi
 
 #-------------------------------------------------------------------------------
 
-def From_LG_tempo_to_usable(L_g_tempo,x_L,y_L,w):
-    #from a tempo configuration (circular grains), an initial configuration (polygonal grains) is generated
-
-    L_g = []
-    for grain_tempo in L_g_tempo:
-        ci_M_IC = IC(x_L,y_L,grain_tempo.radius,w,grain_tempo.center)
-        L_g.append(Grain.Grain(grain_tempo.id,ci_M_IC,None,np.array([0,0]),np.array([0,0]),grain_tempo.y,grain_tempo.nu,grain_tempo.rho_surf))
-    return L_g
-
-#-------------------------------------------------------------------------------
-
 def Intersection(g1,g2):
     #verify is two grains overlap or not
 
     d_12 = np.linalg.norm(g1.center - g2.center)
     return d_12 < g1.radius + g2.radius
+
+#-------------------------------------------------------------------------------
+
+def E_cin_total(L_g):
+    #compute total kinetic energy
+
+    Ecin = 0
+    for grain in L_g:
+        Ecin = Ecin + 1/2*grain.mass*np.dot(grain.v,grain.v)
+    return Ecin
+
+#-------------------------------------------------------------------------------
+
+def F_total(L_g):
+    #compute total force applied on grain
+
+    F = 0
+    for grain in L_g:
+        F = F + np.linalg.norm([grain.fx, grain.fy])
+    return F
+
+#-------------------------------------------------------------------------------
+
+def Control_y_max_NR(y_max,Force_target,L_contact_gw,L_g):
+    #Control the upper wall to apply force
+    #a Newton-Raphson method is applied
+
+    F = 0
+    overlap_L = []
+    k_L = []
+    for contact in L_contact_gw:
+        if contact.nature == 'gwy_max':
+            F = F + contact.Fwg_n
+            overlap_L.append(contact.overlap)
+            k_L.append(contact.k)
+            #compute force applied, save contact overlap and spring
+
+    if overlap_L != []:
+        i_NR = 0
+        dy = 0
+        ite_criteria = True
+        #control the upper wall
+        if -0.01*Force_target<error_on_ymax_f(dy,overlap_L,k_L,Force_target) and error_on_ymax_f(dy,overlap_L,k_L,Force_target)<0.01*Force_target:
+            ite_criteria = False
+        while ite_criteria :
+            i_NR = i_NR + 1
+            dy = dy - error_on_ymax_f(dy,overlap_L,k_L,Force_target)/error_on_ymax_df(dy,overlap_L,k_L)
+            if i_NR > 100: #Maximum try
+                ite_criteria = False
+            if -0.01*Force_target<error_on_ymax_f(dy,overlap_L,k_L,Force_target) and error_on_ymax_f(dy,overlap_L,k_L,Force_target)<0.01*Force_target:
+                ite_criteria = False
+        y_max = y_max + dy
+
+    else :
+        #if there is no contact with the upper wall, the wall is reset
+        y_max = Reset_y_max(L_g,Force_target)
+
+    for contact in L_contact_gw:
+        if contact.nature == 'gwy_max':
+            #reactualisation
+            contact.limit = y_max
+
+    return y_max, F
+
+#-------------------------------------------------------------------------------
+
+def error_on_ymax_f(dy,overlap_L,k_L,Force_target) :
+    #compute the function f to control the upper wall
+    #difference between the force applied and the target value
+
+    f = Force_target
+    for i in range(len(overlap_L)):
+        f = f - k_L[i]*(max(overlap_L[i]-dy,0))**(3/2)
+    return f
+
+#-------------------------------------------------------------------------------
+
+def error_on_ymax_df(dy,overlap_L,k_L) :
+    #compute the derivative function df to control the upper wall
+
+    df = 0
+    for i in range(len(overlap_L)):
+        df = df + 3/2*k_L[i]*(max(overlap_L[i]-dy,0))**(1/2)
+    return df
+
+#-------------------------------------------------------------------------------
+
+def Reset_y_max(L_g,Force):
+    #the upper wall is located as a single contact verify the target value
+
+    y_max = None
+    id_grain_max = None
+    for id_grain in range(len(L_g)):
+        grain = L_g[id_grain]
+        y_max_grain = max(grain.l_border_y)
+
+        if y_max != None and y_max_grain > y_max:
+            y_max = y_max_grain
+            id_grain_max = id_grain
+        elif y_max == None:
+            y_max = y_max_grain
+            id_grain_max = id_grain
+
+    factor = 5
+    k = factor*4/3*L_g[id_grain_max].y/(1-L_g[id_grain_max].nu*L_g[id_grain_max].nu)*math.sqrt(L_g[id_grain_max].radius)
+    y_max = y_max - (Force/k)**(2/3)
+
+    return y_max
 
 #-------------------------------------------------------------------------------
 
@@ -875,22 +857,32 @@ def Plot_Config_Loaded_End(L_g,x_min,x_max,y_min,y_max):
 
 #-------------------------------------------------------------------------------
 
-def E_cin_total(L_g):
-    #compute total kinetic energy
+def From_LG_tempo_to_usable(L_g_tempo,x_L,y_L,w):
+    #from a tempo configuration (circular grains), an initial configuration (polygonal grains) is generated
 
-    Ecin = 0
-    for grain in L_g:
-        Ecin = Ecin + 1/2*grain.mass*np.dot(grain.v,grain.v)
-    return Ecin
+    L_g = []
+    for grain_tempo in L_g_tempo:
+        ci_M_IC = IC(x_L,y_L,grain_tempo.radius,w,grain_tempo.center)
+        L_g.append(Grain.Grain(grain_tempo.id,ci_M_IC,None,np.array([0,0]),np.array([0,0]),grain_tempo.y,grain_tempo.nu,grain_tempo.rho_surf))
+    return L_g
 
 #-------------------------------------------------------------------------------
 
-def F_total(L_g):
-    #compute total force applied on grain
+def IC(x_L,y_L,R,w,C):
+  #create initial phase field, assuming a circular grain.
 
-    F = 0
-    for grain in L_g:
-        F = F + np.linalg.norm([grain.fx, grain.fy])
-    return F
+  etai_M_IC = np.zeros((len(y_L),len(x_L)))
+
+  for y in y_L:
+    for x in x_L:
+      r = np.linalg.norm(np.array([x,y])-C)
+      if r<R-w/2:
+        etai_M_IC[len(y_L)-1-y_L.index(y)][x_L.index(x)] = 1
+      elif r>R+w/2:
+        etai_M_IC[len(y_L)-1-y_L.index(y)][x_L.index(x)] = 0
+      else :
+        etai_M_IC[len(y_L)-1-y_L.index(y)][x_L.index(x)] = 0.5*(1 + np.cos(pi*(r-R+w/2)/w))
+
+  return etai_M_IC
 
 #-------------------------------------------------------------------------------

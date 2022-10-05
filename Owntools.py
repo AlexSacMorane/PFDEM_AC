@@ -21,6 +21,7 @@ import os
 import pickle
 from pathlib import Path
 from datetime import datetime
+import imageio
 import Contact
 import Contact_gw
 import Grain
@@ -604,3 +605,20 @@ def Plot_chain_force(i_PF,i_DEM):
     plt.axis("equal")
     plt.savefig('Debug/DEM_ite/Chain_force_'+str(i_PF)+'.png')
     plt.close(1)
+
+#-------------------------------------------------------------------------------
+
+def make_mp4(i_f):
+    #The goal of this function is to create a movie with all configuration pictures
+    #from https://www.blog.pythonlibrary.org/2021/06/23/creating-an-animated-gif-with-python/
+
+
+    fileList = []
+    for i in range(0,i_f+1):
+        fileList.append('Debug/DEM_ite/PF_ite_'+str(i)+'.png')
+
+    duration_movie  = 10 #sec
+    writer = imageio.get_writer('Debug/PF_ite.mp4', fps=int(i_f/duration_movie))
+    for im in fileList:
+        writer.append_data(imageio.imread(im))
+    writer.close()
