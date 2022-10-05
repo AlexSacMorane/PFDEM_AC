@@ -14,3 +14,12 @@ An Allen-Cahn formulation is used.
 
 ### DEM
 The goal of the DEM step is to compute a steady-state configuration. Grains are assumed as polygonal. The shape is computed from an interpolation of the PF variable. At the end of the step, interactions (grain-grain and grain-wall) are computed to highlight the evolution of the chain force and k0.
+
+## What is next ?
+Some next releases are presented here.
+
+- add rolling resistance
+- optimize the code (contact detection inside a neighbourood + use of nearest vertices)
+- increase the user experience (add some file with all parameters to define a simulation)
+- create a database of initial condition
+- change the initial shape of grain
