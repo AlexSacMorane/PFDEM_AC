@@ -70,6 +70,7 @@ class Contact:
           if d_ij < d_ij_min :
               d_ij_min = d_ij
               ij_min = [i,j]
+    self.ij_min = ij_min
 
     #-----------------------------------------------------------------------------
     #Computing CP
@@ -159,8 +160,8 @@ class Contact:
         F_2_1 = F_2_1_n * PC_normal
         self.F_2_1_n = F_2_1_n
         self.Ep_n = 2/5 * k * overlap**(5/2) #-dEp/dx = F_2_1_n
-        self.g1.update_f( F_2_1[0],  F_2_1[1])
-        self.g2.update_f(-F_2_1[0], -F_2_1[1])
+        self.g1.update_f( F_2_1[0],  F_2_1[1], self.g1.l_border[:-1][ij_min[0]])
+        self.g2.update_f(-F_2_1[0], -F_2_1[1], self.g2.l_border[:-1][ij_min[1]])
 
         #Damping term
         gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
@@ -169,8 +170,8 @@ class Contact:
         F_2_1_damp_n = np.dot(self.g2.v - self.g1.v,PC_normal)*eta
         F_2_1_damp = F_2_1_damp_n *PC_normal
         self.F_2_1_damp = F_2_1_damp_n
-        self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1])
-        self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1])
+        self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1], self.g1.l_border[:-1][ij_min[0]])
+        self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1], self.g2.l_border[:-1][ij_min[1]])
 
     #no contact finally
     else :
@@ -198,25 +199,27 @@ class Contact:
         kt0 = 8 * G_eq *math.sqrt(R_eq*abs(self.overlap_normal))
         kt = kt0*math.sqrt(max(1-2/3*kt0*abs(self.overlap_tangential)/self.mu/abs(self.F_2_1_n),0)) #not linear spring
 
-        Delta_Us = np.dot(self.g1.v-self.g2.v,self.pc_tangential) * dt_DEM
+        r1 = np.linalg.norm(self.g1.l_border[:-1][self.ij_min[0]] - self.g1.center) - self.overlap_normal/2
+        r2 = np.linalg.norm(self.g2.l_border[:-1][self.ij_min[1]] - self.g2.center) - self.overlap_normal/2
+        Delta_Us = (np.dot(self.g1.v-self.g2.v,self.pc_tangential) + r1*self.g1.w + r2*self.g2.w)*dt_DEM
         self.overlap_tangential = self.overlap_tangential + Delta_Us
         self.ft = self.ft - kt*Delta_Us
         self.tangential_old = self.pc_tangential
         if abs(self.ft) > abs(self.mu*self.F_2_1_n) or kt == 0: #Coulomb criteria
             self.ft = self.mu * abs(self.F_2_1_n) * np.sign(self.ft)
 
-        self.g1.update_f( self.ft*self.pc_tangential[0],  self.ft*self.pc_tangential[1])
-        self.g2.update_f(-self.ft*self.pc_tangential[0], -self.ft*self.pc_tangential[1])
+        self.g1.update_f( self.ft*self.pc_tangential[0],  self.ft*self.pc_tangential[1], self.g1.l_border[:-1][self.ij_min[0]])
+        self.g2.update_f(-self.ft*self.pc_tangential[0], -self.ft*self.pc_tangential[1], self.g2.l_border[:-1][self.ij_min[1]])
 
         #Damping term
         gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
         mass_eq = self.g1.m*self.g2.m/(self.g1.m+self.g2.m)
         eta = 2 * gamma * math.sqrt(mass_eq*kt)
-        F_2_1_damp_t = np.dot(self.g2.v - self.g1.v,self.pc_tangential)*eta/2
+        F_2_1_damp_t = -Delta_Us/dt_DEM*eta/2
         F_2_1_damp = F_2_1_damp_t *self.pc_tangential
         self.ft_damp = F_2_1_damp_t
-        self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1])
-        self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1])
+        self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1], self.g1.l_border[:-1][self.ij_min[0]])
+        self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1], self.g2.l_border[:-1][self.ij_min[1]])
 
     #no contact finally
     else :
@@ -241,6 +244,7 @@ class Contact:
           if d_ij < d_ij_min :
               d_ij_min = d_ij
               ij_min = [i,j]
+    self.ij_min = ij_min
 
     #-----------------------------------------------------------------------------
     #Computing CP
@@ -327,8 +331,8 @@ class Contact:
         F_2_1_n = -k_surf * D_inter * overlap #surface linear spring
         F_2_1 = F_2_1_n * PC_normal
         self.F_2_1_n = F_2_1_n
-        self.g1.update_f( F_2_1[0],  F_2_1[1])
-        self.g2.update_f(-F_2_1[0], -F_2_1[1])
+        self.g1.update_f( F_2_1[0],  F_2_1[1], self.g1.l_border[:-1][ij_min[0]])
+        self.g2.update_f(-F_2_1[0], -F_2_1[1], self.g2.l_border[:-1][ij_min[1]])
 
         #Damping term
         gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
@@ -337,8 +341,8 @@ class Contact:
         F_2_1_damp_n = np.dot(self.g2.v - self.g1.v,PC_normal)*eta
         F_2_1_damp = F_2_1_damp_n *PC_normal
         self.F_2_1_damp = F_2_1_damp_n
-        self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1])
-        self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1])
+        self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1], self.g1.l_border[:-1][ij_min[0]])
+        self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1], self.g2.l_border[:-1][ij_min[1]])
 
     #no contact finally
     else :
@@ -370,24 +374,26 @@ class Contact:
         kn_surf = Y_eq / L_inter #inspired by the bond formulation
         kt_surf = kn_surf
 
-        Delta_Us = np.dot(self.g1.v-self.g2.v,self.pc_tangential) * dt_DEM
+        r1 = np.linalg.norm(self.g1.l_border[:-1][self.ij_min[0]] - self.g1.center) - self.overlap_normal/2
+        r2 = np.linalg.norm(self.g2.l_border[:-1][self.ij_min[1]] - self.g2.center) - self.overlap_normal/2
+        Delta_Us = (np.dot(self.g1.v-self.g2.v,self.pc_tangential) + r1*self.g1.w + r2*self.g2.w)* dt_DEM
         self.overlap_tangential = self.overlap_tangential + Delta_Us
         self.ft = self.ft - kt_surf*D_inter*Delta_Us #inspired by the bond formulation
         self.tangential_old = self.pc_tangential
         if abs(self.ft) > abs(self.mu*self.F_2_1_n) : #Coulomb criteria
             self.ft = self.mu * abs(self.F_2_1_n) * np.sign(self.ft)
-        self.g1.update_f( self.ft*self.pc_tangential[0],  self.ft*self.pc_tangential[1])
-        self.g2.update_f(-self.ft*self.pc_tangential[0], -self.ft*self.pc_tangential[1])
+        self.g1.update_f( self.ft*self.pc_tangential[0],  self.ft*self.pc_tangential[1], self.g1.l_border[:-1][self.ij_min[0]])
+        self.g2.update_f(-self.ft*self.pc_tangential[0], -self.ft*self.pc_tangential[1], self.g2.l_border[:-1][self.ij_min[1]])
 
         #Damping term
         gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
         mass_eq = self.g1.m*self.g2.m/(self.g1.m+self.g2.m)
         eta = 2 * gamma * math.sqrt(mass_eq*kt*D_inter)
-        F_2_1_damp_t = np.dot(self.g2.v - self.g1.v,self.pc_tangential)*eta/2
+        F_2_1_damp_t = -Delta_Us/dt_DEM*eta/2
         self.ft_damp = F_2_1_damp_t
         F_2_1_damp = F_2_1_damp_t *self.pc_tangential
-        self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1])
-        self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1])
+        self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1], self.g1.l_border[:-1][self.ij_min[0]])
+        self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1], self.g2.l_border[:-1][self.ij_min[1]])
 
     #no contact finally
     else :
@@ -536,9 +542,9 @@ def Grains_Polyhedral_contact_f(g1,g2):
       #-----------------------------------------------------------------------------
 
       #looking for the nearest nodes
+      d_virtual = max(g1.r_max,g2.r_max)
       ij_min = [0,0]
       d_ij_min = 100*d_virtual #Large
-      d_virtual = max(g1.r_max,g2.r_max)
       for i in range(len(g1.l_border[:-1])):
         for j in range(len(g2.l_border[:-1])):
             d_ij = np.linalg.norm(g2.l_border[:-1][j]-g1.l_border[:-1][i]+d_virtual*(g2.center-g1.center)/np.linalg.norm(g2.center-g1.center))

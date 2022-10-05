@@ -68,15 +68,15 @@ simulation_report.tic_tempo(datetime.now())
 #Time discretisation
 dt_PF = 0.075 #s
 n_t_PF_moose = 5
-n_t_PF = 7
+n_t_PF = 3
 # DEM parameters
-N_grain = 162
+N_grain = 51
 R_mean = 350 #µm
 L_R = [1.1*R_mean, 1*R_mean, 0.9*R_mean] #from larger to smaller
 L_percentage_R = [1/3, 1/3, 1/3]
 #Box définition
 x_box_min = 0 #µm
-x_box_max = 11600 #µm
+x_box_max = 4900 #µm
 y_box_min = 0 #µm
 #External sollicitation
 Vertical_Confinement_Pressure = 500*10**5 #Pa
@@ -289,12 +289,15 @@ while not Criteria_StopSimulation(i_PF,n_t_PF):
                   raise ValueError('Spring type not available !')
 
           #Move particles and trackers
+          #Semi implicit euler scheme
           Ecin = 0
           Force_applied = 0
           for grain in L_g:
               a_i = grain.f/grain.m
               v_i = grain.v + a_i*dt_DEM
-              grain.update_v_a_geometry(v_i,a_i,dt_DEM) #Move grains
+              dw_i = grain.mz/grain.inertia
+              w_i = grain.w + dw_i*dt_DEM
+              grain.update_v_a_geometry(v_i,a_i,w_i,dt_DEM) #Move grains
               Ecin = Ecin + 0.5*grain.m*np.linalg.norm(grain.v)**2/len(L_g)
               Force_applied = Force_applied + np.linalg.norm(grain.f)/len(L_g)
           Ecin_tracker.append(Ecin)
@@ -344,16 +347,18 @@ while not Criteria_StopSimulation(i_PF,n_t_PF):
 
           if i_DEM >= i_DEM_stop :
               DEM_loop_statut = False
+              print("DEM loop stopped by too many iterations.")
               simulation_report.tac_tempo(datetime.now(),'DEM loop '+str(i_PF))
-              simulation_report.write_and_print('/!\ End of DEM steps with '+str(i_DEM+1)+' iterations / '+str(i_DEM_stop+1)+'/!\ \n',"DEM loop stopped by too many iterations.")
+              simulation_report.write('/!\ End of DEM steps with '+str(i_DEM+1)+' iterations / '+str(i_DEM_stop+1)+'/!\ \n')
           if Ecin < Ecin_stop and i_DEM > n_window_stop and (Vertical_Confinement_Force*0.95<F_on_ymax and F_on_ymax<Vertical_Confinement_Force*1.05):
               k0_xmin_window = k0_xmin_tracker[i_DEM+1-n_window_stop:i_DEM+1]
               k0_xmax_window = k0_xmax_tracker[i_DEM+1-n_window_stop:i_DEM+1]
               y_box_max_window = y_box_max_tracker[i_DEM+1-n_window_stop:i_DEM+1]
               if max(k0_xmin_window) - min(k0_xmin_window) < dk0_stop and max(k0_xmax_window) - min(k0_xmax_window) < dk0_stop and max(y_box_max_window) - min(y_box_max_window) < dy_box_max_stop:
                   DEM_loop_statut = False
+                  print("DEM loop stopped by steady state reached.")
                   simulation_report.tac_tempo(datetime.now(),'DEM loop '+str(i_PF))
-                  simulation_report.write_and_print("DEM loop stopped by steady state reached with "+str(i_DEM+1)+' iterations / '+str(i_DEM_stop+1)+"\n","DEM loop stopped by steady state reached.")
+                  simulation_report.write("DEM loop stopped by steady state reached with "+str(i_DEM+1)+' iterations / '+str(i_DEM_stop+1)+"\n")
 
       #-----------------------------------------------------------------------------
       # Computing rigid body motion

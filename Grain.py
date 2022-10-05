@@ -40,12 +40,14 @@ class Grain:
     self.id = ID
     self.etai_M = etai_M_IC
     self.id_eta = Id_Eta
-    self.v = V
-    self.a = A
     self.y = Y
     self.nu = Nu
     self.g = Y /2/(1+Nu) #shear modulus
     self.rho_surf = Rho_surf
+    self.v = V
+    self.a = A
+    self.theta = 0
+    self.w = 0 #dtheta/dt
 
 #-------------------------------------------------------------------------------
 
@@ -54,10 +56,11 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def update_v_a_geometry(self, V, A, DT):
+  def update_v_a_geometry(self, V, A, W, DT):
     #update the acceleration and the velocity of a grain
     #update geometrical parameters as border and center nodes
 
+    #translation
     self.v = V
     self.a = A
     for i in range(len(self.l_border)):
@@ -65,6 +68,18 @@ class Grain:
         self.l_border_x[i] = self.l_border_x[i] + self.v[0]*DT
         self.l_border_y[i] = self.l_border_y[i] + self.v[1]*DT
     self.center = self.center + self.v*DT
+
+    #rotation
+    self.w = W
+    self.theta = self.theta + self.w*DT
+    for i in range(len(self.l_border)):
+        p = self.l_border[i] - self.center
+        Rot_Matrix = np.array([[math.cos(self.w*DT), -math.sin(self.w*DT)],
+                               [math.sin(self.w*DT),  math.cos(self.w*DT)]])
+        p = np.dot(Rot_Matrix,p)
+        self.l_border[i] = p + self.center
+        self.l_border_x[i] = p[0] + self.center[0]
+        self.l_border_y[i] = p[1] + self.center[1]
 
 #-------------------------------------------------------------------------------
 
@@ -75,15 +90,20 @@ class Grain:
     self.fx = 0
     self.fy = -g*self.m
     self.f = np.array([self.fx,self.fy])
+    self.mz = 0
 
 #-------------------------------------------------------------------------------
 
-  def update_f(self, Fx, Fy):
+  def update_f(self, Fx, Fy, p_application):
     #add a force (an array [Fx,Fy]) to the grain
 
     self.fx = self.fx + Fx
     self.fy = self.fy + Fy
     self.f = np.array([self.fx,self.fy])
+
+    v1 = np.array([p_application[0]-self.center[0], p_application[1]-self.center[1], 0])
+    v2 = np.array([Fx, Fy, 0])
+    self.mz = self.mz + np.cross(v1,v2)[2]
 
 #-------------------------------------------------------------------------------
 
@@ -254,6 +274,7 @@ class Grain:
       self.center = Center_Mass
       self.l_border_x = L_border_x
       self.l_border_y = L_border_y
+      self.inertia = Inertia
 
 #-------------------------------------------------------------------------------
 

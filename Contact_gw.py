@@ -80,7 +80,7 @@ class Contact_gw:
         Fwg_n = self.k*self.overlap**(3/2)
         Fwg = Fwg_n*nwg
         self.Fwg_n = Fwg_n
-        self.g.update_f(Fwg[0],Fwg[1])
+        self.g.update_f(Fwg[0],Fwg[1],self.g.l_border[self.g.l_border_y.index(min(self.g.l_border_y))])
         #damping
         gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
         mass_eq = self.g.m
@@ -88,7 +88,7 @@ class Contact_gw:
         Fwg_damp_n = -np.dot(self.g.v,nwg)*eta
         Fwg_damp = Fwg_damp_n*nwg
         self.Fwg_damp_n = Fwg_damp_n
-        self.g.update_f(Fwg_damp[0],Fwg_damp[1])
+        self.g.update_f(Fwg_damp[0],Fwg_damp[1],self.g.l_border[self.g.l_border_y.index(min(self.g.l_border_y))])
 
     elif self.nature == 'gwy_max':
         #unlinear stiffness
@@ -97,7 +97,7 @@ class Contact_gw:
         Fwg_n = self.k*self.overlap**(3/2)
         Fwg = Fwg_n*nwg
         self.Fwg_n = Fwg_n
-        self.g.update_f(Fwg[0],Fwg[1])
+        self.g.update_f(Fwg[0],Fwg[1],self.g.l_border[self.g.l_border_y.index(max(self.g.l_border_y))])
         #damping
         Fwg_damp_n = 0
         self.Fwg_damp_n = Fwg_damp_n
@@ -109,7 +109,7 @@ class Contact_gw:
         Fwg_n = self.k*self.overlap**(3/2)
         Fwg = Fwg_n*nwg
         self.Fwg_n = Fwg_n
-        self.g.update_f(Fwg[0],Fwg[1])
+        self.g.update_f(Fwg[0],Fwg[1],self.g.l_border[self.g.l_border_x.index(min(self.g.l_border_x))])
         #damping
         gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
         mass_eq = self.g.m
@@ -117,7 +117,7 @@ class Contact_gw:
         Fwg_damp_n = -np.dot(self.g.v,nwg)*eta
         Fwg_damp = Fwg_damp_n*nwg
         self.Fwg_damp_n = Fwg_damp_n
-        self.g.update_f(Fwg_damp[0],Fwg_damp[1])
+        self.g.update_f(Fwg_damp[0],Fwg_damp[1],self.g.l_border[self.g.l_border_x.index(min(self.g.l_border_x))])
 
     elif self.nature == 'gwx_max':
         #unlinear stiffness
@@ -126,7 +126,7 @@ class Contact_gw:
         Fwg_n = self.k*self.overlap**(3/2)
         Fwg = Fwg_n*nwg
         self.Fwg_n = Fwg_n
-        self.g.update_f(Fwg[0],Fwg[1])
+        self.g.update_f(Fwg[0],Fwg[1],self.g.l_border[self.g.l_border_x.index(max(self.g.l_border_x))])
         #damping
         gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
         mass_eq = self.g.m
@@ -134,7 +134,7 @@ class Contact_gw:
         Fwg_damp_n = -np.dot(self.g.v,nwg)*eta
         Fwg_damp = Fwg_damp_n*nwg
         self.Fwg_damp_n = Fwg_damp_n
-        self.g.update_f(Fwg_damp[0],Fwg_damp[1])
+        self.g.update_f(Fwg_damp[0],Fwg_damp[1],self.g.l_border[self.g.l_border_x.index(max(self.g.l_border_x))])
 
 #-------------------------------------------------------------------------------
 
@@ -147,49 +147,53 @@ class Contact_gw:
        #unlinear stiffness
        twg = np.array([-1, 0])
        self.twg = twg
-       Delta_Us = np.dot(self.g.v,self.twg) * dt_DEM
+       r = np.linalg.norm(self.g.l_border[:-1][self.g.l_border_y.index(min(self.g.l_border_y))] - self.g.center) - self.overlap
+       Delta_Us = (np.dot(self.g.v,self.twg) - r*self.g.w) * dt_DEM
        self.overlap_tangential = self.overlap_tangential + Delta_Us
        self.ft = self.ft - self.kt*Delta_Us
        if abs(self.ft) > abs(self.mu*self.Fwg_n) :
            self.ft = self.mu * abs(self.Fwg_n) * np.sign(self.ft)
        Fwg = self.ft*twg
-       self.g.update_f(Fwg[0],Fwg[1])
+       self.g.update_f(Fwg[0],Fwg[1],self.g.l_border[self.g.l_border_y.index(min(self.g.l_border_y))])
 
    elif self.nature == 'gwy_max':
        #unlinear stiffness
        twg = np.array([1, 0])
        self.twg = twg
-       Delta_Us = np.dot(self.g.v,self.twg) * dt_DEM
+       r = np.linalg.norm(self.g.l_border[:-1][self.g.l_border_y.index(max(self.g.l_border_y))] - self.g.center) - self.overlap
+       Delta_Us = (np.dot(self.g.v,self.twg) - r*self.g.w) * dt_DEM
        self.overlap_tangential = self.overlap_tangential + Delta_Us
        self.ft = self.ft - self.kt*Delta_Us
        if abs(self.ft) > abs(self.mu*self.Fwg_n) :
            self.ft = self.mu * abs(self.Fwg_n) * np.sign(self.ft)
        Fwg = self.ft*twg
-       self.g.update_f(Fwg[0],Fwg[1])
+       self.g.update_f(Fwg[0],Fwg[1],self.g.l_border[self.g.l_border_y.index(max(self.g.l_border_y))])
 
    elif self.nature == 'gwx_min':
        #unlinear stiffness
        twg = np.array([0, 1])
        self.twg = twg
-       Delta_Us = np.dot(self.g.v,self.twg) * dt_DEM
+       r = np.linalg.norm(self.g.l_border[:-1][self.g.l_border_x.index(min(self.g.l_border_x))] - self.g.center) - self.overlap
+       Delta_Us = (np.dot(self.g.v,self.twg) - r*self.g.w) * dt_DEM
        self.overlap_tangential = self.overlap_tangential + Delta_Us
        self.ft = self.ft - self.kt*Delta_Us
        if abs(self.ft) > abs(self.mu*self.Fwg_n) :
            self.ft = self.mu * abs(self.Fwg_n) * np.sign(self.ft)
        Fwg = self.ft*twg
-       self.g.update_f(Fwg[0],Fwg[1])
+       self.g.update_f(Fwg[0],Fwg[1],self.g.l_border[self.g.l_border_x.index(min(self.g.l_border_x))])
 
    elif self.nature == 'gwx_max':
        #linear stiffness
        twg = np.array([0, -1])
        self.twg = twg
-       Delta_Us = np.dot(self.g.v,self.twg) * dt_DEM
+       r = np.linalg.norm(self.g.l_border[:-1][self.g.l_border_x.index(max(self.g.l_border_x))] - self.g.center) - self.overlap
+       Delta_Us = (np.dot(self.g.v,self.twg) - r*self.g.w) * dt_DEM
        self.overlap_tangential = self.overlap_tangential + Delta_Us
        self.ft = self.ft - self.kt*Delta_Us
        if abs(self.ft) > abs(self.mu*self.Fwg_n) :
            self.ft = self.mu * abs(self.Fwg_n) * np.sign(self.ft)
        Fwg = self.ft*twg
-       self.g.update_f(Fwg[0],Fwg[1])
+       self.g.update_f(Fwg[0],Fwg[1],self.g.l_border[self.g.l_border_x.index(max(self.g.l_border_x))])
 
 #-------------------------------------------------------------------------------
 
