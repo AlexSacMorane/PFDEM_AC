@@ -23,7 +23,6 @@ The goal of the DEM step is to compute a steady-state configuration. Grains are 
 Some next releases are presented here.
 
 - add rolling resistance
-- optimize the code (use of nearest vertices only)
 - increase the user experience (add some files with all parameters to define a simulation)
 - create a database of initial condition
 - change the initial shape of grain
