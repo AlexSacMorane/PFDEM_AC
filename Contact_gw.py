@@ -68,7 +68,7 @@ class Contact_gw:
 
 #-------------------------------------------------------------------------------
 
-  def  DEM_gw_Polyhedral_normal(self,dt_DEM):
+  def  DEM_gw_Polyhedral_normal(self):
     #compute the normal reaction of a contact grain-wall
     #Here a pontual spring is considered
     #conditions "if" are defined and same for each wall nature
