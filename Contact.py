@@ -583,7 +583,7 @@ def Grains_Polyhedral_contact_f(g1,g2):
 
       #extract vertices inside of an angular window
       angular_window = math.pi*5/8 #window
-      v12 = (grain2.center-grain1.center)/np.linalg.norm(grain2.center-grain1.center)
+      v12 = (g2.center-g1.center)/np.linalg.norm(g2.center-g1.center)
       if v12[1] >= 0:
           angle12 = math.acos(v12[0])
       else :
