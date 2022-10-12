@@ -664,8 +664,6 @@ def Grains_Polyhedral_contact(L_g,L_ij_contact,L_contact,id_contact,mu_friction,
      return L_contact, L_ij_contact, id_contact
 
 #-------------------------------------------------------------------------------
-# New features !!
-#-------------------------------------------------------------------------------
 
 def Grains_Polyhedral_contact_Neighbouroods_f(g1,g2):
   #detect contact grain-grain
