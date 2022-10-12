@@ -290,7 +290,7 @@ while not Criteria_StopSimulation(i_PF,n_t_PF):
                   raise ValueError('Spring type not available !')
           for contact in L_contact_gw :
               if Spring_type == 'Ponctual':
-                  contact.DEM_gw_Polyhedral_normal(dt_DEM)
+                  contact.DEM_gw_Polyhedral_normal()
                   contact.DEM_gw_Polyhedral_tangential(dt_DEM)
               else : #Surface must be coded for contact gw
                   simulation_report.write('Spring type not available !')
