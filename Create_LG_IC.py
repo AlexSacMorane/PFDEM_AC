@@ -539,7 +539,7 @@ def Create_grains(L_g_tempo,L_n_grain_radius,L_n_grain_radius_done,L_radius,x_mi
         radius = L_radius[i]
         n_grain = L_n_grain_radius[i]
         n_grain_done = L_n_grain_radius_done[i]
-        last_id_grain_created = len(L_g_tempo)
+        last_id_grain_created = np.sum(L_n_grain_radius_done)
         for id_grain in range(last_id_grain_created, last_id_grain_created + n_grain - n_grain_done):
             i_test = 0
             grain_created = False
