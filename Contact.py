@@ -60,7 +60,7 @@ class Contact:
     #compute the normal reaction of a contact grain-grain
     #Here a pontual spring is considered
 
-    #extract vertices inside of an angular window
+    '''#extract vertices inside of an angular window
     angular_window = math.pi*5/8 #window
     v12 = (self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center)
     if v12[1] >= 0:
@@ -101,14 +101,16 @@ class Contact:
                 L_j_border_extract.append(j)
         else:
             if angle21_min < angle and angle < angle21_max:
-                L_j_border_extract.append(j)
+                L_j_border_extract.append(j)'''
 
     #looking for the nearest nodes
     d_virtual = max(self.g1.r_max,self.g2.r_max)
     ij_min = [0,0]
     d_ij_min = 100*d_virtual #Large
-    for i in L_i_border_extract:
-        for j in L_j_border_extract:
+    '''for i in L_i_border_extract:
+        for j in L_j_border_extract:'''
+    for i in range(len(self.g1.l_border[:-1])):
+        for j in range(len(self.g2.l_border[:-1])):
             d_ij = np.linalg.norm(self.g2.l_border[:-1][j]-self.g1.l_border[:-1][i]+d_virtual*(self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center))
             if d_ij < d_ij_min :
                 d_ij_min = d_ij
@@ -581,7 +583,7 @@ def Grains_Polyhedral_contact_f(g1,g2):
 
   if np.linalg.norm(g1.center-g2.center) < 1.5*(g1.r_max+g2.r_max):
 
-      #extract vertices inside of an angular window
+      '''#extract vertices inside of an angular window
       angular_window = math.pi*5/8 #window
       v12 = (g2.center-g1.center)/np.linalg.norm(g2.center-g1.center)
       if v12[1] >= 0:
@@ -622,14 +624,16 @@ def Grains_Polyhedral_contact_f(g1,g2):
                   L_j_border_extract.append(j)
           else:
               if angle21_min < angle and angle < angle21_max:
-                  L_j_border_extract.append(j)
+                  L_j_border_extract.append(j)'''
 
       #looking for the nearest nodes
       d_virtual = max(g1.r_max,g2.r_max)
       ij_min = [0,0]
       d_ij_min = 100*d_virtual #Large
-      for i in L_i_border_extract:
-          for j in L_j_border_extract:
+      '''for i in L_i_border_extract:
+          for j in L_j_border_extract:'''
+      for i in range(len(g1.l_border[:-1])):
+          for j in range(len(g2.l_border[:-1])):
               d_ij = np.linalg.norm(g2.l_border[:-1][j]-g1.l_border[:-1][i]+d_virtual*(g2.center-g1.center)/np.linalg.norm(g2.center-g1.center))
               if d_ij < d_ij_min :
                   d_ij_min = d_ij
