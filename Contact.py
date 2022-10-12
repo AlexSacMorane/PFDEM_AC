@@ -62,7 +62,7 @@ class Contact:
 
     #extract vertices inside of an angular window
     angular_window = math.pi*5/8 #window
-    v12 = (grain2.center-grain1.center)/np.linalg.norm(grain2.center-grain1.center)
+    v12 = (self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center)
     if v12[1] >= 0:
         angle12 = math.acos(v12[0])
     else :
@@ -71,8 +71,8 @@ class Contact:
     angle12_max = angle12 + angular_window/2
     #grain i
     L_i_border_extract = []
-    for i in range(len(g1.l_border[:-1])):
-        angle = g1.l_theta_r[i]
+    for i in range(len(self.g1.l_border[:-1])):
+        angle = self.g1.l_theta_r[i]
         if angle12_min < 0:
             if angle < angle12_max or angle12_min + 2*math.pi < angle :
                 L_i_border_extract.append(i)
@@ -91,8 +91,8 @@ class Contact:
     angle21_max = angle21 + angular_window/2
     #grain j
     L_j_border_extract = []
-    for j in range(len(g2.l_border[:-1])):
-        angle = g2.l_theta_r[j]
+    for j in range(len(self.g2.l_border[:-1])):
+        angle = self.g2.l_theta_r[j]
         if angle21_min < 0:
             if angle < angle21_max or angle21_min + 2*math.pi < angle :
                 L_j_border_extract.append(j)
@@ -104,7 +104,7 @@ class Contact:
                 L_j_border_extract.append(j)
 
     #looking for the nearest nodes
-    d_virtual = max(g1.r_max,g2.r_max)
+    d_virtual = max(self.g1.r_max,self.g2.r_max)
     ij_min = [0,0]
     d_ij_min = 100*d_virtual #Large
     for i in L_i_border_extract:
