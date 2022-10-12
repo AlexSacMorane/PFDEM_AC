@@ -16,7 +16,7 @@ import math
 import random
 import pickle
 import matplotlib.pyplot as plt
-import Grain 
+import Grain
 
 #-------------------------------------------------------------------------------
 #Classes definition
@@ -332,7 +332,7 @@ def LG_tempo(x_min,x_max,y_min,N_grain,L_radius,L_percentage_radius,rho_surf,Y,n
     #create an initial condition
 
     #number of grains generation
-    n_generation = 2
+    n_generation = 2 #Work only for 2
 
     #define the y_max for the grains generation
     factor = 1.5
