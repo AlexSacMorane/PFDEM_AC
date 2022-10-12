@@ -16,6 +16,7 @@ import math
 import random
 import pickle
 import matplotlib.pyplot as plt
+import Grain 
 
 #-------------------------------------------------------------------------------
 #Classes definition
