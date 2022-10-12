@@ -282,8 +282,6 @@ def Grains_Polyhedral_Wall_contact(L_g,L_contact_gw,L_contact_gw_ij,id_contact_g
   return L_contact_gw, L_contact_gw_ij, id_contact_gw
 
 #-------------------------------------------------------------------------------
-# New features !!
-#-------------------------------------------------------------------------------
 
 def Grains_Polyhedral_Wall_contact_Neighbourood(wall_neighbourood,L_contact_gw,L_contact_gw_ij,id_contact_gw,x_min,x_max,y_min,y_max,mu,coeff_restitution):
   #detect contact grain in the neighbourood of the wall and  the wall
