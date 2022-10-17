@@ -274,8 +274,8 @@ while not Criteria_StopSimulation(i_PF,n_t_PF):
           # Detection of contacts between grain and walls
           #L_contact_gw, L_ij_contact_gw, id_contact_gw = Contact_gw.Grains_Polyhedral_Wall_contact(L_g,L_contact_gw,L_ij_contact_gw,id_contact_gw,x_box_min,x_box_max,y_box_min,y_box_max,0,coeff_restitution)
           if i_DEM % i_update_neighbouroods  == 0:
-              Contact_gw.Update_wall_Neighbouroods(L_g,1.5,x_box_min,x_box_max,y_box_min,y_box_max)
-          L_contact_gw, L_ij_contact_gw, id_contact_gw = Contact_gw.Grains_Polyhedral_Wall_contact_Neighbourood(L_g,L_contact_gw,L_ij_contact_gw,id_contact_gw,x_box_min,x_box_max,y_box_min,y_box_max,0,coeff_restitution)
+              wall_neighborhood = Contact_gw.Update_wall_Neighbouroods(L_g,1.5,x_box_min,x_box_max,y_box_min,y_box_max)
+          L_contact_gw, L_ij_contact_gw, id_contact_gw = Contact_gw.Grains_Polyhedral_Wall_contact_Neighbourood(wall_neighborhood,L_contact_gw,L_ij_contact_gw,id_contact_gw,x_box_min,x_box_max,y_box_min,y_box_max,0,coeff_restitution)
 
           #Compute contact interactions (g-g and g-w)
           for contact in L_contact:
