@@ -47,6 +47,7 @@ class Grain_Tempo:
     self.fy = 0
     self.v = np.array([0,0])
     self.plot_preparation()
+    self.neighbourood = []
 
 #-------------------------------------------------------------------------------
 
@@ -332,7 +333,7 @@ def LG_tempo(x_min,x_max,y_min,N_grain,L_radius,L_percentage_radius,rho_surf,Y,n
     #create an initial condition
 
     #number of grains generation
-    n_generation = 2 #Work only for 2
+    n_generation = 2
 
     #define the y_max for the grains generation
     factor = 1.5
@@ -351,7 +352,7 @@ def LG_tempo(x_min,x_max,y_min,N_grain,L_radius,L_percentage_radius,rho_surf,Y,n
         L_n_grain_radius_done.append(0)
 
     #Parameters for the DEM
-    i_DEM_stop = 10000
+    i_DEM_stop = 3000
     i_DEM = 0
 
     #Creation of grains
@@ -369,7 +370,7 @@ def LG_tempo(x_min,x_max,y_min,N_grain,L_radius,L_percentage_radius,rho_surf,Y,n
     for grain in L_g_tempo:
         if grain.center[1]+grain.radius > y_max:
             y_max = grain.center[1]+grain.radius
-    L_g_tempo, y_min, i_DEM = DEM_loading(L_g_tempo, mu_gg, e_gg, mu_gw, e_gw, x_min, x_max, y_min, y_max, dt_DEM, Force_target, gravity, i_DEM_stop, i_DEM, simulation_report)
+    L_g_tempo, y_min, i_DEM = DEM_loading(L_g_tempo, mu_gg, e_gg, mu_gw, e_gw, x_min, x_max, y_min, y_max, dt_DEM, 5, Force_target, gravity, i_DEM_stop, i_DEM, simulation_report)
     L_L_g_tempo.append(L_g_tempo.copy())
 
     print('Second generation of grains')
@@ -381,7 +382,7 @@ def LG_tempo(x_min,x_max,y_min,N_grain,L_radius,L_percentage_radius,rho_surf,Y,n
     for grain in L_g_tempo:
         if grain.center[1]+grain.radius > y_max:
             y_max = grain.center[1]+grain.radius
-    L_g_tempo, y_max, i_DEM = DEM_loading(L_g_tempo, mu_gg, e_gg, mu_gw, e_gw, x_min, x_max, y_min, y_max, dt_DEM, Force_target, gravity, i_DEM_stop, i_DEM, simulation_report)
+    L_g_tempo, y_max, i_DEM = DEM_loading(L_g_tempo, mu_gg, e_gg, mu_gw, e_gw, x_min, x_max, y_min, y_max, dt_DEM, 5, Force_target, gravity, i_DEM_stop, i_DEM, simulation_report)
     L_L_g_tempo.append(L_g_tempo.copy())
 
     print('Combine generations of grains')
@@ -389,7 +390,7 @@ def LG_tempo(x_min,x_max,y_min,N_grain,L_radius,L_percentage_radius,rho_surf,Y,n
     for L_g_tempo in L_L_g_tempo:
         for g_tempo in L_g_tempo:
             L_g.append(g_tempo)
-    L_g_tempo, y_max, i_DEM = DEM_loading(L_g, mu_gg, e_gg, mu_gw, e_gw, x_min, x_max, y_min_init, y_max, dt_DEM, Force_target, gravity, i_DEM_stop, i_DEM, simulation_report)
+    L_g_tempo, y_max, i_DEM = DEM_loading(L_g, mu_gg, e_gg, mu_gw, e_gw, x_min, x_max, y_min_init, y_max, dt_DEM, 100, Force_target, gravity, i_DEM_stop, i_DEM, simulation_report)
 
     simulation_report.write_and_print(str(len(L_g_tempo))+' / '+str(N_grain)+' grains have been created\n','\n'+str(len(L_g_tempo))+' / '+str(N_grain)+' grains have been created\n')
 
@@ -397,7 +398,7 @@ def LG_tempo(x_min,x_max,y_min,N_grain,L_radius,L_percentage_radius,rho_surf,Y,n
 
 #-------------------------------------------------------------------------------
 
-def DEM_loading(L_g_tempo, mu_gg, e_gg, mu_gw, e_gw, x_min, x_max, y_min, y_max, dt_DEM, Forcev_target, gravity, i_DEM_stop, i_DEM, simulation_report):
+def DEM_loading(L_g_tempo, mu_gg, e_gg, mu_gw, e_gw, x_min, x_max, y_min, y_max, dt_DEM, i_update_neighbouroods, Forcev_target, gravity, i_DEM_stop, i_DEM, simulation_report):
     #loading the granular
 
     i_DEM_0 = i_DEM
@@ -411,68 +412,30 @@ def DEM_loading(L_g_tempo, mu_gg, e_gg, mu_gw, e_gw, x_min, x_max, y_min, y_max,
     id_contact = 0
 
     #trackers and stop conditions
+    if gravity > 0:
+        Force_stop = 0
+        for grain in L_g_tempo:
+            Force_stop = Force_stop + 0.8*grain.mass*gravity
+
     Force_tracker = []
-    Force_stop = 0
     Ecin_tracker = []
     Ecin_stop = 0
     Ymax_tracker = []
-    Ymax_stop = 0
     for grain in L_g_tempo:
-        Force_stop = Force_stop + 0.8*grain.mass*gravity
-        Ecin_stop = Ecin_stop + 0.5*grain.mass*(0.00005*grain.radius/dt_DEM)**2
+        Ecin_stop = Ecin_stop + 0.5*grain.mass*(0.0005*grain.radius/dt_DEM)**2
 
     while DEM_loop_statut :
 
         i_DEM = i_DEM + 1
 
         #Contact detection
-        for i_grain in range(len(L_g_tempo)-1):
-              for j_grain in range(i_grain+1,len(L_g_tempo)):
-                  #contact grain-grain
-                  if Intersection(L_g_tempo[i_grain],L_g_tempo[j_grain]) and (i_grain,j_grain) not in L_contact_ij:
-                      L_contact_gg.append(Contact_Tempo(id_contact, L_g_tempo[i_grain], mu_gg, e_gg, 'gg', L_g_tempo[j_grain]))
-                      id_contact = id_contact + 1
-                      L_contact_ij.append((i_grain,j_grain))
-                  elif not Intersection(L_g_tempo[i_grain],L_g_tempo[j_grain]) and (i_grain,j_grain) in L_contact_ij:
-                      i_contact = L_contact_ij.index((i_grain,j_grain))
-                      L_contact_gg.pop(i_contact)
-                      L_contact_ij.pop(i_contact)
-        for i_grain in range(len(L_g_tempo)):
-              # contact grain-wall x_min
-              if L_g_tempo[i_grain].center[0] < x_min + L_g_tempo[i_grain].radius and (i_grain,-1) not in L_contact_gw_ij:
-                  L_contact_gw.append(Contact_Tempo(id_contact, L_g_tempo[i_grain], mu_gw, e_gw, 'gwx_min', None, x_min))
-                  L_contact_gw_ij.append((i_grain,-1))
-              elif L_g_tempo[i_grain].center[0] > x_min + L_g_tempo[i_grain].radius and (i_grain,-1) in L_contact_gw_ij:
-                  i_contact = L_contact_gw_ij.index((i_grain,-1))
-                  L_contact_gw.pop(i_contact)
-                  L_contact_gw_ij.pop(i_contact)
-              # contact grain-wall x_max
-              if L_g_tempo[i_grain].center[0] > x_max - L_g_tempo[i_grain].radius and (i_grain,-2) not in L_contact_gw_ij:
-                  L_contact_gw.append(Contact_Tempo(id_contact, L_g_tempo[i_grain], mu_gw, e_gw, 'gwx_max', None, x_max))
-                  id_contact = id_contact + 1
-                  L_contact_gw_ij.append((i_grain,-2))
-              elif L_g_tempo[i_grain].center[0] < x_max - L_g_tempo[i_grain].radius and (i_grain,-2) in L_contact_gw_ij:
-                  i_contact = L_contact_gw_ij.index((i_grain,-2))
-                  L_contact_gw.pop(i_contact)
-                  L_contact_gw_ij.pop(i_contact)
-              # contact grain-wall y_min
-              if L_g_tempo[i_grain].center[1] < y_min + L_g_tempo[i_grain].radius and (i_grain,-3) not in L_contact_gw_ij:
-                  L_contact_gw.append(Contact_Tempo(id_contact, L_g_tempo[i_grain], mu_gw, e_gw, 'gwy_min', None, y_min))
-                  id_contact = id_contact + 1
-                  L_contact_gw_ij.append((i_grain,-3))
-              elif L_g_tempo[i_grain].center[1] > y_min + L_g_tempo[i_grain].radius and (i_grain,-3) in L_contact_gw_ij:
-                  i_contact = L_contact_gw_ij.index((i_grain,-3))
-                  L_contact_gw.pop(i_contact)
-                  L_contact_gw_ij.pop(i_contact)
-              # contact grain-wall y_max
-              if L_g_tempo[i_grain].center[1] > y_max - L_g_tempo[i_grain].radius and (i_grain,-4) not in L_contact_gw_ij:
-                  L_contact_gw.append(Contact_Tempo(id_contact, L_g_tempo[i_grain], mu_gw, e_gw, 'gwy_max', None, y_max))
-                  id_contact = id_contact + 1
-                  L_contact_gw_ij.append((i_grain,-4))
-              elif L_g_tempo[i_grain].center[1] < y_max - L_g_tempo[i_grain].radius and (i_grain,-4) in L_contact_gw_ij:
-                  i_contact = L_contact_gw_ij.index((i_grain,-4))
-                  L_contact_gw.pop(i_contact)
-                  L_contact_gw_ij.pop(i_contact)
+        if (i_DEM-i_DEM_0-1) % i_update_neighbouroods  == 0:
+            Update_Neighbouroods(L_g_tempo,1.5)
+        L_contact_gg, L_contact_ij, id_contact = Grains_Polyhedral_contact_Neighbouroods(L_g_tempo,L_contact_gg,L_contact_ij,id_contact,mu_gg,e_gg)
+        # Detection of contacts between grain and walls
+        if (i_DEM-i_DEM_0-1) % i_update_neighbouroods  == 0:
+            wall_neighbourood = Update_wall_Neighbouroods(L_g_tempo,1.5,x_min,x_max,y_min,y_max)
+        L_contact_gw, L_contact_gw_ij, id_contact = Grains_Polyhedral_Wall_contact_Neighbourood(wall_neighbourood,L_contact_gw,L_contact_gw_ij,id_contact,x_min,x_max,y_min,y_max,mu_gw,e_gw)
 
         #Sollicitation computation
         for grain in L_g_tempo:
@@ -511,17 +474,27 @@ def DEM_loading(L_g_tempo, mu_gg, e_gg, mu_gw, e_gw, x_min, x_max, y_min, y_max,
         Ecin_tracker.append(Ecin)
         Ymax_tracker.append(y_max)
 
-        if i_DEM%100==0:
-            print('i_DEM',i_DEM,'and Ecin',int(100*Ecin/Ecin_stop),'% and Force',int(100*F/Force_stop),'% and Confinement',int(100*Fv/Forcev_target),'%')
-            Plot_Config_Loaded(L_g_tempo,x_min,x_max,y_min,y_max,i_DEM)
+        if i_DEM % 20 == 0:
+            if gravity > 0 :
+                print('i_DEM',i_DEM,'and Ecin',int(100*Ecin/Ecin_stop),'% and Force',int(100*F/Force_stop),'% and Confinement',int(100*Fv/Forcev_target),'%')
+            else:
+                print('i_DEM',i_DEM,'and Ecin',int(100*Ecin/Ecin_stop),'% and Confinement',int(100*Fv/Forcev_target),'%')
+            #Plot_Config_Loaded(L_g_tempo,x_min,x_max,y_min,y_max,i_DEM)
 
         #Check stop conditions for DEM
         if i_DEM >= i_DEM_stop + i_DEM_0:
              DEM_loop_statut = False
-        if Ecin < Ecin_stop and F < Force_stop and (0.95*Forcev_target<Fv and Fv<1.05*Forcev_target):
-              DEM_loop_statut = False
+        if gravity > 0 :
+            if Ecin < Ecin_stop and F < Force_stop and (0.95*Forcev_target<Fv and Fv<1.05*Forcev_target):
+                  DEM_loop_statut = False
+        else :
+            if Ecin < Ecin_stop and (0.95*Forcev_target<Fv and Fv<1.05*Forcev_target):
+                  DEM_loop_statut = False
         if L_g_tempo == []:
             DEM_loop_statut = False
+
+    #trackers
+    Plot_Trackers(Force_tracker, Ecin_tracker, Ymax_tracker, i_DEM)
 
     return L_g_tempo, y_max, i_DEM
 
@@ -678,6 +651,129 @@ def Reset_y_max(L_g,Force):
 
 #-------------------------------------------------------------------------------
 
+def Update_Neighbouroods(L_g,factor):
+    #determine a neighbouroods for each grain. This function is called every x time step
+    #grain contact is determined by Grains_Polyhedral_contact_Neighbouroods
+    #
+    #notice that if there is a potential contact between grain_i and grain_j
+    #grain_i is not in the neighbourood of grain_j
+    #whereas grain_j is in the neighbourood of grain_i
+    #with i_grain < j_grain
+    #
+    #factor determines the size of the neighbourood window
+
+    for i_grain in range(len(L_g)-1) :
+        neighbourood = []
+        for j_grain in range(i_grain+1,len(L_g)):
+            if np.linalg.norm(L_g[i_grain].center-L_g[j_grain].center) < factor*(L_g[i_grain].radius+L_g[j_grain].radius):
+                neighbourood.append(L_g[j_grain])
+        L_g[i_grain].neighbourood = neighbourood
+
+#-------------------------------------------------------------------------------
+
+def Grains_Polyhedral_contact_Neighbouroods(L_g,L_contact,L_ij_contact,id_contact,mu_gg,e_gg):
+    #detect contact between a grain and grains from its neighbourood
+    #the neighbourood is updated with Update_Neighbouroods()
+
+    for i_grain in range(len(L_g)-1) :
+        grain_i = L_g[i_grain]
+        for neighbour in L_g[i_grain].neighbourood:
+            grain_j = neighbour
+            j_grain = neighbour.id
+            if Intersection(grain_i,grain_j):
+                if (i_grain,j_grain) not in L_ij_contact:  #contact not detected previously
+                   #creation of contact
+                   L_ij_contact.append((i_grain,j_grain))
+                   L_contact.append(Contact_Tempo(id_contact, grain_i, mu_gg, e_gg, 'gg', grain_j))
+                   id_contact = id_contact + 1
+
+            else :
+                if (i_grain,j_grain) in L_ij_contact : #contact detected previously is not anymore
+                       L_contact.pop(L_ij_contact.index((i_grain,j_grain)))
+                       L_ij_contact.remove((i_grain,j_grain))
+
+    return L_contact, L_ij_contact, id_contact
+
+#-------------------------------------------------------------------------------
+
+def Update_wall_Neighbouroods(L_g,factor,x_min,x_max,y_min,y_max):
+    #determine a neighbouroods for wall. This function is called every x time step
+    #grain_wall contact is determined by Grains_Polyhedral_Wall_contact_Neighbourood
+    #factor determines the size of the neighbourood window
+
+    wall_neighbourood = []
+    for grain in L_g:
+
+        p_x_min = min(grain.l_border_x)
+        p_x_max = max(grain.l_border_x)
+        p_y_min = min(grain.l_border_y)
+        p_y_max = max(grain.l_border_y)
+
+        #grain-wall x_min
+        if abs(p_x_min-x_min) < factor*grain.radius :
+            wall_neighbourood.append(grain)
+        #grain-wall x_max
+        if abs(p_x_max-x_max) < factor*grain.radius :
+            wall_neighbourood.append(grain)
+        #grain-wall y_min
+        if abs(p_y_min-y_min) < factor*grain.radius :
+            wall_neighbourood.append(grain)
+        #grain-wall y_max
+        if abs(p_y_max-y_max) < factor*grain.radius :
+            wall_neighbourood.append(grain)
+
+    return wall_neighbourood
+
+#-------------------------------------------------------------------------------
+
+def Grains_Polyhedral_Wall_contact_Neighbourood(wall_neighbourood,L_contact_gw,L_contact_gw_ij,id_contact,x_min,x_max,y_min,y_max,mu_gw,e_gw):
+  #detect contact grain in the neighbourood of the wall and  the wall
+  #the neighbourood is updated with Update_wall_Neighbouroods()
+  #we realize iterations on the grain list and compare with the coordinate of the different walls
+
+  for grain in wall_neighbourood:
+
+      # contact grain-wall x_min
+      if grain.center[0] < x_min + grain.radius and (grain.id,-1) not in L_contact_gw_ij:
+          L_contact_gw.append(Contact_Tempo(id_contact, grain, mu_gw, e_gw, 'gwx_min', None, x_min))
+          id_contact = id_contact + 1
+          L_contact_gw_ij.append((grain.id,-1))
+      elif grain.center[0] > x_min + grain.radius and (grain.id,-1) in L_contact_gw_ij:
+          i_contact = L_contact_gw_ij.index((grain.id,-1))
+          L_contact_gw.pop(i_contact)
+          L_contact_gw_ij.pop(i_contact)
+      # contact grain-wall x_max
+      if grain.center[0] > x_max - grain.radius and (grain.id,-2) not in L_contact_gw_ij:
+          L_contact_gw.append(Contact_Tempo(id_contact, grain, mu_gw, e_gw, 'gwx_max', None, x_max))
+          id_contact = id_contact + 1
+          L_contact_gw_ij.append((grain.id,-2))
+      elif grain.center[0] < x_max - grain.radius and (grain.id,-2) in L_contact_gw_ij:
+          i_contact = L_contact_gw_ij.index((grain.id,-2))
+          L_contact_gw.pop(i_contact)
+          L_contact_gw_ij.pop(i_contact)
+      # contact grain-wall y_min
+      if grain.center[1] < y_min + grain.radius and (grain.id,-3) not in L_contact_gw_ij:
+          L_contact_gw.append(Contact_Tempo(id_contact, grain, mu_gw, e_gw, 'gwy_min', None, y_min))
+          id_contact = id_contact + 1
+          L_contact_gw_ij.append((grain.id,-3))
+      elif grain.center[1] > y_min + grain.radius and (grain.id,-3) in L_contact_gw_ij:
+          i_contact = L_contact_gw_ij.index((grain.id,-3))
+          L_contact_gw.pop(i_contact)
+          L_contact_gw_ij.pop(i_contact)
+      # contact grain-wall y_max
+      if grain.center[1] > y_max - grain.radius and (grain.id,-4) not in L_contact_gw_ij:
+          L_contact_gw.append(Contact_Tempo(id_contact, grain, mu_gw, e_gw, 'gwy_max', None, y_max))
+          id_contact = id_contact + 1
+          L_contact_gw_ij.append((grain.id,-4))
+      elif grain.center[1] < y_max - grain.radius and (grain.id,-4) in L_contact_gw_ij:
+          i_contact = L_contact_gw_ij.index((grain.id,-4))
+          L_contact_gw.pop(i_contact)
+          L_contact_gw_ij.pop(i_contact)
+
+  return L_contact_gw, L_contact_gw_ij, id_contact
+
+#-------------------------------------------------------------------------------
+
 def Plot_Config_Loaded(L_g,x_min,x_max,y_min,y_max,i):
     #plot loading configuration
 
@@ -720,6 +816,37 @@ def Plot_Config_Loaded_End(L_g,x_min,x_max,y_min,y_max):
     plt.plot([x_min,x_min,x_max,x_max,x_min],[y_max,y_min,y_min,y_max,y_max],'k')
     plt.axis('equal')
     plt.savefig('Debug/ConfigLoaded.png')
+    plt.close(1)
+
+
+#-------------------------------------------------------------------------------
+
+def Plot_Trackers(Force_tracker, Ecin_tracker, Ymax_tracker, i_DEM):
+    #plot trackers
+
+    plt.figure(1,figsize=(16,9))
+    plt.subplot(321)
+    plt.plot(Force_tracker)
+    plt.vlines(int(2/3*len(Force_tracker)),min(Force_tracker),max(Force_tracker))
+    plt.title('Force total')
+    plt.subplot(322)
+    plt.plot(Force_tracker[int(2/3*len(Force_tracker)):])
+    plt.title('End force total')
+    plt.subplot(323)
+    plt.plot(Ecin_tracker)
+    plt.vlines(int(2/3*len(Ecin_tracker)),min(Ecin_tracker),max(Ecin_tracker))
+    plt.title('Kinetic energy')
+    plt.subplot(324)
+    plt.plot(Ecin_tracker[int(2/3*len(Ecin_tracker)):])
+    plt.title('End Kinetic energy')
+    plt.subplot(325)
+    plt.plot(Ymax_tracker)
+    plt.vlines(int(2/3*len(Ymax_tracker)),min(Ymax_tracker),max(Ymax_tracker))
+    plt.title('Upper wall position')
+    plt.subplot(326)
+    plt.plot(Ymax_tracker[int(2/3*len(Ymax_tracker)):])
+    plt.title('End upper wall position')
+    plt.savefig('Debug/DEM_ite/Init/Trackers_'+str(i_DEM)+'.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
