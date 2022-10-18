@@ -164,3 +164,48 @@ def etai_distribution(L_g):
             adaptation_done = True
 
     return L_ig_etai
+
+#-------------------------------------------------------------------------------
+
+def etai_distribution_dissolution(L_g,frac_dissolved):
+    #Assign grains to eta
+    #some etas are for dissolved grains, other for undissolved
+
+    #run initialy etai_distribution to have a distribution of the etai
+    L_ig_etai_undissolved = etai_distribution(L_g)
+
+    #compute the number of grain dissolved
+    n_grain_dissolved = int(frac_dissolved*len(L_g))
+
+    #compute the number of etai needed for L_ig_etai_dissolved
+    n_eta = int(frac_dissolved*len(L_ig_etai_undissolved))+1
+
+    #prepare the selection of grain dissolved
+    n_try_max = 2*len(L_ig_etai_undissolved[0])
+    L_etai_dissolved = []
+    L_ig_etai_dissolved = []
+    for i in range(n_eta):
+        L_etai_dissolved.append(len(L_ig_etai_undissolved)+i)
+        L_ig_etai_dissolved.append([])
+
+    #random selection of grain dissolved
+    for i in range(n_grain_dissolved):
+        etai = L_etai_dissolved[i%n_eta]
+
+        grain_selected = False
+        i_try = 0
+        while not grain_selected:
+            i_try = i_try + 1
+            grain_i = random.choice(L_ig_etai_undissolved[i%len(L_ig_etai_undissolved)])
+            grain = L_g[grain_i]
+            if etai not in grain.eta_near_L:
+                grain.id_eta = etai
+                grain_selected = True
+                L_ig_etai_dissolved[i%n_eta].append(grain_i)
+                L_ig_etai_undissolved[i%len(L_ig_etai_undissolved)].remove(grain_i)
+                for grain2 in L_g:
+                    if grain_i in grain2.ig_near_L:
+                        grain2.eta_near_L.append(etai)
+                        grain2.eta_near_L.remove(i%len(L_ig_etai_undissolved))
+
+    return L_ig_etai_undissolved, L_ig_etai_dissolved
