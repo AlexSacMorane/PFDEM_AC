@@ -82,6 +82,7 @@ Vertical_Confinement_Pressure = 500*10**5 #Pa
 Vertical_Confinement_Force = Vertical_Confinement_Pressure*(x_box_max-x_box_min)*(2*R_mean)*10**(-6) #µN
 gravity = 10*10**(6) #µm/s2
 Dissolution_Energy = 0.0025 #e-12 J
+frac_dissolved = 0.15 #Percentage of grain dissolved
 # Particle
 Y = 70*(10**9)*(10**6)*(10**(-12)) #Young Modulus µN/µm2
 nu = 0.3 #Poisson's ratio
@@ -185,10 +186,26 @@ simulation_report.tac_tempo(datetime.now(),'Creation of grains and initialisatio
 
 #Distribution etai
 simulation_report.tic_tempo(datetime.now())
-L_ig_etai = Etai.etai_distribution(L_g)
-L_etai = []
-for etai in range(0,len(L_ig_etai)):
-    L_etai.append(Etai.Etai(etai,L_ig_etai[etai]))
+L_ig_etai_undissolved, L_ig_etai_dissolved = Etai.etai_distribution_dissolution(L_g,frac_dissolved)
+n_dissolved = 0
+for L_ig in L_ig_etai_dissolved:
+    n_dissolved = n_dissolved + len(L_ig)
+n_total = 0
+for L_ig in L_ig_etai_undissolved + L_ig_etai_dissolved:
+    n_total = n_total + len(L_ig)
+
+simulation_report.write_and_print('Real fraction dissolved : '+str(int(100*n_dissolved/n_total))+'\n','Real fraction dissolved : '+str(int(100*n_dissolved/n_total)))
+simulation_report.write('Number of eta for undissolved grain : '+str(len(L_ig_etai_undissolved))+'\n'+\
+                        'Number of eta for dissolved grain : '+str(len(L_ig_etai_dissolved))+'\n')
+
+#create eta for undissolved
+L_etai_undissolved = []
+for etai in range(0,len(L_ig_etai_undissolved)):
+    L_etai_undissolved.append(Etai.Etai(etai,L_ig_etai_undissolved[etai]))
+#create eta for dissolved
+L_etai_dissolved = []
+for etai in range(0,len(L_ig_etai_dissolved)):
+    L_etai_dissolved.append(Etai.Etai(len(L_ig_etai_undissolved)+etai,L_ig_etai_dissolved[etai]))
 if Debug :
     Owntools.Debug_etai_f(L_g,x_box_min,x_box_max,y_box_min,y_box_max,x_L,y_L)
 
@@ -428,7 +445,7 @@ while not Criteria_StopSimulation(i_PF,n_t_PF):
       if MovePF_selector == 'DeconstructRebuild':
           for grain in L_g:
               grain.DEMtoPF_Decons_rebuild(w,x_L,y_L,i_PF)
-          for etai in L_etai:
+          for etai in L_etai_undissolved+L_etai_dissolved:
               etai.update_etai_M(L_g)
               etai.Write_txt_Decons_rebuild(i_PF,x_L,y_L)
       #does not work for multiple grain by etai
@@ -446,7 +463,7 @@ while not Criteria_StopSimulation(i_PF,n_t_PF):
       #-----------------------------------------------------------------------------
 
       #Create the .i for moose
-      Create_i_AC(i_PF,dt_PF,x_L,y_L,M_pf,kc_pf,n_t_PF_moose,double_well_height,L_etai)
+      Create_i_AC(i_PF,dt_PF,x_L,y_L,M_pf,kc_pf,n_t_PF_moose,double_well_height,L_etai_undissolved,L_etai_dissolved)
 
       simulation_report.tic_tempo(datetime.now())
       #Running moose
@@ -459,7 +476,7 @@ while not Criteria_StopSimulation(i_PF,n_t_PF):
       #Convert PF data into DEM data
       simulation_report.tic_tempo(datetime.now())
       FileToRead = 'Output/PF_'+str(i_PF)+'/PF_'+str(i_PF)+'_other_'+j_str
-      PFtoDEM_Multi(FileToRead,x_L,y_L,L_g,L_etai,np_proc)
+      PFtoDEM_Multi(FileToRead,x_L,y_L,L_g,L_etai_undissolved+L_etai_dissolved,np_proc)
 
       #Geometric study
       S_grains = 0
