@@ -18,7 +18,7 @@ from math import pi
 #Function Definition
 #-------------------------------------------------------------------------------
 
-def Create_i_AC(i,dt,x_L,y_L,M_pf,kc_pf,n_t_PF_moose,double_well_height,L_etai):
+def Create_i_AC(i,dt,x_L,y_L,M_pf,kc_pf,n_t_PF_moose,double_well_height,L_etai_undissolved,L_etai_dissolved):
 
   file_to_write = open('PF_'+str(i)+'.i','w')
   file_to_read = open('PF_base_AC.i','r')
@@ -42,7 +42,7 @@ def Create_i_AC(i,dt,x_L,y_L,M_pf,kc_pf,n_t_PF_moose,double_well_height,L_etai):
       line = line[:-1] + ' ' + str(max(y_L))+'\n'
     elif j == 21:
       line = line[:-1]
-      for etai in L_etai :
+      for etai in L_etai_undissolved+L_etai_dissolved :
           line = line + '\t[./eta'+str(etai.id+1)+']\n'+\
                              '\t\torder = FIRST\n'+\
                              '\t\tfamily = LAGRANGE\n'+\
@@ -53,7 +53,7 @@ def Create_i_AC(i,dt,x_L,y_L,M_pf,kc_pf,n_t_PF_moose,double_well_height,L_etai):
                              '\t[../]\n'
     elif j == 25:
       line = line[:-1]
-      for etai in L_etai :
+      for etai in L_etai_undissolved+L_etai_dissolved :
           line = line + '\t[./eta_res_'+str(etai.id+1)+']\n'+\
                         '\t\ttype = AllenCahn\n'+\
                         '\t\tvariable = eta'+str(etai.id+1)+'\n'+\
@@ -74,22 +74,22 @@ def Create_i_AC(i,dt,x_L,y_L,M_pf,kc_pf,n_t_PF_moose,double_well_height,L_etai):
         line = line[:-1] + "'"+ str(M_pf)+' '+ str(kc_pf)+"'"+'\n'
     elif j == 39:
         line = line[:-1]+"'"
-        for etai in L_etai:
+        for etai in L_etai_undissolved+L_etai_dissolved:
             line = line +'eta'+str(etai.id+1)+' '
         line = line[:-1]+"'\n"
     elif j == 41:
       line = line[:-1] + ' ' +str(double_well_height)+'\n'
     elif j == 43:
         line = line[:-1]
-        for etai in L_etai:
+        for etai in L_etai_undissolved+L_etai_dissolved:
             line = line + 'eta'+str(etai.id+1)+'^2*(1-eta'+str(etai.id+1)+')^2+'
         line = line[:-1]+')+e_dissolution*('
-        for etai in L_etai:
+        for etai in L_etai_dissolved:
             line = line + 'eta'+str(etai.id+1)+'^2*(3-2*eta'+str(etai.id+1)+')+'
         line = line[:-1]+')\n'
     elif j ==  56:
         line = line[:-1]
-        for etai in L_etai:
+        for etai in L_etai_undissolved+L_etai_dissolved:
             line = line +'\t[eta'+str(etai.id+1)+'_txt]\n'+\
                          '\t\ttype = PiecewiseMultilinear\n'+\
                          '\t\tdata_file = Data/eta'+str(etai.id+1)+'_'+str(i)+'.txt\n'+\
