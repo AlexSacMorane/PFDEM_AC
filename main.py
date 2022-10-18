@@ -31,6 +31,7 @@ import Etai
 import Contact
 import Contact_gw
 import Report
+import User
 
 #-------------------------------------------------------------------------------
 #Plan simulation
@@ -64,112 +65,49 @@ simulation_report = Report.Report('Debug/Report',datetime.now())
 
 simulation_report.tic_tempo(datetime.now())
 
-#Time discretisation
-dt_PF = 0.075 #s
-n_t_PF_moose = 5
-n_t_PF = 3
-# DEM parameters
-N_grain = 51
-R_mean = 350 #µm
-L_R = [1.1*R_mean, 1*R_mean, 0.9*R_mean] #from larger to smaller
-L_percentage_R = [1/3, 1/3, 1/3]
-#Box définition
-x_box_min = 0 #µm
-x_box_max = 4900 #µm
-y_box_min = 0 #µm
-#External sollicitation
-Vertical_Confinement_Pressure = 500*10**5 #Pa
-Vertical_Confinement_Force = Vertical_Confinement_Pressure*(x_box_max-x_box_min)*(2*R_mean)*10**(-6) #µN
-gravity = 10*10**(6) #µm/s2
-Dissolution_Energy = 0.0025 #e-12 J
-frac_dissolved = 0.15 #Percentage of grain dissolved
-# Particle
-Y = 70*(10**9)*(10**6)*(10**(-12)) #Young Modulus µN/µm2
-nu = 0.3 #Poisson's ratio
-mu_friction = 0.5
-rho_surf = 1.27*10**(-9) #kg/µm2
-coeff_restitution = 0.2 #1 is perfect elastic
-Spring_type = 'Ponctual' #Ponctual or Surface
-#DEM parameters
-dt_DEM = 1*10**(-6) #s
-i_update_neighbouroods = 100
+dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations = User.All_parameters()
+
 #Creation of the grain (without PF)
 print('\nCREATION OF THE GRAINS\n')
-L_g_tempo, y_box_max  = LG_tempo(x_box_min,x_box_max,y_box_min,N_grain,L_R,L_percentage_R,rho_surf,Y,nu,0,coeff_restitution,0,coeff_restitution,\
-                                Vertical_Confinement_Force,gravity,5*dt_DEM,simulation_report)
+LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+
 #Spatial discretisation
-x_min = x_box_min-R_mean*0.25 #µm
-x_max = x_box_max+R_mean*0.25 #µm
-n_x = 251
-x_L = list(np.linspace(x_min,x_max,n_x))
-y_min = y_box_min-R_mean*0.25 #µm
-y_max = y_box_max+R_mean*0.25 #µm
-n_y = 151
-y_L = list(np.linspace(y_min,y_max,n_y))
+User.Add_SpatialDiscretisation(dict_geometry,dict_sample)
+
 # PF parameters
-M_pf = 1 # mobility
-kc_pf = 3
-w = math.sqrt((x_L[4]-x_L[0])**2+(y_L[4]-y_L[0])**2)
-double_well_height = 20*kc_pf/w/w #double well height J/µm2
-#the factor 20 was found by try and error
+User.Add_WidthInt_DoubleWellBarrier(dict_material, dict_sample)
+
+Owntools.Stop_Debug(simulation_report)
+
 # Creation of the real list of grains
 L_g = From_LG_tempo_to_usable(L_g_tempo,x_L,y_L,w)
-#Move PF
-MovePF_selector = 'DeconstructRebuild' #DeconstructRebuild or Interpolation
-#NP
-np_proc = 4
+
 #creation pf the dissolution .txt
 Owntools.Write_e_dissolution_txt(Dissolution_Energy,x_L,y_L)
-# simulation_report
-simulation_report.write('\nGlobal parameters :\n'+\
-'Dt_PF = '+str(dt_PF*n_t_PF_moose)+' s\n'+\
-'M_PF = '+str(M_pf)+'\n'+\
-'k_pf = '+str(kc_pf)+'\n'+\
-'w_pf = '+str(w)+' µm\n'+\
-'L_R = '+str(L_R)+' µm\n'+\
-'L_percentage_R = '+str(L_percentage_R)+'\n'+\
-'N_grain = '+str(N_grain)+'\n'+\
-'Y = '+str(Y)+' N/µm2\n'+\
-'nu = '+str(nu)+'\n'+\
-'mu = '+str(mu_friction)+' \n'+\
-'coeff_restitution = '+str(coeff_restitution)+'\n'\
-'Spring_type = '+Spring_type+'\n'+\
-'Dim_x = '+str(x_box_min)+' - '+str(x_box_max)+' µm\n'+\
-'Dim_y = '+str(y_box_min)+' µm\n'+\
-'Vertical_Confinement_Force = '+str(int(Vertical_Confinement_Force))+' N\n'+\
-'Move_PF = '+MovePF_selector+'\n'+\
-'Spring_type = '+Spring_type+'\n'+\
-'nproc = '+str(np_proc)+'\n\n')
+
 #Criteria to stop simulation (PF and DEM)
 def Criteria_StopSimulation(i_PF,n_t_PF):
     Criteria_Verified = False
     if i_PF >= n_t_PF:
         Criteria_Verified = True
     return Criteria_Verified
-i_DEM_stop = 5000
-dk0_stop = 0.05
-dy_box_max_stop = 0.5
-n_window_stop = 50
-Ecin_ratio = 0.0002
-# User parameters
-Debug = True
-Debug_DEM = True
-i_print_plot = 50
-if Debug or Debug_DEM :
+
+if dict_algorithm['Debug'] or dict_algorithm['Debug_DEM'] :
     simulation_report.write('This simulation can be debugged\n')
-SaveData = False
-if SaveData :
-    if not Path('../Data_MG_Box_AC_M').exists():
-        os.mkdir('../Data_MG_Box_AC_M')
+if dict_algorithm['SaveData'] :
+    if not Path('../'+dict_algorithm['main_folder_name']).exists():
+        os.mkdir('../'+dict_algorithm['main_folder_name'])
     simulation_report.write('This simulation is saved\n')
     i_run = 1
-    folderpath = Path('../Data_MG_Box_AC_M/Run_'+str(i_run))
+    folderpath = Path('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['template_simulation_name']+str(i_run))
     while folderpath.exists():
         i_run = i_run + 1
-        folderpath = Path('../Data_MG_Box_AC_M/Run_'+str(i_run))
-    name_folder = 'Run_'+str(i_run)
-if SaveData or Debug or Debug_DEM:
+        folderpath = Path('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['template_simulation_name']+str(i_run))
+    name_folder = dict_algorithm['template_simulation_name']+str(i_run)
+if dict_algorithm['SaveData'] or dict_algorithm['Debug'] or dict_algorithm['Debug_DEM']:
     simulation_report.write('\n')
+
+Owntools.Stop_Debug(simulation_report)
 
 #-------------------------------------------------------------------------------
 #Initial condition
