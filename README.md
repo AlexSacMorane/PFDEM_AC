@@ -24,7 +24,7 @@ Some next releases are presented here.
 
 - optimize DEM (rework on the nearest vertices detection)
 - add rolling resistance
-- increase the user experience (add some files with all parameters to define a simulation, use dictionnary to transmit data, homogenize names, correct english)
+- increase the user experience (homogenize names, correct english)
 - create a database of initial condition
 - create AI to select algorithm parameters (as neighborhood update frequency, time step, stop criteria, etc...)
 - change the initial shape of grain
