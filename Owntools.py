@@ -30,7 +30,7 @@ import Grain
 
 class Grain_pp:
 
-    def __init__(self, Id, Center, Coordinate_x, Coordinate_y):
+    def __init__(self, Id, Dissolved, Center, Coordinate_x, Coordinate_y):
         #defining a grain for the postprocess
         #each grain is described by a id (an integer class)
         #                           a center (an array [x,y])
@@ -38,6 +38,7 @@ class Grain_pp:
         #                           a list of y-coordinate of border (a list)
 
         self.id = Id
+        self.dissolved = Dissolved
         self.center = Center
         self.coordinate_x = Coordinate_x
         self.coordinate_y = Coordinate_y
@@ -125,120 +126,164 @@ def Stop_Debug(simulation_report):
 
 #-------------------------------------------------------------------------------
 
-def Debug_DEM_f(L_g,L_contact,L_contact_gw,i_PF,i_DEM,x_min,x_max,y_min,y_max,x_L,y_L):
+def Debug_DEM_f(dict_algorithm, dict_sample):
     #plot the configuration of the grains during a DEM step
     #only for debug
 
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
+    #load data needed
+    x_min = dict_sample['x_box_min']
+    x_max = dict_sample['x_box_max']
+    y_min = dict_sample['y_box_min']
+    y_max = dict_sample['y_box_max']
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
+
     fig = plt.figure(1,figsize=(16,9.12))
-    for grain in L_g:
+    for grain in dict_sample['L_g']:
         plt.plot(grain.l_border_x,grain.l_border_y,'k')
-    for contact in L_contact :
-        alpha = 50
+    for contact in dict_sample['L_contact'] :
+        alpha = (contact.g1.r_mean*0.1 + contact.g2.r_mean*0.1)/2
         M = (contact.g1.center + contact.g2.center)/2
         plt.plot([M[0], M[0]+contact.pc_normal[0]*alpha], [M[1], M[1]+contact.pc_normal[1]*alpha],'k')
         plt.plot([M[0], M[0]+contact.pc_tangential[0]*alpha], [M[1], M[1]+contact.pc_tangential[1]*alpha],'k')
-    for contact in L_contact_gw :
-        alpha = 50
+    for contact in dict_sample['L_contact_gw'] :
+        alpha = contact.g.r_mean*0.1
         if contact.nature == 'gwy_min' or contact.nature == 'gwy_max':
             M = np.array([contact.g.center[0],contact.limit])
         elif contact.nature == 'gwx_min' or contact.nature == 'gwx_max':
             M = np.array([contact.limit,contact.g.center[1]])
         plt.plot([M[0], M[0]+contact.nwg[0]*alpha], [M[1], M[1]+contact.nwg[1]*alpha],'k')
         plt.plot([M[0], M[0]+contact.twg[0]*alpha], [M[1], M[1]+contact.twg[1]*alpha],'k')
-    plt.xlim([min(x_L), max(x_L)])
-    plt.ylim([min(y_L), max(y_L)])
+    plt.xlim([min(dict_sample['x_L']), max(dict_sample['x_L'])])
+    plt.ylim([min(dict_sample['y_L']), max(dict_sample['y_L'])])
     plt.plot([x_min,x_max,x_max,x_min,x_min],[y_min,y_min,y_max,y_max,y_min],'k')
     plt.axis("equal")
-    fig.savefig('Debug/DEM_ite/PF_'+str(i_PF)+'/png/Config_'+str(i_DEM)+'.png')
+    fig.savefig('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/png/Config_'+str(dict_algorithm['i_DEM'])+'.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
 
-def Debug_f(L_g,i_PF,x_min,x_max,y_min,y_max,x_L,y_L):
+def Debug_f(dict_algorithm,dict_sample):
   #plot the configuration of the grains after the DEM step
   #same as Debug_f2 but with id odd
 
+  #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
+  #load data needed
+  x_min = dict_sample['x_box_min']
+  x_max = dict_sample['x_box_max']
+  y_min = dict_sample['y_box_min']
+  y_max = dict_sample['y_box_max']
+  #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
+
   fig = plt.figure(1,figsize=(16,9.12))
-  for grain in L_g:
-      plt.plot(grain.l_border_x,grain.l_border_y,'k')
-  plt.xlim([min(x_L), max(x_L)])
-  plt.ylim([min(y_L), max(y_L)])
+  for grain in dict_sample['L_g']:
+      if grain.dissolved:
+          plt.plot(grain.l_border_x,grain.l_border_y,'k-.')
+      else:
+          plt.plot(grain.l_border_x,grain.l_border_y,'k')
+  plt.xlim([min(dict_sample['x_L']), max(dict_sample['x_L'])])
+  plt.ylim([min(dict_sample['y_L']), max(dict_sample['y_L'])])
   plt.plot([x_min,x_max,x_max,x_min,x_min],[y_min,y_min,y_max,y_max,y_min],'k')
   plt.axis("equal")
-  fig.savefig('Debug/DEM_ite/PF_ite_'+str(int(2*i_PF-1))+'.png')
+  fig.savefig('Debug/DEM_ite/PF_ite_'+str(int(2*dict_algorithm['i_PF']-1))+'.png')
   plt.close(1)
 
 #-------------------------------------------------------------------------------
 
-def Debug_f2(L_g,i_PF,x_min,x_max,y_min,y_max,x_L,y_L):
+def Debug_f2(dict_algorithm,dict_sample):
   #plot the configuration of the grains after the PF step
   #same as Debug_f but with id pair
 
+  #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
+  #load data needed
+  x_min = dict_sample['x_box_min']
+  x_max = dict_sample['x_box_max']
+  y_min = dict_sample['y_box_min']
+  y_max = dict_sample['y_box_max']
+  #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
+
   fig = plt.figure(1,figsize=(16,9.12))
-  for grain in L_g:
-      plt.plot(grain.l_border_x,grain.l_border_y,'k')
-  plt.xlim([min(x_L), max(x_L)])
-  plt.ylim([min(y_L), max(y_L)])
+  for grain in dict_sample['L_g']:
+      if grain.dissolved:
+          plt.plot(grain.l_border_x,grain.l_border_y,'k-.')
+      else:
+          plt.plot(grain.l_border_x,grain.l_border_y,'k')
+  plt.xlim([min(dict_sample['x_L']), max(dict_sample['x_L'])])
+  plt.ylim([min(dict_sample['y_L']), max(dict_sample['y_L'])])
   plt.plot([x_min,x_max,x_max,x_min,x_min],[y_min,y_min,y_max,y_max,y_min],'k')
   plt.axis("equal")
-  fig.savefig('Debug/DEM_ite/PF_ite_'+str(int(2*i_PF))+'.png')
+  fig.savefig('Debug/DEM_ite/PF_ite_'+str(int(2*dict_algorithm['i_PF']))+'.png')
   plt.close(1)
 
 #-------------------------------------------------------------------------------
 
-def Debug_etai_f(L_g,x_min,x_max,y_min,y_max,x_L,y_L):
-  #plot the etai distribution
-  #only for Debug
+def Debug_etai_f(dict_sample):
+    #plot the etai distribution
+    #only for Debug
 
-  eta_max = 0
-  for grain in L_g:
-      if grain.id_eta > eta_max:
-          eta_max = grain.id_eta
-  L_color_eta = ['blue','orange','green','red','purple','brown','pink','gray','olive','cyan']
-  fig = plt.figure(1,figsize=(16,9.12))
-  for i_color in range(min(len(L_color_eta),eta_max+1)):
-      plt.plot([],[],color = L_color_eta[i_color],label = 'eta'+str(i_color+1))
-  plt.legend()
-  for grain in L_g:
-      plt.plot(grain.l_border_x,grain.l_border_y,color=L_color_eta[grain.id_eta])
-  plt.plot([x_min, x_max, x_max, x_min, x_min],[y_min, y_min, y_max, y_max, y_min],'k')
-  plt.xlim([min(x_L), max(x_L)])
-  plt.ylim([min(y_L), max(y_L)])
-  plt.axis("equal")
-  fig.savefig('Debug/Distribution_etai.png')
-  plt.close(1)
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+    #load data needed
+    L_g = dict_sample['L_g']
+    x_min = dict_sample['x_box_min']
+    x_max = dict_sample['x_box_max']
+    y_min = dict_sample['y_box_min']
+    y_max = dict_sample['y_box_max']
+    x_L = dict_sample['x_L']
+    y_L = dict_sample['y_L']
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+
+    eta_max = 0
+    for grain in L_g:
+        if grain.id_eta > eta_max:
+            eta_max = grain.id_eta
+    L_color_eta = ['blue','orange','green','red','purple','brown','pink','gray','olive','cyan']
+    fig = plt.figure(1,figsize=(16,9.12))
+    for i_color in range(min(len(L_color_eta),eta_max+1)):
+        plt.plot([],[],color = L_color_eta[i_color],label = 'eta'+str(i_color+1))
+    plt.legend()
+    for grain in L_g:
+        if grain.dissolved:
+            plt.plot(grain.l_border_x,grain.l_border_y,color=L_color_eta[grain.id_eta],linestyle='-.')
+        else:
+            plt.plot(grain.l_border_x,grain.l_border_y,color=L_color_eta[grain.id_eta])
+    plt.plot([x_min, x_max, x_max, x_min, x_min],[y_min, y_min, y_max, y_max, y_min],'k')
+    plt.xlim([min(x_L), max(x_L)])
+    plt.ylim([min(y_L), max(y_L)])
+    plt.axis("equal")
+    fig.savefig('Debug/Distribution_etai.png')
+    plt.close(1)
 
 #-------------------------------------------------------------------------------
 
-def Debug_Trackers(Ecin_tracker,Ecin_stop,Force_Applied_tracker,k0_xmin_tracker,k0_xmax_tracker,y_box_max_tracker,F_on_ymax_tracker,F_on_ymax_target,i_PF):
+def Debug_Trackers(dict_algorithm,dict_sollicitations,dict_tracker):
     #plot the trakers used during DEM simulation
     #only for debug
 
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9),num=1)
 
     ax1.set_title('Mean kinetic energy (e-12 J)')
-    ax1.plot(Ecin_tracker)
-    ax1.plot([0, len(Ecin_tracker)-1],[Ecin_stop, Ecin_stop],'r')
+    ax1.plot(dict_tracker['Ecin'])
+    ax1.plot([0, len(dict_tracker['Ecin'])-1],[dict_algorithm['Ecin_stop'], dict_algorithm['Ecin_stop']],'r')
 
     ax2.set_title('Mean force applied (µN)')
-    ax2.plot(Force_Applied_tracker)
+    ax2.plot(dict_tracker['Force_applied'])
 
     ax3.set_title('k0s (-)')
-    ax3.plot(k0_xmin_tracker,label='xmin')
-    ax3.plot(k0_xmax_tracker,label='xmax')
+    ax3.plot(dict_tracker['k0_xmin'],label='xmin')
+    ax3.plot(dict_tracker['k0_xmax'],label='xmax')
     ax3.legend()
 
     ax4.set_title('About the upper plate')
-    ax4.plot(y_box_max_tracker, color = 'blue')
+    ax4.plot(dict_tracker['y_box_max'], color = 'blue')
     ax4.set_ylabel('Coordinate y (µm)', color = 'blue')
     ax4.tick_params(axis ='y', labelcolor = 'blue')
     ax4a = ax4.twinx()
-    ax4a.plot(range(50,len(F_on_ymax_tracker)),F_on_ymax_tracker[50:], color = 'orange')
-    ax4a.plot([50, len(F_on_ymax_tracker)-1],[F_on_ymax_target, F_on_ymax_target], color = 'red')
+    ax4a.plot(range(50,len(dict_tracker['Force_on_upper_wall'])),dict_tracker['Force_on_upper_wall'][50:], color = 'orange')
+    ax4a.plot([50, len(dict_tracker['Force_on_upper_wall'])-1],[dict_sollicitations['Vertical_Confinement_Force'], dict_sollicitations['Vertical_Confinement_Force']], color = 'red')
     ax4a.set_ylabel('Force applied (µN)', color = 'orange')
     ax4a.tick_params(axis ='y', labelcolor = 'orange')
 
-    fig.savefig('Debug/DEM_ite/PF_'+str(i_PF)+'/Trackers.png')
+    fig.savefig('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/Trackers.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
@@ -286,14 +331,19 @@ def error_on_ymax_df(dy,overlap_L,k_L) :
 
 #-------------------------------------------------------------------------------
 
-def Control_y_max_NR(y_max,Force_target,L_contact_gw,L_g):
+def Control_y_max_NR(dict_sample,dict_sollicitations):
     #Control the upper wall to apply force
     #a Newton-Raphson method is applied
+
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+    #load data needed
+    Force_target = dict_sollicitations['Vertical_Confinement_Force']
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
     F = 0
     overlap_L = []
     k_L = []
-    for contact in L_contact_gw:
+    for contact in dict_sample['L_contact_gw']:
         if contact.nature == 'gwy_max':
             F = F + contact.Fwg_n
             overlap_L.append(contact.overlap)
@@ -313,18 +363,19 @@ def Control_y_max_NR(y_max,Force_target,L_contact_gw,L_g):
                 ite_criteria = False
             if -0.01*Force_target<error_on_ymax_f(dy,overlap_L,k_L,Force_target) and error_on_ymax_f(dy,overlap_L,k_L,Force_target)<0.01*Force_target:
                 ite_criteria = False
-        y_max = y_max + dy
+        dict_sample['y_box_max'] = dict_sample['y_box_max'] + dy
 
     else :
         #if there is no contact with the upper wall, the wall is reset
-        y_max = Reset_y_max(L_g,Force_target)
+        dict_sample['y_box_max'] = Reset_y_max(dict_sample['L_g'],Force_target)
 
-    for contact in L_contact_gw:
+    for contact in dict_sample['L_contact_gw']:
         if contact.nature == 'gwy_max':
             #reactualisation
-            contact.limit = y_max
+            contact.limit = dict_sample['y_box_max']
 
-    return y_max, F
+    #Update dict
+    dict_sollicitations['Force_on_upper_wall'] = F
 
 #-------------------------------------------------------------------------------
 
@@ -369,9 +420,19 @@ def Debug_Control_y_max_NR(L_g,y_max,mu,eta):
 
 #-------------------------------------------------------------------------------
 
-def Compute_horizontal_sollicitations(L_contact_gw):
-    #compute the forces applied on left and right walls (to compute k0)
+def Compute_k0(dict_sample,dict_sollicitations):
 
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+    #Load data needed
+    L_contact_gw = dict_sample['L_contact_gw']
+    x_min = dict_sample['x_box_min']
+    x_max = dict_sample['x_box_max']
+    y_min = dict_sample['y_box_min']
+    y_max = dict_sample['y_box_max']
+    F_y_max = dict_sollicitations['Force_on_upper_wall']
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+
+    #compute the forces applied on left and right walls (to compute k0)
     F_x_min = 0
     F_x_max = 0
     for contact in L_contact_gw:
@@ -380,13 +441,7 @@ def Compute_horizontal_sollicitations(L_contact_gw):
         elif contact.nature == 'gwx_max':
             F_x_max = F_x_max + contact.Fwg_n
 
-    return F_x_min, F_x_max
-
-#-------------------------------------------------------------------------------
-
-def Compute_k0(F_x_min, F_x_max, F_y_max, x_min, x_max, y_min, y_max):
     #compute k0 = (sigma_2/sigma_1)
-
     sigma_x_min = F_x_min / (y_max-y_min)
     sigma_x_max = F_x_max / (y_max-y_min)
     sigma_y_max = F_y_max / (x_max-x_min)
@@ -398,13 +453,22 @@ def Compute_k0(F_x_min, F_x_max, F_y_max, x_min, x_max, y_min, y_max):
         k0_xmin = 0
         k0_xmax = 0
 
-    return k0_xmin, k0_xmax
+    #update element in dicts
+    dict_sample['k0_xmin'] = k0_xmin
+    dict_sample['k0_xmax'] = k0_xmax
 
 #-------------------------------------------------------------------------------
 
-def Write_e_dissolution_txt(e_dissolution,x_L,y_L):
+def Write_e_dissolution_txt(dict_sample,dict_sollicitations):
       #write an .txt file for MOOSE
       #this file described an homogenous dissolution field
+
+      #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+      #Load data needed
+      x_L = dict_sample['x_L']
+      y_L = dict_sample['y_L']
+      e_dissolution = dict_sollicitations['Dissolution_Energy']
+      #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
       file_to_write = open('Data/e_dissolution.txt','w')
       file_to_write.write('AXIS X\n')
@@ -450,10 +514,10 @@ def Plot_chain_force(i_PF,i_DEM):
 
         if line == '<grain_c>\n':
             Read_one_grain = False
-            L_g.append(Grain_pp(id,center,coordinate_x,coordinate_y))
+            L_g.append(Grain_pp(id,dissolved,center,coordinate_x,coordinate_y))
         elif line == '<contact_c>\n':
             Read_one_contact = False
-            L_contact.append(Contact_pp(L_id_g[0],L_id_g[1],L_g, normal_reaction+normal_damping))
+            L_contact.append(Contact_pp(L_id_g[0], L_id_g[1], L_g, normal_reaction+normal_damping))
         elif line == '<contact_w_c>\n':
             Read_one_contact_wall = False
             L_contact_gw.append(Contact_gw_pp(id_g, L_g, type, limit, normal_reaction+normal_damping))
@@ -467,6 +531,18 @@ def Plot_chain_force(i_PF,i_DEM):
                         Read_data = True
                     elif (line[c]==' ' or c==len(line)-1) and Read_data:
                         id = float(line[c_start:c])
+                        Read_data = False
+            elif line[:len('\tDissolved : ')] == '\tDissolved : ':
+                Read_data = False
+                for c in range(len('\tDissolved : ')-1,len(line)):
+                    if (line[c]!=' ') and not Read_data:
+                        c_start = c
+                        Read_data = True
+                    elif (line[c]==' ' or c==len(line)-1) and Read_data:
+                        if line[c_start:c] == 'True':
+                            dissolved = True
+                        else :
+                            dissolved = False
                         Read_data = False
             elif line[:len('\tCenter : ')] == '\tCenter : ':
                 Read_data = False
@@ -598,7 +674,10 @@ def Plot_chain_force(i_PF,i_DEM):
     plt.figure(1,figsize=(16,9))
     plt.plot([x_min, x_max, x_max, x_min, x_min],[y_min, y_min, y_max, y_max, y_min],'k')
     for grain in L_g:
-        plt.plot(grain.coordinate_x,grain.coordinate_y,color= 'k')
+        if grain.dissolved:
+            plt.plot(grain.coordinate_x,grain.coordinate_y,color= 'k-.')
+        else :
+            plt.plot(grain.coordinate_x,grain.coordinate_y,color= 'k')
     for contact in L_contact+L_contact_gw:
         L_x, L_y, ratio_normal = contact.plot(normal_ref)
         plt.plot(L_x,L_y,linewidth = ratio_normal,color = 'k')
@@ -622,3 +701,52 @@ def make_mp4(i_f):
     for im in fileList:
         writer.append_data(imageio.imread(im))
     writer.close()
+
+#-------------------------------------------------------------------------------
+
+def save_tempo(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker):
+
+    outfile = open('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/save_tempo','wb')
+    dict = {}
+    dict['E_cin_stop'] = dict_algorithm['Ecin_stop']
+    dict['n_window_stop'] = dict_algorithm['n_window_stop']
+    dict['dy_box_max_stop'] = dict_algorithm['dy_box_max_stop']
+    dict['dk0_stop'] = dict_algorithm['dk0_stop']
+    dict['L_g'] = dict_sample['L_g']
+    dict['L_contact'] = dict_sample['L_contact']
+    dict['L_ij_contact'] = dict_sample['L_ij_contact']
+    dict['L_contact_gw'] = dict_sample['L_contact_gw']
+    dict['L_ij_contact_gw'] = dict_sample['L_ij_contact_gw']
+    dict['F_on_ymax'] = dict_sollicitations['Force_on_upper_wall']
+    dict['E_cin'] = dict_tracker['Ecin']
+    dict['Force'] = dict_tracker['Force_applied']
+    dict['k0_xmin_tracker'] = dict_tracker['k0_xmin']
+    dict['k0_xmax_tracker'] = dict_tracker['k0_xmax']
+    dict['y_box_max'] = dict_tracker['y_box_max'][:-1]
+    pickle.dump(dict,outfile)
+    outfile.close()
+
+#-------------------------------------------------------------------------------
+
+def save_final(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker):
+
+    os.remove('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/save_tempo')
+    outfile = open('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/save_final','wb')
+    dict = {}
+    dict['E_cin_stop'] = dict_algorithm['Ecin_stop']
+    dict['n_window_stop'] = dict_algorithm['n_window_stop']
+    dict['dy_box_max_stop'] = dict_algorithm['dy_box_max_stop']
+    dict['dk0_stop'] = dict_algorithm['dk0_stop']
+    dict['L_g'] = dict_sample['L_g']
+    dict['L_contact'] = dict_sample['L_contact']
+    dict['L_ij_contact'] = dict_sample['L_ij_contact']
+    dict['L_contact_gw'] = dict_sample['L_contact_gw']
+    dict['L_ij_contact_gw'] = dict_sample['L_ij_contact_gw']
+    dict['F_on_ymax'] = dict_sollicitations['Force_on_upper_wall']
+    dict['E_cin'] = dict_tracker['Ecin']
+    dict['Force'] = dict_tracker['Force_applied']
+    dict['k0_xmin_tracker'] = dict_tracker['k0_xmin']
+    dict['k0_xmax_tracker'] = dict_tracker['k0_xmax']
+    dict['y_box_max'] = dict_tracker['y_box_max'][:-1]
+    pickle.dump(dict,outfile)
+    outfile.close()

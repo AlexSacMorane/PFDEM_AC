@@ -47,6 +47,7 @@ class Grain:
     self.a = A
     self.theta = 0
     self.w = 0 #dtheta/dt
+    self.dissolved = False
 
 #-------------------------------------------------------------------------------
 
@@ -92,14 +93,19 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def init_f_control(self,g):
+  def init_f_control(self,dict_sollicitations):
       #initialize the force applied to the grain
       #a gravity of g is applied
 
-    self.fx = 0
-    self.fy = -g*self.m
-    self.f = np.array([self.fx,self.fy])
-    self.mz = 0
+      #-------------------------------------------------------------------------
+      #load data needed
+      g = dict_sollicitations['gravity']
+      #-------------------------------------------------------------------------
+
+      self.fx = 0
+      self.fy = -g*self.m
+      self.f = np.array([self.fx,self.fy])
+      self.mz = 0
 
 #-------------------------------------------------------------------------------
 
@@ -116,12 +122,19 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def Geometricstudy(self,x_L,y_L,n,simulation_report):
+  def Geometricstudy(self,dict_geometry,dict_sample,simulation_report):
       #Searching limits
       #Not best method but first approach
       #We iterate on y constant, we look for a value under and over 0.5
       #If both conditions are verified, there is a limit at this y
       #Same with iteration on x constant
+
+      #-------------------------------------------------------------------------
+      #load data needed
+      n = dict_geometry['grain_discretisation']
+      x_L = dict_sample['x_L']
+      y_L = dict_sample['y_L']
+      #-------------------------------------------------------------------------
 
       L_border_old = []
       for y_i in range(len(y_L)):

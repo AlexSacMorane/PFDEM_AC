@@ -82,11 +82,16 @@ class Etai:
 #Function
 #-------------------------------------------------------------------------------
 
-def etai_distribution(L_g):
+def etai_distribution(dict_algorithm,dict_sample):
     #Assign grains to eta
     #a minimal distance between grains with same eta is computed from the factor variable
 
-    factor = 1.5 #the factor can be more or less selective
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+    #load data needed
+    factor = dict_algorithm['factor_distribution_etai']
+    L_g = dict_sample['L_g']
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+
     #initialisation
     for grain in L_g:
         grain.ig_near_L = []
@@ -167,12 +172,18 @@ def etai_distribution(L_g):
 
 #-------------------------------------------------------------------------------
 
-def etai_distribution_dissolution(L_g,frac_dissolved):
+def etai_distribution_dissolution(dict_algorithm,dict_sample, dict_sollicitations, simulation_report):
     #Assign grains to eta
     #some etas are for dissolved grains, other for undissolved
 
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+    #load data needed
+    L_g = dict_sample['L_g']
+    frac_dissolved = dict_sollicitations['frac_dissolved']
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+
     #run initialy etai_distribution to have a distribution of the etai
-    L_ig_etai_undissolved = etai_distribution(L_g)
+    L_ig_etai_undissolved = etai_distribution(dict_algorithm,dict_sample)
 
     #compute the number of grain dissolved
     n_grain_dissolved = int(frac_dissolved*len(L_g))
@@ -199,8 +210,9 @@ def etai_distribution_dissolution(L_g,frac_dissolved):
             grain_i = random.choice(L_ig_etai_undissolved[i%len(L_ig_etai_undissolved)])
             grain = L_g[grain_i]
             if etai not in grain.eta_near_L:
-                grain.id_eta = etai
                 grain_selected = True
+                grain.id_eta = etai
+                grain.dissolved = True
                 L_ig_etai_dissolved[i%n_eta].append(grain_i)
                 L_ig_etai_undissolved[i%len(L_ig_etai_undissolved)].remove(grain_i)
                 for grain2 in L_g:
@@ -208,4 +220,18 @@ def etai_distribution_dissolution(L_g,frac_dissolved):
                         grain2.eta_near_L.append(etai)
                         grain2.eta_near_L.remove(i%len(L_ig_etai_undissolved))
 
-    return L_ig_etai_undissolved, L_ig_etai_dissolved
+    #cntrol the algorithm
+    n_dissolved = 0
+    for L_ig in L_ig_etai_dissolved:
+        n_dissolved = n_dissolved + len(L_ig)
+    n_total = n_dissolved
+    for L_ig in L_ig_etai_undissolved :
+        n_total = n_total + len(L_ig)
+
+    simulation_report.write_and_print('Real fraction dissolved : '+str(int(100*n_dissolved/n_total))+' (asked : '+str(int(100*frac_dissolved))+')\n','Real fraction dissolved : '+str(int(100*n_dissolved/n_total))+' (asked : '+str(int(100*frac_dissolved))+')')
+    simulation_report.write('Number of eta for undissolved grain : '+str(len(L_ig_etai_undissolved))+'\n'+\
+                            'Number of eta for dissolved grain : '+str(len(L_ig_etai_dissolved))+'\n')
+
+    #add element in dict
+    dict_sample['L_ig_etai_undissolved'] = L_ig_etai_undissolved
+    dict_sample['L_ig_etai_dissolved'] = L_ig_etai_dissolved

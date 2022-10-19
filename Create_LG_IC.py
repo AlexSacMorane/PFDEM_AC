@@ -35,12 +35,12 @@ class Grain_Tempo:
     #                           a Poisson's ratio (a float)
     #                           a surface mass (a float)
 
-    #---------------------------------------------------------------------------
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     Rho_surf = dict_material['rho_surf']
     Y = dict_material['Y']
     Nu = dict_material['nu']
-    #---------------------------------------------------------------------------
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
     self.id = ID
     self.center = Center
@@ -339,7 +339,7 @@ class Contact_Tempo:
 def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report):
     #create an initial condition
 
-    #---------------------------------------------------------------------------
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     n_generation = dict_ic['n_generation']
     factor = dict_ic['factor_ymax_box']
@@ -348,7 +348,7 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
     L_percentage_radius = dict_geometry['L_percentage_R']
     x_min = dict_sample['x_box_min']
     x_max = dict_sample['x_box_max']
-    #---------------------------------------------------------------------------
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
     #define the y_max for the grains generation
     radius_mean = 0
@@ -367,7 +367,6 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
 
     #Creation of grains
     #grains generation is decomposed in several steps (creation of grain then settlement)
-    simulation_report.write('Creation of the grains\n')
     i_DEM = 0
     L_L_g_tempo = []
 
@@ -388,8 +387,10 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
 
     Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, 1, simulation_report)
 
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     L_g_tempo = dict_ic['L_g_tempo']
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
     #DEM to find the steady-state configuration after loading
     #find the maximum y (center+radius)
@@ -414,8 +415,10 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
 
     Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, 2, simulation_report)
 
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     L_g_tempo = dict_ic['L_g_tempo']
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
     #DEM to find the steady-state configuration after loading
     #find the maximum y (center+radius)
@@ -433,8 +436,10 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
 
     print('Combine generations of grains')
 
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     L_L_g_tempo = dict_ic['L_L_g_tempo']
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
     #combine all smaller sample
     L_g = []
@@ -447,8 +452,10 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
 
     DEM_loading(dict_ic, dict_material, dict_sample, dict_sollicitations, True, simulation_report)
 
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     L_g_tempo = dict_ic['L_g_tempo']
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
     simulation_report.write_and_print(str(len(L_g_tempo))+' / '+str(N_grain)+' grains have been created\n','\n'+str(len(L_g_tempo))+' / '+str(N_grain)+' grains have been created\n')
 
@@ -459,13 +466,14 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
 def DEM_loading(dict_ic, dict_material, dict_sample, dict_sollicitations, multi_generation, simulation_report):
     #loading the granular
 
-    #---------------------------------------------------------------------------
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     L_g_tempo = dict_ic['L_g_tempo']
     dt_DEM = dict_ic['dt_DEM_IC']
     i_DEM_stop = dict_ic['i_DEM_stop_IC']
     i_DEM = dict_ic['i_DEM_IC']
     Ecin_ratio_IC = dict_ic['Ecin_ratio_IC']
+    i_print_plot_IC = dict_ic['i_print_plot_IC']
     factor_neighborhood_IC = dict_ic['factor_neighborhood_IC']
     if multi_generation :
         i_update_neighbouroods = dict_ic['i_update_neighborhoods_com']
@@ -482,7 +490,7 @@ def DEM_loading(dict_ic, dict_material, dict_sample, dict_sollicitations, multi_
     y_max = dict_sample['y_box_max']
     Forcev_target = dict_sollicitations['Vertical_Confinement_Force']
     gravity = dict_sollicitations['gravity']
-    #---------------------------------------------------------------------------
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
 
     i_DEM_0 = i_DEM
@@ -514,11 +522,11 @@ def DEM_loading(dict_ic, dict_material, dict_sample, dict_sollicitations, multi_
 
         #Contact detection
         if (i_DEM-i_DEM_0-1) % i_update_neighbouroods  == 0:
-            Update_Neighbouroods(dict_ic,factor_neighborhood_IC)
+            Update_Neighbouroods(dict_ic)
         L_contact_gg, L_contact_ij, id_contact = Grains_Polyhedral_contact_Neighbouroods(L_g_tempo,L_contact_gg,L_contact_ij,id_contact,mu_gg,e_gg)
         # Detection of contacts between grain and walls
         if (i_DEM-i_DEM_0-1) % i_update_neighbouroods  == 0:
-            wall_neighbourood = Update_wall_Neighbouroods(L_g_tempo,1.5,x_min,x_max,y_min,y_max)
+            wall_neighbourood = Update_wall_Neighbouroods(L_g_tempo,factor_neighborhood_IC,x_min,x_max,y_min,y_max)
         L_contact_gw, L_contact_gw_ij, id_contact = Grains_Polyhedral_Wall_contact_Neighbourood(wall_neighbourood,L_contact_gw,L_contact_gw_ij,id_contact,x_min,x_max,y_min,y_max,mu_gw,e_gw)
 
         #Sollicitation computation
@@ -558,7 +566,7 @@ def DEM_loading(dict_ic, dict_material, dict_sample, dict_sollicitations, multi_
         Ecin_tracker.append(Ecin)
         Ymax_tracker.append(y_max)
 
-        if i_DEM % 20 == 0:
+        if i_DEM % i_print_plot_IC == 0:
             if gravity > 0 :
                 print('i_DEM',i_DEM,'and Ecin',int(100*Ecin/Ecin_stop),'% and Force',int(100*F/Force_stop),'% and Confinement',int(100*Fv/Forcev_target),'%')
             else:
@@ -594,9 +602,10 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, id_generat
     #generate the grains
     #a position is tried, then we verify this new grain does not overlap with previously created ones
 
-    #---------------------------------------------------------------------------
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     L_g_tempo = dict_ic['L_g_tempo']
+    N_test_max = dict_ic['N_test_max']
     if id_generation == 1:
         L_n_grain_radius = dict_ic['L_n_grain_radius_try_one']
     else :
@@ -608,13 +617,9 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, id_generat
     y_min = dict_sample['y_box_min_ic']
     dy_creation = dict_sample['dy_creation']
     y_max = y_min + dy_creation
-    rho_surf = dict_material['rho_surf']
-    Y = dict_material['Y']
-    nu = dict_material['nu']
-    #---------------------------------------------------------------------------
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
     #Parameters for the method
-    N_test_max = 5000
     n_not_created = 0
 
     for i in range(len(L_radius)):
@@ -762,7 +767,7 @@ def Reset_y_max(L_g,Force):
 
 #-------------------------------------------------------------------------------
 
-def Update_Neighbouroods(dict_ic,factor):
+def Update_Neighbouroods(dict_ic):
     #determine a neighbouroods for each grain. This function is called every x time step
     #grain contact is determined by Grains_Polyhedral_contact_Neighbouroods
     #
@@ -773,10 +778,11 @@ def Update_Neighbouroods(dict_ic,factor):
     #
     #factor determines the size of the neighbourood window
 
-    #---------------------------------------------------------------------------
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     L_g = dict_ic['L_g_tempo']
-    #---------------------------------------------------------------------------
+    factor = dict_ic['factor_neighborhood_IC']
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
     for i_grain in range(len(L_g)-1) :
         neighbourood = []
@@ -970,14 +976,24 @@ def Plot_Trackers(Force_tracker, Ecin_tracker, Ymax_tracker, i_DEM):
 
 #-------------------------------------------------------------------------------
 
-def From_LG_tempo_to_usable(L_g_tempo,x_L,y_L,w):
+def From_LG_tempo_to_usable(dict_ic, dict_material, dict_sample):
     #from a tempo configuration (circular grains), an initial configuration (polygonal grains) is generated
+
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+    #load data needed
+    L_g_tempo = dict_ic['L_g_tempo']
+    w = dict_material['w']
+    x_L = dict_sample['x_L']
+    y_L = dict_sample['y_L']
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
     L_g = []
     for grain_tempo in L_g_tempo:
-        ci_M_IC = IC(x_L,y_L,grain_tempo.radius,w,grain_tempo.center)
-        L_g.append(Grain.Grain(grain_tempo.id,ci_M_IC,None,np.array([0,0]),np.array([0,0]),grain_tempo.y,grain_tempo.nu,grain_tempo.rho_surf))
-    return L_g
+        etai_M_IC = IC(x_L,y_L,grain_tempo.radius,w,grain_tempo.center)
+        L_g.append(Grain.Grain(grain_tempo.id,etai_M_IC,None,np.array([0,0]),np.array([0,0]),grain_tempo.y,grain_tempo.nu,grain_tempo.rho_surf))
+
+    #Add element in dict
+    dict_sample['L_g'] = L_g
 
 #-------------------------------------------------------------------------------
 

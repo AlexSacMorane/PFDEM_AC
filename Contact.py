@@ -25,7 +25,7 @@ class Contact:
 
 #-------------------------------------------------------------------------------
 
-  def __init__(self, ID, G1, G2, Mu, Coeff_Restitution):
+  def __init__(self, ID, G1, G2, dict_material):
     #defining the contact grain-grain
     #each contact is described by a id (an integer class)
     #                             two grains (a grain class)
@@ -36,14 +36,14 @@ class Contact:
     self.g1 = G1
     self.g2 = G2
     self.ft = 0
-    self.mu = Mu
-    self.coeff_restitution = Coeff_Restitution
+    self.mu = dict_material['mu_friction_gg']
+    self.coeff_restitution = dict_material['coeff_restitution']
     self.tangential_old_statut = False
     self.overlap_tangential = 0
 
 #-------------------------------------------------------------------------------
 
-  def init_contact(self,L_g):
+  '''def init_contact(self,L_g):
     #initialize the contact with updating the grains,
     #                            putting at 0 the tangential reaction
     #                            saying the boolean at False (new contact grain-grain)
@@ -52,7 +52,7 @@ class Contact:
     self.g2 = L_g[self.g2.id]
     self.ft = 0
     self.tangential_old_statut = False
-    self.overlap_tangential = 0
+    self.overlap_tangential = 0'''
 
 #-------------------------------------------------------------------------------
 
@@ -578,103 +578,8 @@ def P_is_inside(P,L_border):
 
 #-------------------------------------------------------------------------------
 
-def Grains_Polyhedral_contact_f(g1,g2):
-  #detect contact grain-grain
-
-  if np.linalg.norm(g1.center-g2.center) < 1.5*(g1.r_max+g2.r_max):
-
-      '''#extract vertices inside of an angular window
-      angular_window = math.pi*5/8 #window
-      v12 = (g2.center-g1.center)/np.linalg.norm(g2.center-g1.center)
-      if v12[1] >= 0:
-          angle12 = math.acos(v12[0])
-      else :
-          angle12 = 2*math.pi - math.acos(v12[0])
-      angle12_min = angle12 - angular_window/2
-      angle12_max = angle12 + angular_window/2
-      #grain i
-      L_i_border_extract = []
-      for i in range(len(g1.l_border[:-1])):
-          angle = g1.l_theta_r[i]
-          if angle12_min < 0:
-              if angle < angle12_max or angle12_min + 2*math.pi < angle :
-                  L_i_border_extract.append(i)
-          elif angle12_max >= 2*math.pi:
-              if angle < angle12_max - 2*math.pi or angle12_min < angle:
-                  L_i_border_extract.append(i)
-          else:
-              if angle12_min < angle and angle < angle12_max:
-                  L_i_border_extract.append(i)
-
-      if angle12 < math.pi:
-          angle21 = angle12 + math.pi
-      else :
-          angle21 = angle12 - math.pi
-      angle21_min = angle21 - angular_window/2
-      angle21_max = angle21 + angular_window/2
-      #grain j
-      L_j_border_extract = []
-      for j in range(len(g2.l_border[:-1])):
-          angle = g2.l_theta_r[j]
-          if angle21_min < 0:
-              if angle < angle21_max or angle21_min + 2*math.pi < angle :
-                  L_j_border_extract.append(j)
-          elif angle21_max >= 2*math.pi:
-              if angle < angle21_max - 2*math.pi or angle21_min < angle:
-                  L_j_border_extract.append(j)
-          else:
-              if angle21_min < angle and angle < angle21_max:
-                  L_j_border_extract.append(j)'''
-
-      #looking for the nearest nodes
-      d_virtual = max(g1.r_max,g2.r_max)
-      ij_min = [0,0]
-      d_ij_min = 100*d_virtual #Large
-      '''for i in L_i_border_extract:
-          for j in L_j_border_extract:'''
-      for i in range(len(g1.l_border[:-1])):
-          for j in range(len(g2.l_border[:-1])):
-              d_ij = np.linalg.norm(g2.l_border[:-1][j]-g1.l_border[:-1][i]+d_virtual*(g2.center-g1.center)/np.linalg.norm(g2.center-g1.center))
-              if d_ij < d_ij_min :
-                  d_ij_min = d_ij
-                  ij_min = [i,j]
-
-      d_ij_min = np.dot(g2.l_border[:-1][ij_min[1]]-g1.l_border[:-1][ij_min[0]],-(g2.center-g1.center)/np.linalg.norm(g2.center-g1.center))
-      return d_ij_min > 0
-
-  else:
-    return False
-
-#-------------------------------------------------------------------------------
-
-def Grains_Polyhedral_contact(L_g,L_ij_contact,L_contact,id_contact,mu_friction,coeff_restitution):
-    #detect contact grain-grain
-
-     for i_grain in range(len(L_g)-1) :
-         for j_grain in range(i_grain+1,len(L_g)):
-
-             if Grains_Polyhedral_contact_f(L_g[i_grain],L_g[j_grain]):
-                 if (i_grain,j_grain) not in L_ij_contact:  #contact not detected previously
-                   #creation of contact
-                   L_ij_contact.append((i_grain,j_grain))
-                   L_contact.append(Contact(id_contact, L_g[i_grain], L_g[j_grain], mu_friction, coeff_restitution))
-                   id_contact = id_contact + 1
-
-             else :
-                 if (i_grain,j_grain) in L_ij_contact : #contact detected previously is not anymore
-                       L_contact.pop(L_ij_contact.index((i_grain,j_grain)))
-                       L_ij_contact.remove((i_grain,j_grain))
-
-     return L_contact, L_ij_contact, id_contact
-
-#-------------------------------------------------------------------------------
-
 def Grains_Polyhedral_contact_Neighbouroods_f(g1,g2):
   #detect contact grain-grain
-
-  #-----------------------------------------------------------------------------
-  # Computing the distance between vertex
-  #-----------------------------------------------------------------------------
 
   #looking for the nearest nodes
   d_virtual = max(g1.r_max,g2.r_max)
@@ -692,7 +597,7 @@ def Grains_Polyhedral_contact_Neighbouroods_f(g1,g2):
 
 #-------------------------------------------------------------------------------
 
-def Update_Neighbouroods(L_g,factor):
+def Update_Neighbouroods(dict_algorithm,dict_sample):
     #determine a neighbouroods for each grain. This function is called every x time step
     #grain contact is determined by Grains_Polyhedral_contact_Neighbouroods
     #
@@ -700,35 +605,31 @@ def Update_Neighbouroods(L_g,factor):
     #grain_i is not in the neighbourood of grain_j
     #whereas grain_j is in the neighbourood of grain_i
     #with i_grain < j_grain
-    #
-    #factor determines the size of the neighbourood window
 
-    for i_grain in range(len(L_g)-1) :
+    for i_grain in range(len(dict_sample['L_g'])-1) :
         neighbourood = []
-        for j_grain in range(i_grain+1,len(L_g)):
-            if np.linalg.norm(L_g[i_grain].center-L_g[j_grain].center) < factor*(L_g[i_grain].r_max+L_g[j_grain].r_max):
-                neighbourood.append(L_g[j_grain])
-        L_g[i_grain].neighbourood = neighbourood
+        for j_grain in range(i_grain+1,len(dict_sample['L_g'])):
+            if np.linalg.norm(dict_sample['L_g'][i_grain].center-dict_sample['L_g'][j_grain].center) < dict_algorithm['factor_neighborhood']*(dict_sample['L_g'][i_grain].r_max+dict_sample['L_g'][j_grain].r_max):
+                neighbourood.append(dict_sample['L_g'][j_grain])
+        dict_sample['L_g'][i_grain].neighbourood = neighbourood
 
 #-------------------------------------------------------------------------------
 
-def Grains_Polyhedral_contact_Neighbouroods(L_g,L_ij_contact,L_contact,id_contact,mu_friction,coeff_restitution):
+def Grains_Polyhedral_contact_Neighbouroods(dict_material,dict_sample):
     #detect contact between a grain and grains from its neighbourood
     #the neighbourood is updated with Update_Neighbouroods()
 
-    for i_grain in range(len(L_g)-1) :
-        for neighbour in L_g[i_grain].neighbourood:
+    for i_grain in range(len(dict_sample['L_g'])-1) :
+        for neighbour in dict_sample['L_g'][i_grain].neighbourood:
             j_grain = neighbour.id
-            if Grains_Polyhedral_contact_Neighbouroods_f(L_g[i_grain],L_g[j_grain]):
-                if (i_grain,j_grain) not in L_ij_contact:  #contact not detected previously
+            if Grains_Polyhedral_contact_Neighbouroods_f(dict_sample['L_g'][i_grain],dict_sample['L_g'][j_grain]):
+                if (i_grain,j_grain) not in dict_sample['L_ij_contact']:  #contact not detected previously
                    #creation of contact
-                   L_ij_contact.append((i_grain,j_grain))
-                   L_contact.append(Contact(id_contact, L_g[i_grain], L_g[j_grain], mu_friction, coeff_restitution))
-                   id_contact = id_contact + 1
+                   dict_sample['L_ij_contact'].append((i_grain,j_grain))
+                   dict_sample['L_contact'].append(Contact(dict_sample['id_contact'], dict_sample['L_g'][i_grain], dict_sample['L_g'][j_grain], dict_material))
+                   dict_sample['id_contact'] = dict_sample['id_contact'] + 1
 
             else :
-                if (i_grain,j_grain) in L_ij_contact : #contact detected previously is not anymore
-                       L_contact.pop(L_ij_contact.index((i_grain,j_grain)))
-                       L_ij_contact.remove((i_grain,j_grain))
-
-    return L_contact, L_ij_contact, id_contact
+                if (i_grain,j_grain) in dict_sample['L_ij_contact'] : #contact detected previously is not anymore
+                       dict_sample['L_contact'].pop(dict_sample['L_ij_contact'].index((i_grain,j_grain)))
+                       dict_sample['L_ij_contact'].remove((i_grain,j_grain))

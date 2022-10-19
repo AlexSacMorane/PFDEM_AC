@@ -41,7 +41,7 @@ class Report:
 
             file_to_write = open(self.name,'w')
             file_to_write.write('Last compilation: '+str(time.ctime(Last_modification))+'\n')
-            file_to_write.write('Simulation started '+str(Datetime)+'\n\n')
+            file_to_write.write('Simulation started '+str(Datetime)[:19]+'\n\n')
             file_to_write.close()
         else:
             print('Error')
@@ -126,7 +126,7 @@ class Report:
      dt = dt % 60
 
      file_to_write = open(self.name,'a')
-     file_to_write.write('\n'+'Simulation ended '+str(Datetime)+'\n')
+     file_to_write.write('\n'+'Simulation ended '+str(Datetime)[:19]+'\n')
      file_to_write.write('Time spent : '+str(dt_day)+' days '+str(dt_hour)+' hours '+str(dt_min)+' min '+str(dt)+' sec\n')
      file_to_write.close()
 

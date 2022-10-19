@@ -11,6 +11,7 @@ This is the file where the user can change the different parameters for the simu
 #-------------------------------------------------------------------------------
 
 import math
+import numpy as np
 
 #-------------------------------------------------------------------------------
 #User
@@ -26,13 +27,15 @@ def All_parameters():
     R_mean = 350 #µm radius
     L_R = [1.1*R_mean, 1*R_mean, 0.9*R_mean] #from larger to smaller
     L_percentage_R = [1/3, 1/3, 1/3] #distribution of the different radius
+    grain_discretisation = 20 #approximatively the number of vertices for one grain
 
     #write dict
     dict_geometry = {
     'N_grain' : N_grain,
     'R_mean' : R_mean,
     'L_R' : L_R,
-    'L_percentage_R' : L_percentage_R
+    'L_percentage_R' : L_percentage_R,
+    'grain_discretisation' : grain_discretisation
     }
 
     #---------------------------------------------------------------------------
@@ -43,7 +46,7 @@ def All_parameters():
     rho = 2500*10**(-6*3) #density kg/µm3
     rho_surf = 4/3*rho*R_mean #kg/µm2
     mu_friction_gg = 0.5 #grain-grain
-    mu_friction_gw = 0.5 #grain-wall
+    mu_friction_gw = 0 #grain-wall
     coeff_restitution = 0.2 #1 is perfect elastic
     # PF parameters
     M_pf = 1 # mobility
@@ -100,12 +103,14 @@ def All_parameters():
 
     #Phase field
     dt_PF = 0.075 #s time step during MOOSE simulation
-    t_PF = 5*dt_PF #s time duration for one MOOSE simulation
+    n_t_PF = 5 #number of iterations PF-DEM
+    factor_distribution_etai = 1.5 #margin to distribute etai
     MovePF_selector = 'DeconstructRebuild' #Move PF
 
     #DEM parameters
     dt_DEM_crit = math.pi*min(L_R)/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
     dt_DEM = dt_DEM_crit/5 #s time step during DEM simulation
+    factor_neighborhood = 1.5 #margin to detect a grain into a neighborhood
     i_update_neighborhoods = 100 #the frequency of the update of the neighborhood of the grains and the walls
     Spring_type = 'Ponctual' #Kind of contact
     #Stop criteria of the DEM
@@ -123,7 +128,7 @@ def All_parameters():
 
     #Debugging
     Debug = True #plot configuration before and after DEM simulation
-    Debug_DEM = True #plot configuration inside DEM
+    Debug_DEM = False #plot configuration inside DEM
     i_print_plot = 50 #frenquency of the print and plot in DEM step
     SaveData = False #save data
     main_folder_name = 'Data_MG_Box_AC_M' #where data are saved
@@ -132,7 +137,7 @@ def All_parameters():
     #write dict
     dict_algorithm = {
     'dt_PF' : dt_PF,
-    't_PF' : t_PF,
+    'n_t_PF' : n_t_PF,
     'dt_DEM_crit' : dt_DEM_crit,
     'dt_DEM' : dt_DEM,
     'i_update_neighborhoods': i_update_neighborhoods,
@@ -151,19 +156,23 @@ def All_parameters():
     'main_folder_name' : main_folder_name,
     'template_simulation_name' : template_simulation_name,
     'i_print_plot' : i_print_plot,
+    'factor_neighborhood' : factor_neighborhood,
+    'factor_distribution_etai' : factor_distribution_etai
     }
 
     #---------------------------------------------------------------------------
     #Initial condition parameters
 
-    n_generation = 2 #number of grains generation Work only for 2
+    n_generation = 2 #number of grains generation /!\ Work only for 2 /!\
     factor_ymax_box = 1.5 #margin to generate grains
+    N_test_max = 5000 # maximum number of tries to generate a grain without overlap
     i_DEM_stop_IC = 3000 #stop criteria for DEM during IC
     i_update_neighborhoods_gen = 5 #the frequency of the update of the neighborhood of the grains and the walls during IC generations
     i_update_neighborhoods_com = 100 #the frequency of the update of the neighborhood of the grains and the walls during IC combination
+    i_print_plot_IC = 100 #frenquency of the print and plot for IC
     dt_DEM_IC = 2*dt_DEM_crit/5 #s time step during IC
     Ecin_ratio_IC = 0.0005
-    factor_neighborhood_IC = 1.5
+    factor_neighborhood_IC = 1.5 #margin to detect a grain into a neighborhood
 
     #write dict
     dict_ic = {
@@ -174,7 +183,9 @@ def All_parameters():
     'i_DEM_stop_IC' : i_DEM_stop_IC,
     'dt_DEM_IC' : dt_DEM_IC,
     'Ecin_ratio_IC' : Ecin_ratio_IC,
-    'factor_neighborhood_IC' : factor_neighborhood_IC
+    'i_print_plot_IC' : i_print_plot_IC,
+    'factor_neighborhood_IC' : factor_neighborhood_IC,
+    'N_test_max' : N_test_max
     }
 
     #---------------------------------------------------------------------------
@@ -185,7 +196,7 @@ def All_parameters():
 
 def Add_SpatialDiscretisation(dict_geometry,dict_sample):
 
-    #---------------------------------------------------------------------------
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     R_mean = dict_geometry['R_mean']
     N_grain = dict_geometry['N_grain']
@@ -193,7 +204,7 @@ def Add_SpatialDiscretisation(dict_geometry,dict_sample):
     x_box_max = dict_sample['x_box_max']
     y_box_min = dict_sample['y_box_min']
     y_box_max = dict_sample['y_box_max']
-    #---------------------------------------------------------------------------
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
 
     #Spatial discretisation
     x_min = x_box_min-R_mean*0.25 #µm
@@ -220,12 +231,12 @@ def Add_SpatialDiscretisation(dict_geometry,dict_sample):
 def Add_WidthInt_DoubleWellBarrier(dict_material, dict_sample):
     #need Spatial dicretisation to run
 
-    #---------------------------------------------------------------------------
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     x_L = dict_sample['x_L']
     y_L = dict_sample['y_L']
     kc_pf = dict_material['kc_pf']
-    #---------------------------------------------------------------------------
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
     w = math.sqrt((x_L[4]-x_L[0])**2+(y_L[4]-y_L[0])**2)
     double_well_height = 20*kc_pf/w/w #double well height J/µm2
@@ -234,3 +245,19 @@ def Add_WidthInt_DoubleWellBarrier(dict_material, dict_sample):
     #add elements in dict
     dict_material['w'] = w
     dict_material['double_well_height'] = double_well_height
+
+#-------------------------------------------------------------------------------
+
+def Criteria_StopSimulation(dict_algorithm):
+    #Criteria to stop simulation (PF and DEM)
+
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+    #load data needed
+    i_PF = dict_algorithm['i_PF']
+    n_t_PF = dict_algorithm['n_t_PF']
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
+
+    Criteria_Verified = False
+    if i_PF >= n_t_PF:
+        Criteria_Verified = True
+    return Criteria_Verified
