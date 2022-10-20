@@ -10,7 +10,7 @@ A back and forth is done between phase-field (PF) simulation and discrete elemen
 
 ![scheme of grain-grain interaction](image/General_plan.png)
 
- PF approach is computed with [MOOSE](https://github.com/idaholab/moose) and DEM is computed with an own script based on python 3.9.6. The launch of this project is done by executing the python script <i>main.py</i>.
+ PF approach is computed with [MOOSE](https://github.com/idaholab/moose) and DEM is computed with an own script based on python 3.9.6. The launch of this project is done by executing the python script <i>main.py</i>. The user can change variables inside the python script <i>User.py</i>. A documentation explains what is the role of the different variable.
 
 ### PF
 The goal of the PF step is to compute the shape of the grains as it evolves with the dissolution.

@@ -47,28 +47,28 @@ class Etai:
 
 #-------------------------------------------------------------------------------
 
-  def Write_txt_Decons_rebuild(self,i_PF,x_L,y_L):
+  def Write_txt_Decons_rebuild(self,dict_algorithm,dict_sample):
       #write a .txt file
       #this file is used to define initial condition of MOOSE simulation
 
-      file_to_write = open('Data/eta'+str(self.id+1)+'_'+str(i_PF)+'.txt','w')
+      file_to_write = open('Data/eta'+str(self.id+1)+'_'+str(dict_algorithm['i_PF'])+'.txt','w')
       file_to_write.write('AXIS X\n')
       line = ''
-      for x in x_L:
+      for x in dict_sample['x_L']:
           line = line + str(x)+ ' '
       line = line + '\n'
       file_to_write.write(line)
 
       file_to_write.write('AXIS Y\n')
       line = ''
-      for y in y_L:
+      for y in dict_sample['y_L']:
         line = line + str(y)+ ' '
       line = line + '\n'
       file_to_write.write(line)
 
       file_to_write.write('DATA\n')
-      for l in range(len(y_L)):
-          for c in range(len(x_L)):
+      for l in range(len(dict_sample['y_L'])):
+          for c in range(len(dict_sample['x_L'])):
               file_to_write.write(str(self.etai_M[l][c])+'\n')
 
       file_to_write.close()

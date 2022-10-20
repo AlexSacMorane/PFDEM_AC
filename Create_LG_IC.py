@@ -342,6 +342,9 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     n_generation = dict_ic['n_generation']
+    if n_generation != 2:
+        simulation_report.write('n_generation must be equal to 2 !')
+        raise ValueError('n_generation must be equal to 2 !')
     factor = dict_ic['factor_ymax_box']
     N_grain = dict_geometry['N_grain']
     L_radius = dict_geometry['L_R']

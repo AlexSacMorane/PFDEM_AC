@@ -43,7 +43,7 @@ class Contact:
 
 #-------------------------------------------------------------------------------
 
-  '''def init_contact(self,L_g):
+  def init_contact(self,L_g):
     #initialize the contact with updating the grains,
     #                            putting at 0 the tangential reaction
     #                            saying the boolean at False (new contact grain-grain)
@@ -52,7 +52,7 @@ class Contact:
     self.g2 = L_g[self.g2.id]
     self.ft = 0
     self.tangential_old_statut = False
-    self.overlap_tangential = 0'''
+    self.overlap_tangential = 0
 
 #-------------------------------------------------------------------------------
 

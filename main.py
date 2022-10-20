@@ -78,6 +78,10 @@ if dict_algorithm['SaveData'] :
     while folderpath.exists():
         i_run = i_run + 1
         folderpath = Path('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['template_simulation_name']+str(i_run))
+
+    #add element in dict
+    dict_algorithm['name_folder'] = dict_algorithm['template_simulation_name']+str(i_run)
+
 if dict_algorithm['SaveData'] or dict_algorithm['Debug'] or dict_algorithm['Debug_DEM']:
     simulation_report.write('\n')
 
@@ -129,24 +133,18 @@ simulation_report.tic_tempo(datetime.now())
 
 Etai.etai_distribution_dissolution(dict_algorithm,dict_sample, dict_sollicitations, simulation_report)
 
-#-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
-#load data needed
-L_ig_etai_undissolved = dict_sample['L_ig_etai_undissolved']
-L_ig_etai_dissolved = dict_sample['L_ig_etai_dissolved']
-#-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
-
 #create eta for undissolved
 L_etai_undissolved = []
-for etai in range(0,len(L_ig_etai_undissolved)):
-    L_etai_undissolved.append(Etai.Etai(etai,L_ig_etai_undissolved[etai]))
+for etai in range(0,len(dict_sample['L_ig_etai_undissolved'])):
+    L_etai_undissolved.append(Etai.Etai(etai,dict_sample['L_ig_etai_undissolved'][etai]))
 #create eta for dissolved
 L_etai_dissolved = []
-for etai in range(0,len(L_ig_etai_dissolved)):
-    L_etai_dissolved.append(Etai.Etai(len(L_ig_etai_undissolved)+etai,L_ig_etai_dissolved[etai]))
+for etai in range(0,len(dict_sample['L_ig_etai_dissolved'])):
+    L_etai_dissolved.append(Etai.Etai(len(dict_sample['L_ig_etai_undissolved'])+etai,dict_sample['L_ig_etai_dissolved'][etai]))
 
 #Add elements in dict
-L_etai_undissolved = dict_sample['L_ig_etai_undissolved']
-L_etai_dissolved = dict_sample['L_ig_etai_dissolved']
+dict_sample['L_etai_undissolved'] = L_etai_undissolved
+dict_sample['L_etai_dissolved'] = L_etai_dissolved
 
 if dict_algorithm['Debug'] :
     Owntools.Debug_etai_f(dict_sample)
@@ -204,17 +202,18 @@ while not User.Criteria_StopSimulation(dict_algorithm):
       # update element in dict
       dict_algorithm['i_PF'] = i_PF
 
-      simulation_report.write_and_print('\nIteration '+str(i_PF)+' / '+str(dict_algorithm['n_t_PF'])+'\n','\nITERATION PF '+str(i_PF)+' / '+str(dict_algorithm['n_t_PF'])+'\n')
+      simulation_report.write_and_print('\nIteration '+str(dict_algorithm['i_PF'])+' / '+str(dict_algorithm['n_t_PFDEM'])+'\n','\nITERATION PF '+str(dict_algorithm['i_PF'])+' / '+str(dict_algorithm['n_t_PFDEM'])+'\n')
 
       #prepare iteration
       os.mkdir('Debug/DEM_ite/PF_'+str(i_PF))
       os.mkdir('Debug/DEM_ite/PF_'+str(i_PF)+'/txt')
       os.mkdir('Debug/DEM_ite/PF_'+str(i_PF)+'/png')
 
-      # Saving to compute a rigid body motion
-      L_center_g = []
-      for grain in dict_sample['L_g']:
-          L_center_g.append(grain.center.copy())
+      if dict_algorithm['MovePF_selector'] == 'Interpolation':
+          # Saving to compute a rigid body motion
+          L_center_g = []
+          for grain in dict_sample['L_g']:
+              L_center_g.append(grain.center.copy())
 
       # Compute kinetic energy criteria
       Ecin_stop = 0
@@ -316,7 +315,7 @@ while not User.Criteria_StopSimulation(dict_algorithm):
               print('Ecin',int(Ecin),'/',int(dict_algorithm['Ecin_stop']),'('+str(int(100*Ecin/dict_algorithm['Ecin_stop'])),' %)')
               print('F_confinement',int(dict_sollicitations['Force_on_upper_wall']),'/',int(dict_sollicitations['Vertical_Confinement_Force']),'('+str(int(100*dict_sollicitations['Force_on_upper_wall']/dict_sollicitations['Vertical_Confinement_Force'])),' %)')
 
-              Owntools.save_tempo(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker)
+              Owntools.save_DEM_tempo(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker)
 
               if dict_algorithm['Debug_DEM'] :
                 Owntools.Debug_DEM_f(dict_algorithm, dict_sample)
@@ -329,7 +328,6 @@ while not User.Criteria_StopSimulation(dict_algorithm):
           if dict_algorithm['i_DEM'] >= dict_algorithm['i_DEM_stop'] :
               DEM_loop_statut = False
               print("DEM loop stopped by too many iterations.")
-              simulation_report.tac_tempo(datetime.now(),'DEM loop '+str(dict_algorithm['i_PF']))
               simulation_report.write('/!\ End of DEM steps with '+str(dict_algorithm['i_DEM']+1)+' iterations / '+str(dict_algorithm['i_DEM_stop']+1)+'/!\ \n')
           if Ecin < dict_algorithm['Ecin_stop'] and dict_algorithm['i_DEM'] > dict_algorithm['n_window_stop'] and (dict_sollicitations['Vertical_Confinement_Force']*0.95<dict_sollicitations['Force_on_upper_wall'] and dict_sollicitations['Force_on_upper_wall']<dict_sollicitations['Vertical_Confinement_Force']*1.05):
               k0_xmin_window = dict_tracker['k0_xmin'][dict_algorithm['i_DEM']+1-dict_algorithm['n_window_stop']:dict_algorithm['i_DEM']+1]
@@ -338,7 +336,6 @@ while not User.Criteria_StopSimulation(dict_algorithm):
               if max(k0_xmin_window) - min(k0_xmin_window) < dict_algorithm['dk0_stop'] and max(k0_xmax_window) - min(k0_xmax_window) < dict_algorithm['dk0_stop'] and max(y_box_max_window) - min(y_box_max_window) < dict_algorithm['dy_box_max_stop']:
                   DEM_loop_statut = False
                   print("DEM loop stopped by steady state reached.")
-                  simulation_report.tac_tempo(datetime.now(),'DEM loop '+str(dict_algorithm['i_PF']))
                   simulation_report.write("DEM loop stopped by steady state reached with "+str(dict_algorithm['i_DEM']+1)+' iterations / '+str(dict_algorithm['i_DEM_stop']+1)+"\n")
 
       #-----------------------------------------------------------------------------
@@ -351,7 +348,7 @@ while not User.Criteria_StopSimulation(dict_algorithm):
         Write_txt(dict_algorithm,dict_sample)
         Owntools.Plot_chain_force(dict_algorithm['i_PF'],dict_algorithm['i_DEM'])
 
-        Owntools.save_final(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker)
+        Owntools.save_DEM_final(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker)
 
       #-----------------------------------------------------------------------------
       # Compute Vertical and horizontal sollicitations to compute k0
@@ -366,83 +363,85 @@ while not User.Criteria_StopSimulation(dict_algorithm):
       dict_tracker['k0_xmin_L'].append(dict_sample['k0_xmin'])
       dict_tracker['k0_xmax_L'].append(dict_sample['k0_xmax'])
 
-      #-----------------------------------------------------------------------------
-      # Computing rigid body motion
-      #-----------------------------------------------------------------------------
-
-      L_rbm = []
-      for id_grain in range(len(dict_sample['L_g'])):
-          rbm = dict_sample['L_g'][id_grain].center - L_center_g[id_grain]
-          L_rbm.append(rbm)
+      simulation_report.tac_tempo(datetime.now(),'DEM loop '+str(dict_algorithm['i_PF']))
 
       #-----------------------------------------------------------------------------
       # Move PF
       #-----------------------------------------------------------------------------
 
-      Owntools.Stop_Debug(simulation_report)
+      simulation_report.tic_tempo(datetime.now())
 
-      if MovePF_selector == 'DeconstructRebuild':
-          for grain in L_g:
-              grain.DEMtoPF_Decons_rebuild(w,x_L,y_L,i_PF)
-          for etai in L_etai_undissolved+L_etai_dissolved:
-              etai.update_etai_M(L_g)
-              etai.Write_txt_Decons_rebuild(i_PF,x_L,y_L)
+      if dict_algorithm['MovePF_selector'] == 'DeconstructRebuild':
+          for grain in dict_sample['L_g']:
+              grain.DEMtoPF_Decons_rebuild(dict_material,dict_sample)
+          for etai in dict_sample['L_etai_undissolved']+dict_sample['L_etai_dissolved']:
+              etai.update_etai_M(dict_sample['L_g'])
+              etai.Write_txt_Decons_rebuild(dict_algorithm,dict_sample)
       #does not work for multiple grain by etai
       #elif MovePF_selector == 'Interpolation':
-      #  for id_grain in range(len(L_g)):
-      #      grain = L_g[id_grain]
-      #      rbm = L_rbm[id_grain]
+      #  for id_grain in range(len(dict_sample['L_g'])):
+      #      rbm = dict_sample['L_g'][id_grain].center - L_center_g[id_grain]
+      #      grain = dict_sample['L_g'][id_grain]
       #      grain.DEMtoPF_Interpolation(x_L,y_L,i_PF,rbm)
       else :
           simulation_report.write('Method to move phase field not available !')
           raise ValueError('Method to move phase field not available !')
 
+      simulation_report.tac_tempo(datetime.now(),'Move phase-field iteration '+str(dict_algorithm['i_PF']))
+
       #-----------------------------------------------------------------------------
       # PF Simulation
       #-----------------------------------------------------------------------------
 
-      #Create the .i for moose
-      Create_i_AC(i_PF,dt_PF,x_L,y_L,M_pf,kc_pf,n_t_PF_moose,double_well_height,L_etai_undissolved,L_etai_dissolved)
-
       simulation_report.tic_tempo(datetime.now())
+
+      #Create the .i for moose
+      Create_i_AC(dict_algorithm, dict_material, dict_sample)
+
       #Running moose
-      os.system('mpiexec -n '+str(np_proc)+' ~/projects/moose/modules/combined/combined-opt -i PF_'+str(i_PF)+'.i')
-      simulation_report.tac_tempo(datetime.now(),'PF '+str(i_PF))
+      os.system('mpiexec -n '+str(dict_algorithm['np_proc'])+' ~/projects/moose/modules/combined/combined-opt -i PF_'+str(dict_algorithm['i_PF'])+'.i')
 
       #sorting files
-      j_str = Owntools.Sort_Files(np_proc,n_t_PF_moose,i_PF,L_g)
+      j_str = Owntools.Sort_Files(dict_algorithm)
+
+      simulation_report.tac_tempo(datetime.now(),'PF '+str(dict_algorithm['i_PF']))
+
+      #-----------------------------------------------------------------------------
+      # Conversion PF to DEM
+      #-----------------------------------------------------------------------------
+
+      simulation_report.tic_tempo(datetime.now())
 
       #Convert PF data into DEM data
-      simulation_report.tic_tempo(datetime.now())
-      FileToRead = 'Output/PF_'+str(i_PF)+'/PF_'+str(i_PF)+'_other_'+j_str
-      PFtoDEM_Multi(FileToRead,x_L,y_L,L_g,L_etai_undissolved+L_etai_dissolved,np_proc)
+      FileToRead = 'Output/PF_'+str(dict_algorithm['i_PF'])+'/PF_'+str(dict_algorithm['i_PF'])+'_other_'+j_str
+      PFtoDEM_Multi(FileToRead,dict_algorithm,dict_sample)
 
       #Geometric study
       S_grains = 0
       for grain in L_g:
-          grain.Geometricstudy(self,dict_geometry,dict_sample,simulation_report)
+          grain.Geometricstudy(dict_geometry,dict_sample,simulation_report)
           grain.init_f_control(dict_sollicitations)
           S_grains = S_grains + grain.surface
 
-      simulation_report.tac_tempo(datetime.now(),'From PF to DEM '+str(i_PF))
+      simulation_report.write('Total Surface '+str(int(S_grains))+' µm2\n')
 
       # Tracker
-      t_L.append(t_L[-1] + dt_PF*n_t_PF_moose)
-      S_grains_L.append(S_grains)
-      S_dissolved_L.append(S_grains_L[0]-S_grains)
-      S_dissolved_perc_L.append((S_grains_L[0]-S_grains)/(S_grains_L[0])*100)
-      n_grains_L.append(len(L_g))
+      dict_tracker['t_L'].append(dict_tracker['t_L'][-1] + dict_algorithm['dt_PF']*dict_algorithm['n_t_PF'])
+      dict_tracker['S_grains_L'].append(S_grains)
+      dict_tracker['S_dissolved_L'].append(dict_tracker['S_grains_L'][0]-S_grains)
+      dict_tracker['S_dissolved_perc_L'].append((dict_tracker['S_grains_L'][0]-S_grains)/(dict_tracker['S_grains_L'][0])*100)
+      dict_tracker['n_grains_L'].append(len(dict_sample['L_g']))
 
-      simulation_report.write('Total Surface '+str(int(S_grains))+' µm2\n')
+      simulation_report.tac_tempo(datetime.now(),'From PF to DEM iteration '+str(dict_algorithm['i_PF']))
 
       #-----------------------------------------------------------------------------
       # Reinitialisation of contact for the next step
       #-----------------------------------------------------------------------------
 
-      for contact in L_contact:
-          contact.init_contact(L_g)
-      for contact in L_contact_gw:
-          contact.init_contact_gw(L_g)
+      for contact in dict_sample['L_contact']:
+          contact.init_contact(dict_sample['L_g'])
+      for contact in dict_sample['L_contact_gw']:
+          contact.init_contact_gw(dict_sample['L_g'])
 
       #-----------------------------------------------------------------------------
       # Print Grains configuration
@@ -455,16 +454,8 @@ while not User.Criteria_StopSimulation(dict_algorithm):
       # Save tempo
       #-----------------------------------------------------------------------------
 
-      if SaveData :
-        outfile = open('../Data_MG_Box_AC_M/'+name_folder+'_save_tempo','wb')
-        dict = {}
-        dict['k0_xmin_L'] = k0_xmin_L
-        dict['k0_xmax_L'] = k0_xmax_L
-        dict['S_dissolved_L'] = S_dissolved_L
-        dict['S_dissolved_perc_L'] = S_dissolved_perc_L
-        dict['S_grains_L'] = S_grains_L
-        pickle.dump(dict,outfile)
-        outfile.close()
+      if dict_algorithm['SaveData'] :
+        Owntools.save_tempo(dict_algorithm,dict_tracker)
 
 #-------------------------------------------------------------------------------
 # toc
@@ -473,32 +464,32 @@ while not User.Criteria_StopSimulation(dict_algorithm):
 simulation_report.end(datetime.now())
 
 #-------------------------------------------------------------------------------
-# Debugging
+# Debugging and Output
 #-------------------------------------------------------------------------------
 
-if Debug :
+if dict_algorithm['Debug'] :
 
     #Making movies
-    Owntools.make_mp4(int(2*i_PF))
+    Owntools.make_mp4(int(2*dict_algorithm['i_PF']))
 
     #Trackers
     fig = plt.figure(1,figsize=(16,9.12))
-    plt.plot(t_L,S_grains_L)
+    plt.plot(dict_tracker['t_L'],dict_tracker['S_grains_L'])
     plt.title('Evolution of the grains surface')
     fig.savefig('Debug/Evolution_Surface.png')
     plt.close(1)
 
     fig = plt.figure(1,figsize=(16,9.12))
-    plt.plot(S_dissolved_L[:-1],k0_xmin_L,label='k0 with xmin')
-    plt.plot(S_dissolved_L[:-1],k0_xmax_L,label='k0 with xmax')
+    plt.plot(dict_tracker['S_dissolved_L'][:-1],dict_tracker['k0_xmin_L'],label='k0 with xmin')
+    plt.plot(dict_tracker['S_dissolved_L'][:-1],dict_tracker['k0_xmax_L'],label='k0 with xmax')
     plt.title('Evolution of the k0')
     plt.xlabel('Grains surface dissolved (µm2)')
     fig.savefig('Debug/Evolution_k0_with_TotalSurface.png')
     plt.close(1)
 
     fig = plt.figure(1,figsize=(16,9.12))
-    plt.plot(S_dissolved_perc_L[:-1],k0_xmin_L,label='k0 with xmin')
-    plt.plot(S_dissolved_perc_L[:-1],k0_xmax_L,label='k0 with xmax')
+    plt.plot(dict_tracker['S_dissolved_perc_L'][:-1],dict_tracker['k0_xmin_L'],label='k0 with xmin')
+    plt.plot(dict_tracker['S_dissolved_perc_L'][:-1],dict_tracker['k0_xmax_L'],label='k0 with xmax')
     plt.title('Evolution of the k0')
     plt.xlabel('Percentage of grains surface dissolved (%)')
     fig.savefig('Debug/Evolution_k0_with_percentage_dissolved.png')
@@ -508,18 +499,9 @@ if Debug :
 #Saving data
 #-------------------------------------------------------------------------------
 
-if SaveData :
+if dict_algorithm['SaveData'] :
 
-    shutil.copytree('../Simu_MG_Box_AC_M', '../Data_MG_Box_AC_M/'+name_folder)
+    name_actual_folder = os.path.dirname(os.path.realpath(__file__))
+    shutil.copytree(name_actual_folder, '../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['name_folder'])
 
-    os.remove('../Data_MG_Box_AC_M/'+name_folder+'_save_tempo')
-
-    outfile = open('../Data_MG_Box_AC_M/'+name_folder+'_save','wb')
-    dict = {}
-    dict['k0_xmin_L'] = k0_xmin_L
-    dict['k0_xmax_L'] = k0_xmax_L
-    dict['S_dissolved_L'] = S_dissolved_L
-    dict['S_dissolved_perc_L'] = S_dissolved_perc_L
-    dict['S_grains_L'] = S_grains_L
-    pickle.dump(dict,outfile)
-    outfile.close()
+    Owntools.save_final(dict_algorithm,dict_tracker)

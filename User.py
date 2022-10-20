@@ -121,7 +121,7 @@ def All_parameters():
     dy_box_max_stop = 0.5
 
     #PF-DEM
-    n_t_PF = 3 #number of cycle DEM-PF
+    n_t_PFDEM = 1 #number of cycle PF-DEM
 
     #Number of processor
     np_proc = 4
@@ -129,8 +129,8 @@ def All_parameters():
     #Debugging
     Debug = True #plot configuration before and after DEM simulation
     Debug_DEM = False #plot configuration inside DEM
-    i_print_plot = 50 #frenquency of the print and plot in DEM step
-    SaveData = False #save data
+    i_print_plot = 100 #frenquency of the print and plot (if Debug_DEM) in DEM step
+    SaveData = True #save simulation
     main_folder_name = 'Data_MG_Box_AC_M' #where data are saved
     template_simulation_name = 'Run_' #template of the simulation name
 
@@ -146,7 +146,7 @@ def All_parameters():
     'n_window_stop' : n_window_stop,
     'dk0_stop' : dk0_stop,
     'dy_box_max_stop' : dy_box_max_stop,
-    'n_t_PF' : n_t_PF,
+    'n_t_PFDEM' : n_t_PFDEM,
     'MovePF_selector' : MovePF_selector,
     'Spring_type' : Spring_type,
     'np_proc' : np_proc,
@@ -163,16 +163,17 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #Initial condition parameters
 
-    n_generation = 2 #number of grains generation /!\ Work only for 2 /!\
+    n_generation = 2 #number of grains generation
+    #/!\ Work only for 2 /!\
     factor_ymax_box = 1.5 #margin to generate grains
     N_test_max = 5000 # maximum number of tries to generate a grain without overlap
     i_DEM_stop_IC = 3000 #stop criteria for DEM during IC
-    i_update_neighborhoods_gen = 5 #the frequency of the update of the neighborhood of the grains and the walls during IC generations
-    i_update_neighborhoods_com = 100 #the frequency of the update of the neighborhood of the grains and the walls during IC combination
-    i_print_plot_IC = 100 #frenquency of the print and plot for IC
+    i_print_plot_IC = 100 #frenquency of the print and plot (if line in Create_LG_IC.py is uncommented) for IC
     dt_DEM_IC = 2*dt_DEM_crit/5 #s time step during IC
     Ecin_ratio_IC = 0.0005
     factor_neighborhood_IC = 1.5 #margin to detect a grain into a neighborhood
+    i_update_neighborhoods_gen = 5 #the frequency of the update of the neighborhood of the grains and the walls during IC generations
+    i_update_neighborhoods_com = 100 #the frequency of the update of the neighborhood of the grains and the walls during IC combination
 
     #write dict
     dict_ic = {
@@ -251,13 +252,7 @@ def Add_WidthInt_DoubleWellBarrier(dict_material, dict_sample):
 def Criteria_StopSimulation(dict_algorithm):
     #Criteria to stop simulation (PF and DEM)
 
-    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
-    #load data needed
-    i_PF = dict_algorithm['i_PF']
-    n_t_PF = dict_algorithm['n_t_PF']
-    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
-
     Criteria_Verified = False
-    if i_PF >= n_t_PF:
+    if dict_algorithm['i_PF'] >= dict_algorithm['n_t_PFDEM']:
         Criteria_Verified = True
     return Criteria_Verified

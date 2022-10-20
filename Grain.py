@@ -319,7 +319,7 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def DEMtoPF_Decons_rebuild(self,w,x_L,y_L,i_PF):
+  def DEMtoPF_Decons_rebuild(self,dict_material,dict_sample):
         #from the grain geometry the phase variable is rebuilt
         #the distance between the poitn of the mesh and the particle center determine the value of the variable
         #an cosine profile is applied inside the interface
@@ -332,9 +332,9 @@ class Grain:
         # Move
         #---------------------------------------------------------------------------
 
-        for i_x in range(len(x_L)):
-            for i_y in range(len(y_L)):
-                p = np.array([x_L[i_x], y_L[len(y_L)-1-i_y]])
+        for i_x in range(len(dict_sample['x_L'])):
+            for i_y in range(len(dict_sample['y_L'])):
+                p = np.array([dict_sample['x_L'][i_x], dict_sample['y_L'][len(dict_sample['y_L'])-1-i_y]])
                 r = np.linalg.norm(self.center - p)
                 if p[1]>self.center[1]:
                     theta = math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
@@ -344,12 +344,12 @@ class Grain:
                 L_theta_R_i = list(abs(np.array(L_theta_R)-theta))
                 R = L_R[L_theta_R_i.index(min(L_theta_R_i))]
                 #Cosine_Profile
-                if r<R-w/2:
+                if r<R-dict_material['w']/2:
                     etai_M_new[i_y][i_x] = 1
-                elif r>R+w/2:
+                elif r>R+dict_material['w']/2:
                     etai_M_new[i_y][i_x] = 0
                 else :
-                    etai_M_new[i_y][i_x] = 0.5*(1 + np.cos(math.pi*(r-R+w/2)/w))
+                    etai_M_new[i_y][i_x] = 0.5*(1 + np.cos(math.pi*(r-R+dict_material['w']/2)/dict_material['w']))
 
         self.etai_M = etai_M_new.copy()
 
