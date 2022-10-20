@@ -155,52 +155,32 @@ simulation_report.tac_tempo(datetime.now(),'Etai distribution')
 #Main
 #-------------------------------------------------------------------------------
 
-#preparation
-L_contact_gw = []
-L_ij_contact_gw = []
-id_contact_gw = 0
-L_contact = []
-L_ij_contact = []
-id_contact = 0
-i_PF = 0
-
-# Tracker
-t_L = [0]
-S_grains_L = [S_grains]
-S_dissolved_L = [0]
-S_dissolved_perc_L = [0]
-n_grains_L = [len(L_g)]
-k0_xmin_L = []
-k0_xmax_L = []
-
-#create an new dict
+#Tracker and create an new dict
 dict_tracker = {
-    't_L' : t_L,
-    'S_grains_L' : S_grains_L,
-    'S_dissolved_L' : S_dissolved_L,
-    'S_dissolved_perc_L' : S_dissolved_perc_L,
-    'n_grains_L' : n_grains_L,
-    'k0_xmin_L' : k0_xmin_L,
-    'k0_xmax_L' : k0_xmax_L
+    't_L' : [0],
+    'S_grains_L' : [S_grains],
+    'S_dissolved_L' : [0],
+    'S_dissolved_perc_L' : [0],
+    'n_grains_L' : [len(L_g)],
+    'k0_xmin_L' : [],
+    'k0_xmax_L' : []
 }
 
-# add elements in dicts
-dict_algorithm['i_PF'] = i_PF
-dict_sample['L_contact_gw'] = L_contact_gw
-dict_sample['L_ij_contact_gw'] = L_ij_contact_gw
-dict_sample['id_contact_gw'] = id_contact_gw
-dict_sample['L_contact'] = L_contact
-dict_sample['L_ij_contact'] = L_ij_contact
-dict_sample['id_contact'] = id_contact
+# Preparation and add elements in dicts
+dict_algorithm['i_PF'] = 0
+dict_sample['L_contact_gw'] = []
+dict_sample['L_ij_contact_gw'] = []
+dict_sample['id_contact_gw'] = 0
+dict_sample['L_contact'] = []
+dict_sample['L_ij_contact'] = []
+dict_sample['id_contact'] = 0
 
 if dict_algorithm['Debug'] :
     Owntools.Debug_f2(dict_algorithm,dict_sample)
 
 while not User.Criteria_StopSimulation(dict_algorithm):
-      i_PF = i_PF + 1
-
       # update element in dict
-      dict_algorithm['i_PF'] = i_PF
+      dict_algorithm['i_PF'] = dict_algorithm['i_PF'] + 1
 
       simulation_report.write_and_print('\nIteration '+str(dict_algorithm['i_PF'])+' / '+str(dict_algorithm['n_t_PFDEM'])+'\n','\nITERATION PF '+str(dict_algorithm['i_PF'])+' / '+str(dict_algorithm['n_t_PFDEM'])+'\n')
 
@@ -223,23 +203,15 @@ while not User.Criteria_StopSimulation(dict_algorithm):
       #Update element in dict
       dict_algorithm['Ecin_stop'] = Ecin_stop
 
-      #Trackers
-      Ecin_tracker = []
-      Force_applied_tracker = []
-      k0_xmin_tracker = []
-      k0_xmax_tracker = []
-      y_box_max_tracker = [dict_sample['y_box_max']]
-      F_on_ymax_tracker = []
+      #Trackers and add element in dict
+      dict_tracker['Ecin'] = []
+      dict_tracker['Force_applied'] = []
+      dict_tracker['k0_xmin'] = []
+      dict_tracker['k0_xmax'] = []
+      dict_tracker['y_box_max'] = [dict_sample['y_box_max']]
+      dict_tracker['Force_on_upper_wall'] = []
 
-      #add element in dict
-      dict_tracker['Ecin'] = Ecin_tracker
-      dict_tracker['Force_applied'] = Force_applied_tracker
-      dict_tracker['k0_xmin'] = k0_xmin_tracker
-      dict_tracker['k0_xmax'] = k0_xmin_tracker
-      dict_tracker['y_box_max'] = y_box_max_tracker
-      dict_tracker['Force_on_upper_wall'] = F_on_ymax_tracker
-
-      i_DEM = - 1
+      dict_algorithm['i_DEM'] = - 1
       DEM_loop_statut = True
       simulation_report.write('\n')
       simulation_report.tic_tempo(datetime.now())
@@ -249,10 +221,8 @@ while not User.Criteria_StopSimulation(dict_algorithm):
       #-----------------------------------------------------------------------------
 
       while DEM_loop_statut :
-          i_DEM = i_DEM + 1
-
           # update element in dict
-          dict_algorithm['i_DEM'] = i_DEM
+          dict_algorithm['i_DEM'] = dict_algorithm['i_DEM'] + 1
 
           for grain in dict_sample['L_g']:
               grain.init_f_control(dict_sollicitations)
