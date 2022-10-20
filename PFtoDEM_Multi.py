@@ -18,15 +18,15 @@ import math
 #Function Definition
 #-------------------------------------------------------------------------------
 
-def PFtoDEM_Multi(FileToRead,x_L,y_L,L_g,L_etai,np_proc):
+def PFtoDEM_Multi(FileToRead,dict_algorithm,dict_sample):
 
     #---------------------------------------------------------------------------
     #Global parameters
     #---------------------------------------------------------------------------
 
     L_etai_M_g = []
-    for grain in L_g:
-        L_etai_M_g.append(np.zeros((len(y_L),len(x_L)))) #etai
+    for grain in dict_sample['L_g']:
+        L_etai_M_g.append(np.zeros((len(dict_sample['y_L']),len(dict_sample['x_L'])))) #etai
 
     id_L = None
     eta_selector_len = len('        <DataArray type="Float64" Name="etai')
@@ -36,12 +36,12 @@ def PFtoDEM_Multi(FileToRead,x_L,y_L,L_g,L_etai,np_proc):
 
     L_L_Work = [] #Debug
 
-    for i_proc in range(np_proc):
+    for i_proc in range(dict_algorithm['np_proc']):
 
         id_etai = 0
         L_Work = [[], #X
                   []] #Y
-        for etai in L_etai:
+        for etai in dict_sample['L_etai_undissolved']+dict_sample['L_etai_dissolved']:
             L_Work.append([]) #etai
 
 
@@ -99,16 +99,16 @@ def PFtoDEM_Multi(FileToRead,x_L,y_L,L_g,L_etai,np_proc):
     #Adaptating data
     #---------------------------------------------------------------------------
 
-        for grain in L_g:
+        for grain in dict_sample['L_g']:
             for i in range(len(L_Work[0])):
                 #Interpolation method
                 L_dy = []
-                for y_i in y_L :
+                for y_i in dict_sample['y_L'] :
                     L_dy.append(abs(y_i - L_Work[1][i]))
                 L_dx = []
-                for x_i in x_L :
+                for x_i in dict_sample['x_L'] :
                     L_dx.append(abs(x_i - L_Work[0][i]))
-                #if np.linalg.norm(grain.center-np.array(x_L[L_dx.index(min(L_dx))],y_L[L_dy.index(min(L_dy))]))<grain.r_max*1.5:
+                #if np.linalg.norm(grain.center-np.array(dict_sample['x_L'][L_dx.index(min(L_dx))],dict_sample['y_L'][L_dy.index(min(L_dy))]))<grain.r_max*1.5:
                 L_etai_M_g[grain.id][L_dy.index(min(L_dy))][L_dx.index(min(L_dx))] = L_Work[2+grain.id_eta][i]
 
         L_L_Work.append(L_Work)
@@ -116,9 +116,9 @@ def PFtoDEM_Multi(FileToRead,x_L,y_L,L_g,L_etai,np_proc):
     # Update
     #---------------------------------------------------------------------------
 
-    for grain in L_g:
-        for i_x in range(len(x_L)):
-            for i_y in range(len(y_L)):
-                if np.linalg.norm(grain.center - np.array([x_L[i_x],y_L[i_y]])) > grain.r_max*1.2:
-                    L_etai_M_g[grain.id][len(y_L)-1-i_y][i_x] = 0
+    for grain in dict_sample['L_g']:
+        for i_x in range(len(dict_sample['x_L'])):
+            for i_y in range(len(dict_sample['y_L'])):
+                if np.linalg.norm(grain.center - np.array([dict_sample['x_L'][i_x],dict_sample['y_L'][i_y]])) > grain.r_max*1.2:
+                    L_etai_M_g[grain.id][len(dict_sample['y_L'])-1-i_y][i_x] = 0
         grain.etai_M = L_etai_M_g[grain.id].copy()

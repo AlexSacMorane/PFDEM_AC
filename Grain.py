@@ -47,6 +47,7 @@ class Grain:
     self.a = A
     self.theta = 0
     self.w = 0 #dtheta/dt
+    self.dissolved = False
 
 #-------------------------------------------------------------------------------
 
@@ -92,14 +93,19 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def init_f_control(self,g):
+  def init_f_control(self,dict_sollicitations):
       #initialize the force applied to the grain
       #a gravity of g is applied
 
-    self.fx = 0
-    self.fy = -g*self.m
-    self.f = np.array([self.fx,self.fy])
-    self.mz = 0
+      #-------------------------------------------------------------------------
+      #load data needed
+      g = dict_sollicitations['gravity']
+      #-------------------------------------------------------------------------
+
+      self.fx = 0
+      self.fy = -g*self.m
+      self.f = np.array([self.fx,self.fy])
+      self.mz = 0
 
 #-------------------------------------------------------------------------------
 
@@ -116,12 +122,19 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def Geometricstudy(self,x_L,y_L,n,simulation_report):
+  def Geometricstudy(self,dict_geometry,dict_sample,simulation_report):
       #Searching limits
       #Not best method but first approach
       #We iterate on y constant, we look for a value under and over 0.5
       #If both conditions are verified, there is a limit at this y
       #Same with iteration on x constant
+
+      #-------------------------------------------------------------------------
+      #load data needed
+      n = dict_geometry['grain_discretisation']
+      x_L = dict_sample['x_L']
+      y_L = dict_sample['y_L']
+      #-------------------------------------------------------------------------
 
       L_border_old = []
       for y_i in range(len(y_L)):
@@ -306,7 +319,7 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def DEMtoPF_Decons_rebuild(self,w,x_L,y_L,i_PF):
+  def DEMtoPF_Decons_rebuild(self,dict_material,dict_sample):
         #from the grain geometry the phase variable is rebuilt
         #the distance between the poitn of the mesh and the particle center determine the value of the variable
         #an cosine profile is applied inside the interface
@@ -319,9 +332,9 @@ class Grain:
         # Move
         #---------------------------------------------------------------------------
 
-        for i_x in range(len(x_L)):
-            for i_y in range(len(y_L)):
-                p = np.array([x_L[i_x], y_L[len(y_L)-1-i_y]])
+        for i_x in range(len(dict_sample['x_L'])):
+            for i_y in range(len(dict_sample['y_L'])):
+                p = np.array([dict_sample['x_L'][i_x], dict_sample['y_L'][len(dict_sample['y_L'])-1-i_y]])
                 r = np.linalg.norm(self.center - p)
                 if p[1]>self.center[1]:
                     theta = math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
@@ -331,12 +344,12 @@ class Grain:
                 L_theta_R_i = list(abs(np.array(L_theta_R)-theta))
                 R = L_R[L_theta_R_i.index(min(L_theta_R_i))]
                 #Cosine_Profile
-                if r<R-w/2:
+                if r<R-dict_material['w']/2:
                     etai_M_new[i_y][i_x] = 1
-                elif r>R+w/2:
+                elif r>R+dict_material['w']/2:
                     etai_M_new[i_y][i_x] = 0
                 else :
-                    etai_M_new[i_y][i_x] = 0.5*(1 + np.cos(math.pi*(r-R+w/2)/w))
+                    etai_M_new[i_y][i_x] = 0.5*(1 + np.cos(math.pi*(r-R+dict_material['w']/2)/dict_material['w']))
 
         self.etai_M = etai_M_new.copy()
 

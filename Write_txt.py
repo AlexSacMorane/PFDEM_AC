@@ -19,17 +19,21 @@ import Contact_gw
 #
 #-------------------------------------------------------------------------------
 
-def Write_txt(L_g,L_contact,L_contact_gw,i_PF,i_DEM):
+def Write_txt(dict_algorithm,dict_sample):
 
-    file_to_write = open('Debug/DEM_ite/PF_'+str(i_PF)+'/txt/ite_DEM_'+str(i_DEM)+'.txt','w')
-    file_to_write.write('Iteration PF : '+str(i_PF)+'\n'+\
-                        'Iteration DEM : '+str(i_DEM)+'\n')
+    file_to_write = open('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/txt/ite_DEM_'+str(dict_algorithm['i_DEM'])+'.txt','w')
+    file_to_write.write('Iteration PF : '+str(dict_algorithm['i_PF'])+'\n'+\
+                        'Iteration DEM : '+str(dict_algorithm['i_DEM'])+'\n')
     file_to_write.write('\n')
     file_to_write.write('GRAINS LIST\n')
     file_to_write.write('\n')
-    for grain in L_g:
+    for grain in dict_sample['L_g']:
         file_to_write.write('<grain_o>\n')
         file_to_write.write('\tid : '+str(grain.id)+'\n')
+        if grain.dissolved :
+            file_to_write.write('\tDissolved : True\n')
+        else:
+            file_to_write.write('\tDissolved : False\n')
         file_to_write.write('\tCenter : ['+str(int(grain.center[0]))+', '+str(int(grain.center[1]))+']\n')
         file_to_write.write('\tSpeed : ['+str(round(grain.v[0],2))+', '+str(round(grain.v[1],2))+']\n')
         file_to_write.write('\tForce applied : ['+str(round(grain.f[0],1))+', '+str(round(grain.f[1],1))+']\n')
@@ -41,7 +45,7 @@ def Write_txt(L_g,L_contact,L_contact_gw,i_PF,i_DEM):
     file_to_write.write('\n')
     file_to_write.write('CONTACTS LIST\n')
     file_to_write.write('\n')
-    for contact in L_contact:
+    for contact in dict_sample['L_contact']:
         file_to_write.write('<contact_o>\n')
         file_to_write.write('\tid : '+str(contact.id)+'\n')
         file_to_write.write('\tGrains : '+str(contact.g1.id)+'-'+str(contact.g2.id)+'\n')
@@ -57,7 +61,7 @@ def Write_txt(L_g,L_contact,L_contact_gw,i_PF,i_DEM):
     file_to_write.write('\n')
     file_to_write.write('CONTACTS WITH WALL LIST\n')
     file_to_write.write('\n')
-    for contact in L_contact_gw:
+    for contact in dict_sample['L_contact_gw']:
         file_to_write.write('<contact_w_o>\n')
         file_to_write.write('\tid : '+str(contact.id)+'\n')
         file_to_write.write('\tType : '+str(contact.nature)+'\n')
