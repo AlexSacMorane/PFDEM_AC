@@ -546,13 +546,13 @@ def DEM_loading(dict_ic, dict_material, dict_sample, dict_sollicitations, multi_
         #check if some grains are outside of the study box
         L_ig_to_delete = []
         for id_grain in range(len(L_g_tempo)):
-            if L_g_tempo[id_grain].center[0] < x_min - L_g_tempo[id_grain].radius:
+            if L_g_tempo[id_grain].center[0] < x_min:
                 L_ig_to_delete.append(id_grain)
-            elif L_g_tempo[id_grain].center[0] > x_max + L_g_tempo[id_grain].radius:
+            elif L_g_tempo[id_grain].center[0] > x_max:
                 L_ig_to_delete.append(id_grain)
-            elif L_g_tempo[id_grain].center[1] < y_min - L_g_tempo[id_grain].radius:
+            elif L_g_tempo[id_grain].center[1] < y_min:
                 L_ig_to_delete.append(id_grain)
-            elif L_g_tempo[id_grain].center[1] > y_max + L_g_tempo[id_grain].radius:
+            elif L_g_tempo[id_grain].center[1] > y_max:
                 L_ig_to_delete.append(id_grain)
         L_ig_to_delete.reverse()
         for id_grain in L_ig_to_delete:
