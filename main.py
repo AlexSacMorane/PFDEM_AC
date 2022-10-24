@@ -185,9 +185,9 @@ while not User.Criteria_StopSimulation(dict_algorithm):
       simulation_report.write_and_print('\nIteration '+str(dict_algorithm['i_PF'])+' / '+str(dict_algorithm['n_t_PFDEM'])+'\n','\nITERATION PF '+str(dict_algorithm['i_PF'])+' / '+str(dict_algorithm['n_t_PFDEM'])+'\n')
 
       #prepare iteration
-      os.mkdir('Debug/DEM_ite/PF_'+str(i_PF))
-      os.mkdir('Debug/DEM_ite/PF_'+str(i_PF)+'/txt')
-      os.mkdir('Debug/DEM_ite/PF_'+str(i_PF)+'/png')
+      os.mkdir('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF']))
+      os.mkdir('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/txt')
+      os.mkdir('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/png')
 
       if dict_algorithm['MovePF_selector'] == 'Interpolation':
           # Saving to compute a rigid body motion
