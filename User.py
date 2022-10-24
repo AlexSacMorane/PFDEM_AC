@@ -183,6 +183,7 @@ def All_parameters():
     'i_update_neighborhoods_com': i_update_neighborhoods_com,
     'factor_ymax_box' : factor_ymax_box,
     'i_DEM_stop_IC' : i_DEM_stop_IC,
+    'Debug_DEM' : Debug_DEM_IC,
     'dt_DEM_IC' : dt_DEM_IC,
     'Ecin_ratio_IC' : Ecin_ratio_IC,
     'i_print_plot_IC' : i_print_plot_IC,
