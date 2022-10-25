@@ -23,19 +23,40 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #Geometric parameters
 
-    N_grain = 51 #number of grains
-    R_mean = 350 #µm radius
+    #for disk particles
+    N_grain_disk = 0 #number of grains
+    grain_discretisation_disk = 20 #approximatively the number of vertices for one grain
+    R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
     L_R = [1.1*R_mean, 1*R_mean, 0.9*R_mean] #from larger to smaller
     L_percentage_R = [1/3, 1/3, 1/3] #distribution of the different radius
-    grain_discretisation = 20 #approximatively the number of vertices for one grain
+    #Recompute the mean radius
+    R_mean = 0
+    for i in range(len(L_R)):
+        R_mean = R_mean + L_R[i]*L_percentage_R[i]
+
+    #for square particles
+    N_grain_square = 51 #number of grains
+    Dimension_mean = 350 #µm radius
+    L_Dimension = [1.1*Dimension_mean, 1*Dimension_mean, 0.9*Dimension_mean] #from larger to smaller
+    L_percentage_Dimension = [1/3, 1/3, 1/3] #distribution of the different radius
+    grain_discretisation_square = 20 #approximatively the number of vertices for one grain
+    #Recompute the mean dimension
+    Dimension_mean = 0
+    for i in range(len(L_Dimension)):
+        Dimension_mean = Dimension_mean + L_Dimension[i]*L_percentage_Dimension[i]
 
     #write dict
     dict_geometry = {
-    'N_grain' : N_grain,
+    'N_grain_disk' : N_grain_disk,
     'R_mean' : R_mean,
     'L_R' : L_R,
     'L_percentage_R' : L_percentage_R,
-    'grain_discretisation' : grain_discretisation
+    'grain_discretisation_disk' : grain_discretisation_disk,
+    'N_grain_square' : N_grain_square,
+    'Dimension_mean' : Dimension_mean,
+    'L_Dimension' : L_Dimension,
+    'L_percentage_Dimension' : L_percentage_Dimension,
+    'grain_discretisation_square' : grain_discretisation_square,
     }
 
     #---------------------------------------------------------------------------
@@ -44,7 +65,10 @@ def All_parameters():
     Y = 70*(10**9)*(10**6)*(10**(-12)) #Young Modulus µN/µm2
     nu = 0.3 #Poisson's ratio
     rho = 2500*10**(-6*3) #density kg/µm3
-    rho_surf = 4/3*rho*R_mean #kg/µm2
+    if N_grain_square == 0:
+        rho_surf = 4/3*rho*R_mean #kg/µm2
+    elif N_grain_disk == 0 :
+        rho_surf = rho*Dimension_mean #kg/µm2
     mu_friction_gg = 0.5 #grain-grain
     mu_friction_gw = 0 #grain-wall
     coeff_restitution = 0.2 #1 is perfect elastic
@@ -68,9 +92,16 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #Sample definition
 
+    if N_grain_disk == 0:
+        Lenght_mean = Dimension_mean/2
+        N_grain = N_grain_square
+    elif N_grain_square == 0:
+        Lenght_mean = R_mean
+        N_grain = N_grain_disk
+
     #Box définition
     x_box_min = 0 #µm
-    x_box_max = 2*R_mean*math.sqrt(N_grain/0.6) #µm 0.6 from Santamarina, 2014 to avoid boundaries effect
+    x_box_max = 2*Lenght_mean*math.sqrt(N_grain/0.6) #µm 0.6 from Santamarina, 2014 to avoid boundaries effect
     y_box_min = 0 #µm
 
     #write dict
@@ -83,7 +114,7 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #External sollicitations
 
-    Vertical_Confinement_Pressure = 500*10**5 #Pa
+    Vertical_Confinement_Pressure = 500*10**5 #Pa used to compute the Vertical_Confinement_Force
     Vertical_Confinement_Force = Vertical_Confinement_Pressure*(x_box_max-x_box_min)*(2*R_mean)*10**(-6) #µN
     gravity = 0 #µm/s2
     Dissolution_Energy = 0.0025 #e-12 J
@@ -108,8 +139,11 @@ def All_parameters():
     MovePF_selector = 'DeconstructRebuild' #Move PF
 
     #DEM parameters
-    dt_DEM_crit = math.pi*min(L_R)/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
-    dt_DEM = dt_DEM_crit/5 #s time step during DEM simulation
+    if N_grain_square == 0 :
+        dt_DEM_crit = math.pi*min(L_R)/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
+    elif N_grain_disk == 0 :
+        dt_DEM_crit = math.pi*min(L_Dimension)/2/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
+    dt_DEM = dt_DEM_crit/8 #s time step during DEM simulation
     factor_neighborhood = 1.5 #margin to detect a grain into a neighborhood
     i_update_neighborhoods = 100 #the frequency of the update of the neighborhood of the grains and the walls
     Spring_type = 'Ponctual' #Kind of contact
@@ -165,12 +199,12 @@ def All_parameters():
 
     n_generation = 2 #number of grains generation
     #/!\ Work only for 2 /!\
-    factor_ymax_box = 1.5 #margin to generate grains
+    factor_ymax_box = 2.5 #margin to generate grains
     N_test_max = 5000 # maximum number of tries to generate a grain without overlap
     i_DEM_stop_IC = 3000 #stop criteria for DEM during IC
     Debug_DEM_IC = False #plot configuration inside DEM during IC
     i_print_plot_IC = 100 #frenquency of the print and plot (if Debug_DEM_IC) for IC
-    dt_DEM_IC = 2*dt_DEM_crit/5 #s time step during IC
+    dt_DEM_IC = dt_DEM_crit/5 #s time step during IC
     Ecin_ratio_IC = 0.0005
     factor_neighborhood_IC = 1.5 #margin to detect a grain into a neighborhood
     i_update_neighborhoods_gen = 5 #the frequency of the update of the neighborhood of the grains and the walls during IC generations
@@ -200,8 +234,13 @@ def Add_SpatialDiscretisation(dict_geometry,dict_sample):
 
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
-    R_mean = dict_geometry['R_mean']
-    N_grain = dict_geometry['N_grain']
+    if dict_geometry['N_grain_square'] == 0:
+        Lenght_mean = dict_geometry['R_mean']
+        N_grain = dict_geometry['N_grain_disk']
+    elif dict_geometry['N_grain_disk'] == 0:
+        Lenght_mean = dict_geometry['Dimension_mean']
+        N_grain = dict_geometry['N_grain_square']
+
     x_box_min = dict_sample['x_box_min']
     x_box_max = dict_sample['x_box_max']
     y_box_min = dict_sample['y_box_min']
@@ -209,12 +248,12 @@ def Add_SpatialDiscretisation(dict_geometry,dict_sample):
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
 
     #Spatial discretisation
-    x_min = x_box_min-R_mean*0.25 #µm
-    x_max = x_box_max+R_mean*0.25 #µm
+    x_min = x_box_min-Lenght_mean*0.25 #µm
+    x_max = x_box_max+Lenght_mean*0.25 #µm
     n_x =  int(math.sqrt(N_grain/0.6)*30) #30 node on a mean grain diameter, 0.6 from Santamarian 2014 to avoid boundaries effect
     x_L = list(np.linspace(x_min,x_max,n_x))
-    y_min = y_box_min-R_mean*0.25 #µm
-    y_max = y_box_max+R_mean*0.25 #µm
+    y_min = y_box_min-Lenght_mean*0.25 #µm
+    y_max = y_box_max+Lenght_mean*0.25 #µm
     n_y = int(n_x*0.6)
     y_L = list(np.linspace(y_min,y_max,n_y))
 
