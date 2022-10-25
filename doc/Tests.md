@@ -43,3 +43,8 @@ Two particles are generated (in contact, not or far). The functions Update_Neigh
 ## Contact detection between particle and wall
 
 One particle and a wall are generated (in contact, not or far). The functions Update_wall_Neighbourhoods and Grains_Polyhedral_Wall_contact_Neighbourhoods are called. Three case mustbe seen : contact detection, no contact detection even if the grains are in the same neighborhood, particle are not in the same neighborhood.
+
+## Create initial condition
+
+A initial condition is asked. 
+
