@@ -112,15 +112,9 @@ From_LG_tempo_to_usable(dict_ic, dict_material, dict_sample)
 #creation pf the dissolution .txt
 Owntools.Write_e_dissolution_txt(dict_sample,dict_sollicitations)
 
-#-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
-#load data needed
-L_g = dict_sample['L_g']
-gravity = dict_sollicitations['gravity']
-#-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
-
 #Saving the grain surface
 S_grains = 0
-for grain in L_g:
+for grain in dict_sample['L_g']:
     grain.Geometricstudy(dict_geometry,dict_sample,simulation_report)
     grain.init_f_control(dict_sollicitations)
     S_grains = S_grains + grain.surface
@@ -149,6 +143,14 @@ for etai in range(0,len(dict_sample['L_ig_etai_dissolved'])):
 dict_sample['L_etai_undissolved'] = L_etai_undissolved
 dict_sample['L_etai_dissolved'] = L_etai_dissolved
 
+#Saving the grain surface
+S_grains_dissolvable = 0
+for grain in dict_sample['L_g']:
+    if grain.dissolved :
+        S_grains_dissolvable = S_grains_dissolvable + grain.surface
+simulation_report.write('Total Surface dissolvable '+str(round(S_grains_dissolvable,0))+' µm2\n')
+
+#Plot etai distribution
 if dict_algorithm['Debug'] :
     Owntools.Debug_etai_f(dict_sample)
 
@@ -162,8 +164,10 @@ simulation_report.tac_tempo(datetime.now(),'Etai distribution')
 dict_tracker = {
     't_L' : [0],
     'S_grains_L' : [S_grains],
+    'S_grains_dissolvable_L' : [S_grains_dissolvable],
     'S_dissolved_L' : [0],
     'S_dissolved_perc_L' : [0],
+    'S_dissolved_perc_dissolvable_L' : [0],
     'n_grains_L' : [len(L_g)],
     'k0_xmin_L' : [],
     'k0_xmax_L' : []
@@ -391,12 +395,15 @@ while not User.Criteria_StopSimulation(dict_algorithm):
 
       #Geometric study
       S_grains = 0
+      S_grains_dissolvable = 0
       for grain in L_g:
           grain.Geometricstudy(dict_geometry,dict_sample,simulation_report)
           grain.init_f_control(dict_sollicitations)
           S_grains = S_grains + grain.surface
-
+          if grain.dissolved : 
+              S_grains_dissolvable = S_grains_dissolvable + grain.surface
       simulation_report.write('Total Surface '+str(int(S_grains))+' µm2\n')
+      simulation_report.write('Total Surface dissolvable '+str(int(S_grains_dissolvable))+' µm2\n')
 
       # Tracker
       dict_tracker['t_L'].append(dict_tracker['t_L'][-1] + dict_algorithm['dt_PF']*dict_algorithm['n_t_PF'])
@@ -404,6 +411,8 @@ while not User.Criteria_StopSimulation(dict_algorithm):
       dict_tracker['S_dissolved_L'].append(dict_tracker['S_grains_L'][0]-S_grains)
       dict_tracker['S_dissolved_perc_L'].append((dict_tracker['S_grains_L'][0]-S_grains)/(dict_tracker['S_grains_L'][0])*100)
       dict_tracker['n_grains_L'].append(len(dict_sample['L_g']))
+      dict_tracker['S_grains_dissolvable_L'].append(S_grains_dissolvable)
+      dict_tracker['S_dissolved_perc_dissolvable_L'].append((dict_tracker['S_grains_dissolvable_L'][0]-S_grains_dissolvable)/(dict_tracker['S_grains_dissolvable_L'][0])*100)
 
       simulation_report.tac_tempo(datetime.now(),'From PF to DEM iteration '+str(dict_algorithm['i_PF']))
 
