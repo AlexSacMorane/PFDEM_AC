@@ -92,8 +92,11 @@ LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dic
 #Spatial discretisation
 User.Add_SpatialDiscretisation(dict_geometry,dict_sample)
 
-# PF parameters
+#PF parameters
 User.Add_WidthInt_DoubleWellBarrier(dict_material, dict_sample)
+
+#Dissolution energy
+User.Add_DissolutionEnergy(dict_algorithm,dict_geometry,dict_material,dict_sollicitations)
 
 simulation_report.tac_tempo(datetime.now(),'Initialisation')
 
