@@ -321,8 +321,8 @@ class Grain:
 
   def DEMtoPF_Decons_rebuild(self,dict_material,dict_sample):
         #from the grain geometry the phase variable is rebuilt
-        #the distance between the poitn of the mesh and the particle center determine the value of the variable
-        #an cosine profile is applied inside the interface
+        #the distance between the point of the mesh and the particle center determines the value of the variable
+        #a cosine profile is applied inside the interface
 
         etai_M_new = self.etai_M.copy()
         L_R = self.l_r

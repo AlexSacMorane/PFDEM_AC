@@ -24,7 +24,7 @@ import random
 from Write_txt import Write_txt
 from PFtoDEM_Multi import PFtoDEM_Multi
 from Create_i_AC import Create_i_AC
-from Create_LG_IC import LG_tempo, From_LG_tempo_to_usable, Grain_Tempo
+from Create_LG_IC import LG_tempo, From_LG_tempo_to_usable
 import Owntools
 import Grain
 import Etai
@@ -107,7 +107,7 @@ simulation_report.tac_tempo(datetime.now(),'Initialisation')
 simulation_report.tic_tempo(datetime.now())
 
 # Creation of the real list of grains
-From_LG_tempo_to_usable(dict_ic, dict_material, dict_sample)
+From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample, simulation_report)
 
 #creation pf the dissolution .txt
 Owntools.Write_e_dissolution_txt(dict_sample,dict_sollicitations)
