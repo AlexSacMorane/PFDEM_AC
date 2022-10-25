@@ -24,10 +24,14 @@ def All_parameters():
     #Geometric parameters
 
     N_grain = 51 #number of grains
-    R_mean = 350 #µm radius
+    R_mean = 350 #µm radius used to define the radius distribution
     L_R = [1.1*R_mean, 1*R_mean, 0.9*R_mean] #from larger to smaller
     L_percentage_R = [1/3, 1/3, 1/3] #distribution of the different radius
     grain_discretisation = 20 #approximatively the number of vertices for one grain
+    #recompute the mean diameter
+    R_mean = 0
+    for i in range(len(L_R)):
+        R_mean = R_mean + L_R[i]*L_percentage_R[i]
 
     #write dict
     dict_geometry = {
@@ -86,7 +90,6 @@ def All_parameters():
     Vertical_Confinement_Pressure = 500*10**5 #Pa
     Vertical_Confinement_Force = Vertical_Confinement_Pressure*(x_box_max-x_box_min)*(2*R_mean)*10**(-6) #µN
     gravity = 0 #µm/s2
-    Dissolution_Energy = 0.0025 #e-12 J
     frac_dissolved = 0.15 #Percentage of grain dissolved
 
     #write dict
@@ -94,7 +97,6 @@ def All_parameters():
     'Vertical_Confinement_Pressure' : Vertical_Confinement_Pressure,
     'Vertical_Confinement_Force' : Vertical_Confinement_Force,
     'gravity' : gravity,
-    'Dissolution_Energy' : Dissolution_Energy,
     'frac_dissolved' : frac_dissolved
     }
 
@@ -249,6 +251,17 @@ def Add_WidthInt_DoubleWellBarrier(dict_material, dict_sample):
     dict_material['w'] = w
     dict_material['double_well_height'] = double_well_height
 
+#-------------------------------------------------------------------------------
+
+def Add_DissolutionEnergy(dict_algorithm, dict_geometry, dict_material, dict_sollicitations):
+    #Add energy to dissolved grain
+    
+    frac_Rmean0 = 0.01 #approximatively the percentage of the initial R_mean dissolved at each iteration
+    Dissolution_Energy = frac_Rmean0*dict_geometry['R_mean']*2/3*dict_material['w']/dict_algorithm['dt_PF']*dict_algorithm['n_t_PF']
+    
+    #update dict
+    dict_sollicitations['Dissolution_Energy'] = Dissolution_Energy
+    
 #-------------------------------------------------------------------------------
 
 def Criteria_StopSimulation(dict_algorithm):
