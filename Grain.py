@@ -15,6 +15,8 @@ import numpy as np
 import math
 from PIL import Image as im
 import random
+from multiprocessing import Pool
+from functools import partial
 import matplotlib.pyplot as plt
 
 #-------------------------------------------------------------------------------
@@ -25,7 +27,7 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def __init__(self, ID, etai_M_IC, Id_Eta, V, A, Y, Nu, Rho_surf):
+  def __init__(self, Grain_Tempo, etai_M_IC, Id_Eta, V, A):
     #defining the grain
     #each grain is described by an id (an integer)
     #                           a field of phase variable (an array of float)
@@ -36,18 +38,20 @@ class Grain:
     #                           a Poisson's ratio (a float)
     #                           a surface mass (a float)
 
-    self.id = ID
+    self.id = Grain_Tempo.id
     self.etai_M = etai_M_IC
     self.id_eta = Id_Eta
-    self.y = Y
-    self.nu = Nu
-    self.g = Y /2/(1+Nu) #shear modulus
-    self.rho_surf = Rho_surf
+    self.y = Grain_Tempo.y
+    self.nu = Grain_Tempo.nu
+    self.g = Grain_Tempo.y /2/(1+Grain_Tempo.nu) #shear modulus
+    self.rho_surf = Grain_Tempo.rho_surf
     self.v = V
     self.a = A
     self.theta = 0
     self.w = 0 #dtheta/dt
     self.dissolved = False
+    self.center = Grain_Tempo.center
+    self.r_max = Grain_Tempo.r_max
 
 #-------------------------------------------------------------------------------
 
@@ -328,12 +332,31 @@ class Grain:
         L_R = self.l_r
         L_theta_R = self.l_theta_r
 
+        #extract a part focused on the grain
+        x_extract_min = self.center[0] - self.r_max - dict_material['w']
+        x_extract_max = self.center[0] + self.r_max + dict_material['w']
+        y_extract_min = self.center[1] - self.r_max - dict_material['w']
+        y_extract_max = self.center[1] + self.r_max + dict_material['w']
+
+        #look for this part inside the global mesh
+        #create search list
+        x_L_search_min = abs(np.array(dict_sample['x_L'])-x_extract_min)
+        x_L_search_max = abs(np.array(dict_sample['x_L'])-x_extract_max)
+        y_L_search_min = abs(np.array(dict_sample['y_L'])-y_extract_min)
+        y_L_search_max = abs(np.array(dict_sample['y_L'])-y_extract_max)
+
+        #get index
+        i_x_min = list(x_L_search_min).index(min(x_L_search_min))
+        i_x_max = list(x_L_search_max).index(min(x_L_search_max))
+        i_y_min = list(y_L_search_min).index(min(y_L_search_min))
+        i_y_max = list(y_L_search_max).index(min(y_L_search_max))
+
         #---------------------------------------------------------------------------
         # Move
         #---------------------------------------------------------------------------
 
-        for i_x in range(len(dict_sample['x_L'])):
-            for i_y in range(len(dict_sample['y_L'])):
+        for i_x in range(i_x_min,i_x_max+1):
+            for i_y in range(i_y_min,i_y_max+1):
                 p = np.array([dict_sample['x_L'][i_x], dict_sample['y_L'][len(dict_sample['y_L'])-1-i_y]])
                 r = np.linalg.norm(self.center - p)
                 if p[1]>self.center[1]:
@@ -362,3 +385,27 @@ class Grain:
 #-------------------------------------------------------------------------------
 #Function
 #-------------------------------------------------------------------------------
+
+def DEMtoPF_Decons_rebuild_MP(dict_material,dict_sample,grain):
+    #Run DEMto_PF_Decons_rebuild on several proccessors
+
+    grain.DEMtoPF_Decons_rebuild(dict_material,dict_sample)
+    return grain
+
+#-------------------------------------------------------------------------------
+
+def DEMtoPF_Decons_rebuild_f(dict_algorithm,dict_material,dict_sample):
+    #Run DEMtoPF_Decons_rebuild_MP if multi proccessors
+    #or DEMtoPF_Decons_rebuild if one proccessor
+
+      if dict_algorithm['np_proc'] > 1:
+          pool = Pool(processes = dict_algorithm['np_proc'])
+          L_g = pool.map(partial(DEMtoPF_Decons_rebuild_MP, dict_material,dict_sample), dict_sample['L_g'])
+          pool.close()
+
+          #update element in dict
+          dict_sample['L_g'] = L_g
+
+      else :
+          for grain in dict_sample['L_g']:
+              grain.DEMtoPF_Decons_rebuild(dict_material,dict_sample)

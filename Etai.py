@@ -220,7 +220,10 @@ def etai_distribution_dissolution(dict_algorithm,dict_sample, dict_sollicitation
                         grain2.eta_near_L.append(etai)
                         grain2.eta_near_L.remove(i%len(L_ig_etai_undissolved))
 
-    #cntrol the algorithm
+            if i_try > 2*len(L_ig_etai_undissolved[i%len(L_ig_etai_undissolved)]) :
+                grain_selected = True
+
+    #control the algorithm
     n_dissolved = 0
     for L_ig in L_ig_etai_dissolved:
         n_dissolved = n_dissolved + len(L_ig)

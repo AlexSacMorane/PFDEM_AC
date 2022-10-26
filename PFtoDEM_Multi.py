@@ -122,3 +122,5 @@ def PFtoDEM_Multi(FileToRead,dict_algorithm,dict_sample):
                 if np.linalg.norm(grain.center - np.array([dict_sample['x_L'][i_x],dict_sample['y_L'][i_y]])) > grain.r_max*1.2:
                     L_etai_M_g[grain.id][len(dict_sample['y_L'])-1-i_y][i_x] = 0
         grain.etai_M = L_etai_M_g[grain.id].copy()
+
+#-------------------------------------------------------------------------------

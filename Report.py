@@ -99,7 +99,7 @@ class Report:
         dt = dt % 60
 
         file_to_write = open(self.name,'a')
-        file_to_write.write('Time spent during "'+Step_name+'" : '+str(dt_day)+' days '+str(dt_hour)+' hours '+str(dt_min)+' min '+str(dt)+' sec\n')
+        file_to_write.write('Time spent during "'+Step_name+'" : '+str(dt_day)+' days '+str(dt_hour)+' hours '+str(dt_min)+' min '+str(dt)+' sec\n\n')
         file_to_write.close()
 
 #-------------------------------------------------------------------------------

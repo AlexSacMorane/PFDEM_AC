@@ -24,8 +24,7 @@ def All_parameters():
     #Geometric parameters
 
     #for disk particles
-    N_grain_disk = 0 #number of grains
-    grain_discretisation_disk = 20 #approximatively the number of vertices for one grain
+    N_grain_disk = 300 #number of grains
     R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
     L_R = [1.1*R_mean, 1*R_mean, 0.9*R_mean] #from larger to smaller
     L_percentage_R = [1/3, 1/3, 1/3] #distribution of the different radius
@@ -35,15 +34,18 @@ def All_parameters():
         R_mean = R_mean + L_R[i]*L_percentage_R[i]
 
     #for square particles
-    N_grain_square = 51 #number of grains
+    N_grain_square = 0 #number of grains
     Dimension_mean = 350 #µm radius
     L_Dimension = [1.1*Dimension_mean, 1*Dimension_mean, 0.9*Dimension_mean] #from larger to smaller
     L_percentage_Dimension = [1/3, 1/3, 1/3] #distribution of the different radius
-    grain_discretisation_square = 20 #approximatively the number of vertices for one grain
+    grain_discretisation_square = 20 #approximatively the number of vertices for one grain during IC
     #Recompute the mean dimension
     Dimension_mean = 0
     for i in range(len(L_Dimension)):
         Dimension_mean = Dimension_mean + L_Dimension[i]*L_percentage_Dimension[i]
+
+    #approximatively the number of vertices for one grain during DEM simulation
+    grain_discretisation = 20
 
     #write dict
     dict_geometry = {
@@ -51,7 +53,7 @@ def All_parameters():
     'R_mean' : R_mean,
     'L_R' : L_R,
     'L_percentage_R' : L_percentage_R,
-    'grain_discretisation_disk' : grain_discretisation_disk,
+    'grain_discretisation' : grain_discretisation,
     'N_grain_square' : N_grain_square,
     'Dimension_mean' : Dimension_mean,
     'L_Dimension' : L_Dimension,
@@ -161,7 +163,7 @@ def All_parameters():
     #Debugging
     Debug = True #plot configuration before and after DEM simulation
     Debug_DEM = False #plot configuration inside DEM
-    i_print_plot = 100 #frenquency of the print and plot (if Debug_DEM) in DEM step
+    i_print_plot = 1 #frenquency of the print and plot (if Debug_DEM) in DEM step
     SaveData = True #save simulation
     main_folder_name = 'Data_MG_Box_AC_M' #where data are saved
     template_simulation_name = 'Run_' #template of the simulation name

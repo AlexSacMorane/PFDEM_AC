@@ -21,6 +21,8 @@ import os
 import pickle
 from pathlib import Path
 from datetime import datetime
+from multiprocessing import Pool
+from functools import partial
 import imageio
 import Contact
 import Contact_gw
@@ -456,6 +458,35 @@ def Compute_k0(dict_sample,dict_sollicitations):
     #update element in dicts
     dict_sample['k0_xmin'] = k0_xmin
     dict_sample['k0_xmax'] = k0_xmax
+
+#-------------------------------------------------------------------------------
+
+def Study_Polygonal_and_init(dict_geometry,dict_sample,dict_sollicitations,simulation_report,grain):
+    #Realize a geometric study on a grain
+    #initialize the force applied on it
+
+    grain.Geometricstudy(dict_geometry,dict_sample,simulation_report)
+    #grain.init_f_control(dict_sollicitations)
+
+    return grain
+
+#-------------------------------------------------------------------------------
+
+def Study_Polygonal_and_init_f(dict_algorithm,dict_geometry,dict_sample,dict_sollicitations,simulation_report):
+    #Run Study_Polygonal_and_init if multi proccessors
+    #or Geometricstudy and init_f_control if one proccessor
+
+      if dict_algorithm['np_proc'] > 1:
+          pool = Pool(processes = dict_algorithm['np_proc'])
+          L_g = pool.map(partial(Study_Polygonal_and_init, dict_geometry, dict_sample, dict_sollicitations, simulation_report), dict_sample['L_g'])
+          pool.close()
+
+          #update element in dict
+          dict_sample['L_g'] = L_g
+      else :
+          for grain in dict_sample['L_g']:
+              grain.Geometricstudy(dict_geometry,dict_sample,simulation_report)
+              #grain.init_f_control(dict_sollicitations)
 
 #-------------------------------------------------------------------------------
 
