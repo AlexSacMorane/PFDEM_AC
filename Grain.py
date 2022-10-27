@@ -386,26 +386,3 @@ class Grain:
 #Function
 #-------------------------------------------------------------------------------
 
-def DEMtoPF_Decons_rebuild_MP(dict_material,dict_sample,grain):
-    #Run DEMto_PF_Decons_rebuild on several proccessors
-
-    grain.DEMtoPF_Decons_rebuild(dict_material,dict_sample)
-    return grain
-
-#-------------------------------------------------------------------------------
-
-def DEMtoPF_Decons_rebuild_f(dict_algorithm,dict_material,dict_sample):
-    #Run DEMtoPF_Decons_rebuild_MP if multi proccessors
-    #or DEMtoPF_Decons_rebuild if one proccessor
-
-      if dict_algorithm['np_proc'] > 1:
-          pool = Pool(processes = dict_algorithm['np_proc'])
-          L_g = pool.map(partial(DEMtoPF_Decons_rebuild_MP, dict_material,dict_sample), dict_sample['L_g'])
-          pool.close()
-
-          #update element in dict
-          dict_sample['L_g'] = L_g
-
-      else :
-          for grain in dict_sample['L_g']:
-              grain.DEMtoPF_Decons_rebuild(dict_material,dict_sample)
