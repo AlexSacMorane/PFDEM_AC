@@ -15,6 +15,8 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 import random
+from multiprocessing import Pool
+from functools import partial
 import Grain
 
 #-------------------------------------------------------------------------------
@@ -578,7 +580,25 @@ def P_is_inside(P,L_border):
 
 #-------------------------------------------------------------------------------
 
-def Grains_Polyhedral_contact_Neighbouroods_f(g1,g2):
+def Update_Neighborhoods(dict_algorithm,dict_sample):
+    #determine a neighbouroods for each grain. This function is called every x time step
+    #grain contact is determined by Grains_Polyhedral_contact_Neighbouroods
+    #
+    #notice that if there is a potential contact between grain_i and grain_j
+    #grain_i is not in the neighbourood of grain_j
+    #whereas grain_j is in the neighbourood of grain_i
+    #with i_grain < j_grain
+
+    for i_grain in range(len(dict_sample['L_g'])-1) :
+        neighborhood = []
+        for j_grain in range(i_grain+1,len(dict_sample['L_g'])):
+            if np.linalg.norm(dict_sample['L_g'][i_grain].center-dict_sample['L_g'][j_grain].center) < dict_algorithm['factor_neighborhood']*(dict_sample['L_g'][i_grain].r_max+dict_sample['L_g'][j_grain].r_max):
+                neighborhood.append(dict_sample['L_g'][j_grain])
+        dict_sample['L_g'][i_grain].neighbourood = neighborhood
+
+#-------------------------------------------------------------------------------
+
+def Grains_Polyhedral_contact_Neighborhoods_bool(g1,g2):
   #detect contact grain-grain
 
   #looking for the nearest nodes
@@ -597,32 +617,14 @@ def Grains_Polyhedral_contact_Neighbouroods_f(g1,g2):
 
 #-------------------------------------------------------------------------------
 
-def Update_Neighbouroods(dict_algorithm,dict_sample):
-    #determine a neighbouroods for each grain. This function is called every x time step
-    #grain contact is determined by Grains_Polyhedral_contact_Neighbouroods
-    #
-    #notice that if there is a potential contact between grain_i and grain_j
-    #grain_i is not in the neighbourood of grain_j
-    #whereas grain_j is in the neighbourood of grain_i
-    #with i_grain < j_grain
-
-    for i_grain in range(len(dict_sample['L_g'])-1) :
-        neighbourood = []
-        for j_grain in range(i_grain+1,len(dict_sample['L_g'])):
-            if np.linalg.norm(dict_sample['L_g'][i_grain].center-dict_sample['L_g'][j_grain].center) < dict_algorithm['factor_neighborhood']*(dict_sample['L_g'][i_grain].r_max+dict_sample['L_g'][j_grain].r_max):
-                neighbourood.append(dict_sample['L_g'][j_grain])
-        dict_sample['L_g'][i_grain].neighbourood = neighbourood
-
-#-------------------------------------------------------------------------------
-
-def Grains_Polyhedral_contact_Neighbouroods(dict_material,dict_sample):
+def Grains_Polyhedral_contact_Neighborhoods(dict_material,dict_sample):
     #detect contact between a grain and grains from its neighbourood
-    #the neighbourood is updated with Update_Neighbouroods()
+    #the neighbourood is updated with Update_Neighborhoods_f()
 
     for i_grain in range(len(dict_sample['L_g'])-1) :
         for neighbour in dict_sample['L_g'][i_grain].neighbourood:
             j_grain = neighbour.id
-            if Grains_Polyhedral_contact_Neighbouroods_f(dict_sample['L_g'][i_grain],dict_sample['L_g'][j_grain]):
+            if Grains_Polyhedral_contact_Neighborhoods_bool(dict_sample['L_g'][i_grain],dict_sample['L_g'][j_grain]):
                 if (i_grain,j_grain) not in dict_sample['L_ij_contact']:  #contact not detected previously
                    #creation of contact
                    dict_sample['L_ij_contact'].append((i_grain,j_grain))

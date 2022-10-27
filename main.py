@@ -19,6 +19,9 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 import random
+from multiprocessing import Pool
+from functools import partial
+import time
 
 #Own function and class
 from Write_txt import Write_txt
@@ -112,13 +115,9 @@ From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample, simu
 #creation pf the dissolution .txt
 Owntools.Write_e_dissolution_txt(dict_sample,dict_sollicitations)
 
-#Saving the grain surface
-S_grains = 0
+#Study the grain and saving the grain surface
 for grain in dict_sample['L_g']:
     grain.Geometricstudy(dict_geometry,dict_sample,simulation_report)
-    grain.init_f_control(dict_sollicitations)
-    S_grains = S_grains + grain.surface
-simulation_report.write('Total Surface '+str(round(S_grains,0))+' µm2\n')
 
 simulation_report.tac_tempo(datetime.now(),'Creation and study of polygonal particles')
 
@@ -145,9 +144,12 @@ dict_sample['L_etai_dissolved'] = L_etai_dissolved
 
 #Saving the grain surface
 S_grains_dissolvable = 0
+S_grains = 0
 for grain in dict_sample['L_g']:
+    S_grains = S_grains + grain.surface
     if grain.dissolved :
         S_grains_dissolvable = S_grains_dissolvable + grain.surface
+simulation_report.write('Total Surface '+str(round(S_grains,0))+' µm2\n')
 simulation_report.write('Total Surface dissolvable '+str(round(S_grains_dissolvable,0))+' µm2\n')
 
 #Plot etai distribution
@@ -168,7 +170,7 @@ dict_tracker = {
     'S_dissolved_L' : [0],
     'S_dissolved_perc_L' : [0],
     'S_dissolved_perc_dissolvable_L' : [0],
-    'n_grains_L' : [len(L_g)],
+    'n_grains_L' : [len(dict_sample['L_g'])],
     'k0_xmin_L' : [],
     'k0_xmax_L' : []
 }
@@ -184,6 +186,18 @@ dict_sample['id_contact'] = 0
 
 if dict_algorithm['Debug'] :
     Owntools.Debug_f2(dict_algorithm,dict_sample)
+
+#To delete !!!
+outfile = open('save_dicts_to_work','wb')
+dict_save = {}
+dict_save['algorithm'] = dict_algorithm,
+dict_save['geometry'] = dict_geometry,
+dict_save['ic'] = dict_ic,
+dict_save['material'] = dict_material,
+dict_save['sample'] = dict_sample,
+dict_save['sollicitations'] = dict_sollicitations
+pickle.dump(dict_save,outfile)
+outfile.close()
 
 while not User.Criteria_StopSimulation(dict_algorithm):
       # update element in dict
@@ -236,8 +250,9 @@ while not User.Criteria_StopSimulation(dict_algorithm):
 
           # Detection of contacts between grains
           if dict_algorithm['i_DEM'] % dict_algorithm['i_update_neighborhoods']  == 0:
-              Contact.Update_Neighbouroods(dict_algorithm,dict_sample)
-          Contact.Grains_Polyhedral_contact_Neighbouroods(dict_material,dict_sample)
+              Contact.Update_Neighborhoods(dict_algorithm,dict_sample)
+          Contact.Grains_Polyhedral_contact_Neighborhoods(dict_material,dict_sample)
+
           # Detection of contacts between grain and walls
           if dict_algorithm['i_DEM'] % dict_algorithm['i_update_neighborhoods']  == 0:
               Contact_gw.Update_wall_Neighbouroods(dict_algorithm, dict_sample)
@@ -349,8 +364,8 @@ while not User.Criteria_StopSimulation(dict_algorithm):
       simulation_report.tic_tempo(datetime.now())
 
       if dict_algorithm['MovePF_selector'] == 'DeconstructRebuild':
-          for grain in dict_sample['L_g']:
-              grain.DEMtoPF_Decons_rebuild(dict_material,dict_sample)
+          Grain.DEMtoPF_Decons_rebuild_f(dict_algorithm,dict_material,dict_sample)
+
           for etai in dict_sample['L_etai_undissolved']+dict_sample['L_etai_dissolved']:
               etai.update_etai_M(dict_sample['L_g'])
               etai.Write_txt_Decons_rebuild(dict_algorithm,dict_sample)
@@ -391,16 +406,15 @@ while not User.Criteria_StopSimulation(dict_algorithm):
 
       #Convert PF data into DEM data
       FileToRead = 'Output/PF_'+str(dict_algorithm['i_PF'])+'/PF_'+str(dict_algorithm['i_PF'])+'_other_'+j_str
-      PFtoDEM_Multi(FileToRead,dict_algorithm,dict_sample)
+      PFtoDEM_Multi(FileToRead,dict_algorithm,dict_material,dict_sample)
 
       #Geometric study
       S_grains = 0
       S_grains_dissolvable = 0
-      for grain in L_g:
+      for grain in dict_sample['L_g']:
           grain.Geometricstudy(dict_geometry,dict_sample,simulation_report)
-          grain.init_f_control(dict_sollicitations)
           S_grains = S_grains + grain.surface
-          if grain.dissolved : 
+          if grain.dissolved :
               S_grains_dissolvable = S_grains_dissolvable + grain.surface
       simulation_report.write('Total Surface '+str(int(S_grains))+' µm2\n')
       simulation_report.write('Total Surface dissolvable '+str(int(S_grains_dissolvable))+' µm2\n')

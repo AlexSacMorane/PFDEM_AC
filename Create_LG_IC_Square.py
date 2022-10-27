@@ -1178,13 +1178,32 @@ def From_LG_tempo_to_usable(dict_ic,dict_material,dict_sample):
     L_g = []
     for grain_tempo in dict_ic['L_g_tempo']:
 
-        # Comute etai_M for a grain based on the IC
+        # Compute etai_M for a grain based on the IC
         etai_M_IC = np.zeros((len(dict_sample['y_L']),len(dict_sample['x_L'])))
         L_R = grain_tempo.l_r
         L_theta_R = grain_tempo.l_theta_r
 
-        for i_x in range(len(dict_sample['x_L'])):
-            for i_y in range(len(dict_sample['y_L'])):
+        #extract a part focused on the grain
+        x_extract_min = grain_tempo.center[0] - grain_tempo.r_max - dict_material['w']
+        x_extract_max = grain_tempo.center[0] + grain_tempo.r_max + dict_material['w']
+        y_extract_min = grain_tempo.center[1] - grain_tempo.r_max - dict_material['w']
+        y_extract_max = grain_tempo.center[1] + grain_tempo.r_max + dict_material['w']
+
+        #look for this part inside the global mesh
+        #create search list
+        x_L_search_min = abs(np.array(x_L)-x_extract_min)
+        x_L_search_max = abs(np.array(x_L)-x_extract_max)
+        y_L_search_min = abs(np.array(y_L)-y_extract_min)
+        y_L_search_max = abs(np.array(y_L)-y_extract_max)
+
+        #get index
+        i_x_min = list(x_L_search_min).index(min(x_L_search_min))
+        i_x_max = list(x_L_search_max).index(min(x_L_search_max))
+        i_y_min = list(y_L_search_min).index(min(y_L_search_min))
+        i_y_max = list(y_L_search_max).index(min(y_L_search_max))
+
+        for i_x in range(i_x_min,i_x_max+1):
+            for i_y in range(i_y_min,i_ymax+1):
                 p = np.array([dict_sample['x_L'][i_x], dict_sample['y_L'][len(dict_sample['y_L'])-1-i_y]])
                 r = np.linalg.norm(grain_tempo.center - p)
                 if p[1]>grain_tempo.center[1]:
@@ -1202,9 +1221,60 @@ def From_LG_tempo_to_usable(dict_ic,dict_material,dict_sample):
                     etai_M_IC[i_y][i_x] = 0.5*(1 + np.cos(math.pi*(r-R+dict_material['w']/2)/dict_material['w']))
 
         # Create real point
-        L_g.append(Grain.Grain(grain_tempo.id,etai_M_IC,None,np.array([0,0]),np.array([0,0]),grain_tempo.y,grain_tempo.nu,grain_tempo.rho_surf))
+        L_g.append(Grain.Grain(grain_tempo,etai_M_IC,None,np.array([0,0]),np.array([0,0])))
 
     #Add element in dict
     dict_sample['L_g'] = L_g
 
 #-------------------------------------------------------------------------------
+
+def From_tempo_to_usable(dict_ic, dict_material, dict_sample, grain_tempo):
+    #from a tempo configuration (circular grains), an initial configuration (polygonal grains) is generated
+
+    # Compute etai_M for a grain based on the IC
+    etai_M_IC = np.zeros((len(dict_sample['y_L']),len(dict_sample['x_L'])))
+    L_R = grain_tempo.l_r
+    L_theta_R = grain_tempo.l_theta_r
+
+    #extract a part focused on the grain
+    x_extract_min = grain_tempo.center[0] - grain_tempo.r_max - dict_material['w']
+    x_extract_max = grain_tempo.center[0] + grain_tempo.r_max + dict_material['w']
+    y_extract_min = grain_tempo.center[1] - grain_tempo.r_max - dict_material['w']
+    y_extract_max = grain_tempo.center[1] + grain_tempo.r_max + dict_material['w']
+
+    #look for this part inside the global mesh
+    #create search list
+    x_L_search_min = abs(np.array(x_L)-x_extract_min)
+    x_L_search_max = abs(np.array(x_L)-x_extract_max)
+    y_L_search_min = abs(np.array(y_L)-y_extract_min)
+    y_L_search_max = abs(np.array(y_L)-y_extract_max)
+
+    #get index
+    i_x_min = list(x_L_search_min).index(min(x_L_search_min))
+    i_x_max = list(x_L_search_max).index(min(x_L_search_max))
+    i_y_min = list(y_L_search_min).index(min(y_L_search_min))
+    i_y_max = list(y_L_search_max).index(min(y_L_search_max))
+
+    for i_x in range(i_x_min,i_x_max+1):
+        for i_y in range(i_y_min,i_ymax+1):
+
+            p = np.array([dict_sample['x_L'][i_x], dict_sample['y_L'][len(dict_sample['y_L'])-1-i_y]])
+            r = np.linalg.norm(grain_tempo.center - p)
+            if p[1]>grain_tempo.center[1]:
+                theta = math.acos((p[0]-grain_tempo.center[0])/np.linalg.norm(grain_tempo.center-p))
+            else :
+                theta= 2*math.pi - math.acos((p[0]-grain_tempo.center[0])/np.linalg.norm(grain_tempo.center-p))
+            L_theta_R_i = list(abs(np.array(L_theta_R)-theta))
+            R = L_R[L_theta_R_i.index(min(L_theta_R_i))]
+            #Cosine_Profile
+            if r<R-dict_material['w']/2:
+                etai_M_IC[i_y][i_x] = 1
+            elif r>R+dict_material['w']/2:
+                etai_M_IC[i_y][i_x] = 0
+            else :
+                etai_M_IC[i_y][i_x] = 0.5*(1 + np.cos(math.pi*(r-R+dict_material['w']/2)/dict_material['w']))
+
+    #create real grain
+    grain = Grain.Grain(grain_tempo,etai_M_IC,None,np.array([0,0]),np.array([0,0]))
+
+    return grain

@@ -21,6 +21,8 @@ import os
 import pickle
 from pathlib import Path
 from datetime import datetime
+from multiprocessing import Pool
+from functools import partial
 import imageio
 import Contact
 import Contact_gw

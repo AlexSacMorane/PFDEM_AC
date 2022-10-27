@@ -45,6 +45,7 @@ class Grain_Tempo:
     self.id = ID
     self.center = Center
     self.radius = Radius
+    self.r_max = Radius
     self.y = Y
     self.nu = Nu
     self.g = Y /2/(1+Nu) #shear modulus
@@ -346,7 +347,7 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
         simulation_report.write('n_generation must be equal to 2 !')
         raise ValueError('n_generation must be equal to 2 !')
     factor = dict_ic['factor_ymax_box']
-    N_grain = dict_geometry['N_grain']
+    N_grain = dict_geometry['N_grain_disk']
     L_radius = dict_geometry['L_R']
     L_percentage_radius = dict_geometry['L_percentage_R']
     x_min = dict_sample['x_box_min']
@@ -993,28 +994,69 @@ def From_LG_tempo_to_usable(dict_ic, dict_material, dict_sample):
 
     L_g = []
     for grain_tempo in L_g_tempo:
-        etai_M_IC = IC(x_L,y_L,grain_tempo.radius,w,grain_tempo.center)
-        L_g.append(Grain.Grain(grain_tempo.id,etai_M_IC,None,np.array([0,0]),np.array([0,0]),grain_tempo.y,grain_tempo.nu,grain_tempo.rho_surf))
+        #compute phase field
+        etai_M_IC = IC(x_L,y_L,w,grain_tempo)
+        #create real grain
+        L_g.append(Grain.Grain(grain_tempo,etai_M_IC,None,np.array([0,0]),np.array([0,0])))
 
     #Add element in dict
     dict_sample['L_g'] = L_g
 
 #-------------------------------------------------------------------------------
 
-def IC(x_L,y_L,R,w,C):
+def From_tempo_to_usable(dict_ic, dict_material, dict_sample, grain_tempo):
+    #from a tempo configuration (circular grains), an initial configuration (polygonal grains) is generated
+
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+    #load data needed
+    w = dict_material['w']
+    x_L = dict_sample['x_L']
+    y_L = dict_sample['y_L']
+    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+
+    #compute hase field
+    etai_M_IC = IC(x_L,y_L,w,grain_tempo)
+    #create real grain
+    grain = Grain.Grain(grain_tempo,etai_M_IC,None,np.array([0,0]),np.array([0,0]))
+
+    return grain
+
+#-------------------------------------------------------------------------------
+
+def IC(x_L,y_L,w,grain_tempo):
   #create initial phase field, assuming a circular grain.
 
+  #init the phase field
   etai_M_IC = np.zeros((len(y_L),len(x_L)))
 
-  for y in y_L:
-    for x in x_L:
-      r = np.linalg.norm(np.array([x,y])-C)
-      if r<R-w/2:
+  #extract a part focused on the grain
+  x_extract_min = grain_tempo.center[0] - grain_tempo.radius - w
+  x_extract_max = grain_tempo.center[0] + grain_tempo.radius + w
+  y_extract_min = grain_tempo.center[1] - grain_tempo.radius - w
+  y_extract_max = grain_tempo.center[1] + grain_tempo.radius + w
+
+  #look for this part inside the global mesh
+  #create search list
+  x_L_search_min = abs(np.array(x_L)-x_extract_min)
+  x_L_search_max = abs(np.array(x_L)-x_extract_max)
+  y_L_search_min = abs(np.array(y_L)-y_extract_min)
+  y_L_search_max = abs(np.array(y_L)-y_extract_max)
+
+  #get index
+  i_x_min = list(x_L_search_min).index(min(x_L_search_min))
+  i_x_max = list(x_L_search_max).index(min(x_L_search_max))
+  i_y_min = list(y_L_search_min).index(min(y_L_search_min))
+  i_y_max = list(y_L_search_max).index(min(y_L_search_max))
+
+  for y in y_L[i_y_min:i_y_max+1]:
+    for x in x_L[i_x_min:i_x_max+1]:
+      r = np.linalg.norm(np.array([x,y])-grain_tempo.center)
+      if r<grain_tempo.radius-w/2:
         etai_M_IC[len(y_L)-1-y_L.index(y)][x_L.index(x)] = 1
-      elif r>R+w/2:
+      elif r>grain_tempo.radius+w/2:
         etai_M_IC[len(y_L)-1-y_L.index(y)][x_L.index(x)] = 0
       else :
-        etai_M_IC[len(y_L)-1-y_L.index(y)][x_L.index(x)] = 0.5*(1 + np.cos(math.pi*(r-R+w/2)/w))
+        etai_M_IC[len(y_L)-1-y_L.index(y)][x_L.index(x)] = 0.5*(1 + np.cos(math.pi*(r-grain_tempo.radius+w/2)/w))
 
   return etai_M_IC
 
