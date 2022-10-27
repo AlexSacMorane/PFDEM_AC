@@ -598,45 +598,6 @@ def Update_Neighborhoods(dict_algorithm,dict_sample):
 
 #-------------------------------------------------------------------------------
 
-def Update_Neighborhoods_MP(dict_algorithm,dict_sample,grain):
-    #determine a neighbouroods for a grain. This function is called every x time step
-    #grain contact is determined by Grains_Polyhedral_contact_Neighbouroods
-    #
-    #notice that if there is a potential contact between grain_i and grain_j
-    #grain_i is not in the neighbourood of grain_j
-    #whereas grain_j is in the neighbourood of grain_i
-    #with i_grain < j_grain
-
-    i_grain = dict_sample['L_g'].index(grain)
-    neighborhood = []
-    for j_grain in range(i_grain+1,len(dict_sample['L_g'])):
-        if np.linalg.norm(grain.center-dict_sample['L_g'][j_grain].center) < dict_algorithm['factor_neighborhood']*(grain.r_max+dict_sample['L_g'][j_grain].r_max):
-            neighborhood.append(dict_sample['L_g'][j_grain])
-    grain.neighbourood = neighborhood
-
-    return grain
-
-#-------------------------------------------------------------------------------
-
-def Update_Neighborhoods_f(dict_algorithm,dict_sample):
-    #Run Update_Neighborhoods_MP if multi proccessors
-    #or Update_Neighborhoods if one proccessor
-
-      #if dict_algorithm['np_proc'] > 1:
-      if False:
-
-          pool = Pool(processes = dict_algorithm['np_proc'])
-          L_g = pool.map(partial(Update_Neighborhoods_MP, dict_algorithm, dict_sample), dict_sample['L_g'])
-          pool.close()
-
-          #update element in dict
-          dict_sample['L_g'] = L_g
-
-      else :
-          Update_Neighborhoods(dict_algorithm,dict_sample)
-
-#-------------------------------------------------------------------------------
-
 def Grains_Polyhedral_contact_Neighborhoods_bool(g1,g2):
   #detect contact grain-grain
 
@@ -674,48 +635,3 @@ def Grains_Polyhedral_contact_Neighborhoods(dict_material,dict_sample):
                 if (i_grain,j_grain) in dict_sample['L_ij_contact'] : #contact detected previously is not anymore
                        dict_sample['L_contact'].pop(dict_sample['L_ij_contact'].index((i_grain,j_grain)))
                        dict_sample['L_ij_contact'].remove((i_grain,j_grain))
-
-#-------------------------------------------------------------------------------
-
-def Grains_Polyhedral_contact_Neighborhoods_MP(dict_material,dict_sample,grain):
-    #detect contact between a grain and grains from its neighbourood
-    #the neighbourood is updated with Update_Neighborhoods_f()
-
-    for neighbour in grain.neighbourood:
-        j_grain = neighbour.id
-        if Grains_Polyhedral_contact_Neighborhoods_bool(grain,dict_sample['L_g'][j_grain]):
-            if (grain.id,j_grain) not in dict_sample['L_ij_contact']:  #contact not detected previously
-
-               return ['Add',(grain.id,j_grain),Contact(dict_sample['id_contact'], grain, dict_sample['L_g'][j_grain], dict_material),dict_sample['id_contact'] + 1]
-        else :
-            if (grain.id,j_grain) in dict_sample['L_ij_contact'] : #contact detected previously is not anymore
-
-               return ['Delete',(grain.id,j_grain)]
-
-#-------------------------------------------------------------------------------
-
-def Grains_Polyhedral_contact_Neighborhoods_f(dict_algorithm,dict_material,dict_sample):
-    #Run Grains_Polyhedral_contact_Neighborhoods_MP if multi proccessors
-    #or Grains_Polyhedral_contact_Neighborhoods if one proccessor
-
-
-      #if dict_algorithm['np_proc'] > 1:
-      if False:
-          pool = Pool(processes = dict_algorithm['np_proc'])
-          L_data = pool.map(partial(Grains_Polyhedral_contact_Neighborhoods_MP, dict_material, dict_sample), dict_sample['L_g'])
-          pool.close()
-
-          for data in L_data :
-
-             if data != None:
-                 if data[0] == 'Add':
-                     #creation of contact
-                     dict_sample['L_ij_contact'].append(data[1])
-                     dict_sample['L_contact'].append(data[2])
-                     dict_sample['id_contact'] = data[3]
-                 elif data[0] == 'Delete':
-                     dict_sample['L_contact'].pop(dict_sample['L_ij_contact'].index(data[1]))
-                     dict_sample['L_ij_contact'].remove(data[1])
-
-      else :
-          Grains_Polyhedral_contact_Neighborhoods(dict_material,dict_sample)

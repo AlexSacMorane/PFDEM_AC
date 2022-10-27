@@ -18,15 +18,15 @@ import math
 #Function Definition
 #-------------------------------------------------------------------------------
 
-def PFtoDEM_Multi(FileToRead,dict_algorithm,dict_sample):
+def PFtoDEM_Multi(FileToRead,dict_algorithm,dict_material,dict_sample):
 
     #---------------------------------------------------------------------------
     #Global parameters
     #---------------------------------------------------------------------------
 
-    L_etai_M_g = []
-    for grain in dict_sample['L_g']:
-        L_etai_M_g.append(np.zeros((len(dict_sample['y_L']),len(dict_sample['x_L'])))) #etai
+    L_etai_M_etai = []
+    for etai in dict_sample['L_etai_undissolved']+dict_sample['L_etai_dissolved']:
+        L_etai_M_etai.append(np.zeros((len(dict_sample['y_L']),len(dict_sample['x_L'])))) #etai
 
     id_L = None
     eta_selector_len = len('        <DataArray type="Float64" Name="etai')
@@ -99,7 +99,7 @@ def PFtoDEM_Multi(FileToRead,dict_algorithm,dict_sample):
     #Adaptating data
     #---------------------------------------------------------------------------
 
-        for grain in dict_sample['L_g']:
+        for etai in dict_sample['L_etai_undissolved']+dict_sample['L_etai_dissolved']:
             for i in range(len(L_Work[0])):
                 #Interpolation method
                 L_dy = []
@@ -108,19 +108,35 @@ def PFtoDEM_Multi(FileToRead,dict_algorithm,dict_sample):
                 L_dx = []
                 for x_i in dict_sample['x_L'] :
                     L_dx.append(abs(x_i - L_Work[0][i]))
-                #if np.linalg.norm(grain.center-np.array(dict_sample['x_L'][L_dx.index(min(L_dx))],dict_sample['y_L'][L_dy.index(min(L_dy))]))<grain.r_max*1.5:
-                L_etai_M_g[grain.id][L_dy.index(min(L_dy))][L_dx.index(min(L_dx))] = L_Work[2+grain.id_eta][i]
+                L_etai_M_etai[etai.id][L_dy.index(min(L_dy))][L_dx.index(min(L_dx))] = L_Work[2+etai.id][i]
 
         L_L_Work.append(L_Work)
+
     #---------------------------------------------------------------------------
     # Update
     #---------------------------------------------------------------------------
 
     for grain in dict_sample['L_g']:
-        for i_x in range(len(dict_sample['x_L'])):
-            for i_y in range(len(dict_sample['y_L'])):
-                if np.linalg.norm(grain.center - np.array([dict_sample['x_L'][i_x],dict_sample['y_L'][i_y]])) > grain.r_max*1.2:
-                    L_etai_M_g[grain.id][len(dict_sample['y_L'])-1-i_y][i_x] = 0
-        grain.etai_M = L_etai_M_g[grain.id].copy()
 
-#-------------------------------------------------------------------------------
+        #extract a part focused on the grain
+        x_extract_min = grain.center[0] - grain.r_max - dict_material['w']
+        x_extract_max = grain.center[0] + grain.r_max + dict_material['w']
+        y_extract_min = grain.center[1] - grain.r_max - dict_material['w']
+        y_extract_max = grain.center[1] + grain.r_max + dict_material['w']
+
+        #look for this part inside the global mesh
+        #create search list
+        x_L_search_min = abs(np.array(dict_sample['x_L'])-x_extract_min)
+        x_L_search_max = abs(np.array(dict_sample['x_L'])-x_extract_max)
+        y_L_search_min = abs(np.array(dict_sample['y_L'])-y_extract_min)
+        y_L_search_max = abs(np.array(dict_sample['y_L'])-y_extract_max)
+
+        #get index
+        i_x_min = list(x_L_search_min).index(min(x_L_search_min))
+        i_x_max = list(x_L_search_max).index(min(x_L_search_max))
+        i_y_min = list(y_L_search_min).index(min(y_L_search_min))
+        i_y_max = list(y_L_search_max).index(min(y_L_search_max))
+
+        for i_x in range(i_x_min,i_x_max+1):
+            for i_y in range(i_y_min,i_y_max+1):
+                grain.etai_M[len(dict_sample['y_L'])-1-i_y][i_x] = L_etai_M_etai[grain.id_eta][len(dict_sample['y_L'])-1-i_y][i_x]

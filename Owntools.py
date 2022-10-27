@@ -461,35 +461,6 @@ def Compute_k0(dict_sample,dict_sollicitations):
 
 #-------------------------------------------------------------------------------
 
-def Study_Polygonal_and_init(dict_geometry,dict_sample,dict_sollicitations,simulation_report,grain):
-    #Realize a geometric study on a grain
-    #initialize the force applied on it
-
-    grain.Geometricstudy(dict_geometry,dict_sample,simulation_report)
-    #grain.init_f_control(dict_sollicitations)
-
-    return grain
-
-#-------------------------------------------------------------------------------
-
-def Study_Polygonal_and_init_f(dict_algorithm,dict_geometry,dict_sample,dict_sollicitations,simulation_report):
-    #Run Study_Polygonal_and_init if multi proccessors
-    #or Geometricstudy and init_f_control if one proccessor
-
-      if dict_algorithm['np_proc'] > 1:
-          pool = Pool(processes = dict_algorithm['np_proc'])
-          L_g = pool.map(partial(Study_Polygonal_and_init, dict_geometry, dict_sample, dict_sollicitations, simulation_report), dict_sample['L_g'])
-          pool.close()
-
-          #update element in dict
-          dict_sample['L_g'] = L_g
-      else :
-          for grain in dict_sample['L_g']:
-              grain.Geometricstudy(dict_geometry,dict_sample,simulation_report)
-              #grain.init_f_control(dict_sollicitations)
-
-#-------------------------------------------------------------------------------
-
 def Write_e_dissolution_txt(dict_sample,dict_sollicitations):
       #write an .txt file for MOOSE
       #this file described an homogenous dissolution field
