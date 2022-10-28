@@ -365,7 +365,7 @@ while not User.Criteria_StopSimulation(dict_algorithm):
 
       if dict_algorithm['MovePF_selector'] == 'DeconstructRebuild':
           for grain in dict_sample['L_g']:
-              Grain.DEMtoPF_Decons_rebuild(dict_material,dict_sample)
+              grain.DEMtoPF_Decons_rebuild(dict_material,dict_sample)
 
           for etai in dict_sample['L_etai_undissolved']+dict_sample['L_etai_dissolved']:
               etai.update_etai_M(dict_sample['L_g'])
