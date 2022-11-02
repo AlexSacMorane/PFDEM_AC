@@ -698,8 +698,8 @@ def DEM_loading(dict_ic, dict_material, dict_sample, dict_sollicitations, multi_
         Grains_Polyhedral_contact_Neighbouroods(dict_ic,dict_material)
         # Detection of contacts between grain and walls
         if (i_DEM-i_DEM_0-1) % i_update_neighbouroods  == 0:
-            wall_neighborhood = Update_wall_Neighbouroods(L_g_tempo,factor_neighborhood_IC,x_min,x_max,y_min,y_max)
-        Grains_Polyhedral_Wall_contact_Neighbourood(wall_neighborhood,x_min,x_max,y_min,y_max, dict_ic, dict_material)
+            wall_neighborhood = Update_wall_Neighborhoods(L_g_tempo,factor_neighborhood_IC,x_min,x_max,y_min,y_max)
+        Grains_Polyhedral_Wall_contact_Neighborhood(wall_neighborhood,x_min,x_max,y_min,y_max, dict_ic, dict_material)
 
         #Sollicitation computation
         for grain in dict_ic['L_g_tempo']:
@@ -952,7 +952,7 @@ def Reset_y_max(L_g,Force):
 
 #-------------------------------------------------------------------------------
 
-def Grains_Polyhedral_contact_Neighbouroods_f(g1,g2):
+def Grains_Polyhedral_contact_Neighborhoods_f(g1,g2):
   #detect contact grain-grain
 
   #looking for the nearest nodes
@@ -998,7 +998,7 @@ def Grains_Polyhedral_contact_Neighbouroods(dict_ic,dict_material):
         for neighbour in dict_ic['L_g_tempo'][i_grain].neighbourood:
             j_grain = neighbour.id
             grain_j = neighbour
-            if Grains_Polyhedral_contact_Neighbouroods_f(grain_i,grain_j):
+            if Grains_Polyhedral_contact_Neighborhoods_f(grain_i,grain_j):
                 if (i_grain,j_grain) not in dict_ic['L_contact_ij']:  #contact not detected previously
                    #creation of contact
                    dict_ic['L_contact_ij'].append((i_grain,j_grain))
@@ -1012,9 +1012,9 @@ def Grains_Polyhedral_contact_Neighbouroods(dict_ic,dict_material):
 
 #-------------------------------------------------------------------------------
 
-def Update_wall_Neighbouroods(L_g_tempo,factor_neighborhood_IC,x_min,x_max,y_min,y_max):
+def Update_wall_Neighborhoods(L_g_tempo,factor_neighborhood_IC,x_min,x_max,y_min,y_max):
     #determine a neighbouroods for wall. This function is called every x time step
-    #grain_wall contact is determined by Grains_Polyhedral_Wall_contact_Neighbourood
+    #grain_wall contact is determined by Grains_Polyhedral_Wall_contact_Neighborhood
     #factor determines the size of the neighbourood window
 
     wall_neighborhood = []
@@ -1042,9 +1042,9 @@ def Update_wall_Neighbouroods(L_g_tempo,factor_neighborhood_IC,x_min,x_max,y_min
 
 #-------------------------------------------------------------------------------
 
-def Grains_Polyhedral_Wall_contact_Neighbourood(wall_neighborhood,x_box_min,x_box_max,y_box_min,y_box_max, dict_ic, dict_material):
+def Grains_Polyhedral_Wall_contact_Neighborhood(wall_neighborhood,x_box_min,x_box_max,y_box_min,y_box_max, dict_ic, dict_material):
   #detect contact grain in the neighbourood of the wall and  the wall
-  #the neighbourood is updated with Update_wall_Neighbouroods()
+  #the neighbourood is updated with Update_wall_Neighborhoods()
   #we realize iterations on the grain list and compare with the coordinate of the different walls
 
   #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
@@ -1171,110 +1171,30 @@ def From_LG_tempo_to_usable(dict_ic,dict_material,dict_sample):
     #the distance between the point of the mesh and the particle center determines the value of the variable
     #a cosine profile is applied inside the interface
 
-    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
-    #load data needed
-    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
-
     L_g = []
     for grain_tempo in dict_ic['L_g_tempo']:
 
-        # Compute etai_M for a grain based on the IC
-        etai_M_IC = np.zeros((len(dict_sample['y_L']),len(dict_sample['x_L'])))
-        L_R = grain_tempo.l_r
-        L_theta_R = grain_tempo.l_theta_r
-
-        #extract a part focused on the grain
-        x_extract_min = grain_tempo.center[0] - grain_tempo.r_max - dict_material['w']
-        x_extract_max = grain_tempo.center[0] + grain_tempo.r_max + dict_material['w']
-        y_extract_min = grain_tempo.center[1] - grain_tempo.r_max - dict_material['w']
-        y_extract_max = grain_tempo.center[1] + grain_tempo.r_max + dict_material['w']
-
-        #look for this part inside the global mesh
-        #create search list
-        x_L_search_min = abs(np.array(x_L)-x_extract_min)
-        x_L_search_max = abs(np.array(x_L)-x_extract_max)
-        y_L_search_min = abs(np.array(y_L)-y_extract_min)
-        y_L_search_max = abs(np.array(y_L)-y_extract_max)
-
-        #get index
-        i_x_min = list(x_L_search_min).index(min(x_L_search_min))
-        i_x_max = list(x_L_search_max).index(min(x_L_search_max))
-        i_y_min = list(y_L_search_min).index(min(y_L_search_min))
-        i_y_max = list(y_L_search_max).index(min(y_L_search_max))
-
-        for i_x in range(i_x_min,i_x_max+1):
-            for i_y in range(i_y_min,i_ymax+1):
-                p = np.array([dict_sample['x_L'][i_x], dict_sample['y_L'][len(dict_sample['y_L'])-1-i_y]])
-                r = np.linalg.norm(grain_tempo.center - p)
-                if p[1]>grain_tempo.center[1]:
-                    theta = math.acos((p[0]-grain_tempo.center[0])/np.linalg.norm(grain_tempo.center-p))
-                else :
-                    theta= 2*math.pi - math.acos((p[0]-grain_tempo.center[0])/np.linalg.norm(grain_tempo.center-p))
-                L_theta_R_i = list(abs(np.array(L_theta_R)-theta))
-                R = L_R[L_theta_R_i.index(min(L_theta_R_i))]
-                #Cosine_Profile
-                if r<R-dict_material['w']/2:
-                    etai_M_IC[i_y][i_x] = 1
-                elif r>R+dict_material['w']/2:
-                    etai_M_IC[i_y][i_x] = 0
-                else :
-                    etai_M_IC[i_y][i_x] = 0.5*(1 + np.cos(math.pi*(r-R+dict_material['w']/2)/dict_material['w']))
-
-        # Create real point
-        L_g.append(Grain.Grain(grain_tempo,etai_M_IC,None,np.array([0,0]),np.array([0,0])))
+        dict_ic_to_real = {
+        'Id' : grain_tempo.id,
+        'Y' : grain_tempo.y,
+        'Nu' : grain_tempo.nu,
+        'Rho_surf' : grain_tempo.rho_surf,
+        'Center' : grain_tempo.center,
+        'L_border' : grain_tempo.l_border,
+        'L_border_x' : grain_tempo.l_border_x,
+        'L_border_y' : grain_tempo.l_border_y,
+        'L_r' : grain_tempo.l_r,
+        'L_theta_r' : grain_tempo.l_theta_r,
+        'R_min' : grain_tempo.radius,
+        'R_max' : grain_tempo.radius,
+        'R_mean' : grain_tempo.radius,
+        'Mass' : grain_tempo.dimension**2*grain_tempo.rho_surf,
+        'Inertia' : 1/6*grain_tempo.dimension**2*grain_tempo.rho_surf*grain_tempo.Dimension**2
+        }
+        #create real grain
+        L_g.append(Grain.Grain(dict_ic_to_real))
 
     #Add element in dict
     dict_sample['L_g'] = L_g
 
 #-------------------------------------------------------------------------------
-
-def From_tempo_to_usable(dict_ic, dict_material, dict_sample, grain_tempo):
-    #from a tempo configuration (circular grains), an initial configuration (polygonal grains) is generated
-
-    # Compute etai_M for a grain based on the IC
-    etai_M_IC = np.zeros((len(dict_sample['y_L']),len(dict_sample['x_L'])))
-    L_R = grain_tempo.l_r
-    L_theta_R = grain_tempo.l_theta_r
-
-    #extract a part focused on the grain
-    x_extract_min = grain_tempo.center[0] - grain_tempo.r_max - dict_material['w']
-    x_extract_max = grain_tempo.center[0] + grain_tempo.r_max + dict_material['w']
-    y_extract_min = grain_tempo.center[1] - grain_tempo.r_max - dict_material['w']
-    y_extract_max = grain_tempo.center[1] + grain_tempo.r_max + dict_material['w']
-
-    #look for this part inside the global mesh
-    #create search list
-    x_L_search_min = abs(np.array(x_L)-x_extract_min)
-    x_L_search_max = abs(np.array(x_L)-x_extract_max)
-    y_L_search_min = abs(np.array(y_L)-y_extract_min)
-    y_L_search_max = abs(np.array(y_L)-y_extract_max)
-
-    #get index
-    i_x_min = list(x_L_search_min).index(min(x_L_search_min))
-    i_x_max = list(x_L_search_max).index(min(x_L_search_max))
-    i_y_min = list(y_L_search_min).index(min(y_L_search_min))
-    i_y_max = list(y_L_search_max).index(min(y_L_search_max))
-
-    for i_x in range(i_x_min,i_x_max+1):
-        for i_y in range(i_y_min,i_ymax+1):
-
-            p = np.array([dict_sample['x_L'][i_x], dict_sample['y_L'][len(dict_sample['y_L'])-1-i_y]])
-            r = np.linalg.norm(grain_tempo.center - p)
-            if p[1]>grain_tempo.center[1]:
-                theta = math.acos((p[0]-grain_tempo.center[0])/np.linalg.norm(grain_tempo.center-p))
-            else :
-                theta= 2*math.pi - math.acos((p[0]-grain_tempo.center[0])/np.linalg.norm(grain_tempo.center-p))
-            L_theta_R_i = list(abs(np.array(L_theta_R)-theta))
-            R = L_R[L_theta_R_i.index(min(L_theta_R_i))]
-            #Cosine_Profile
-            if r<R-dict_material['w']/2:
-                etai_M_IC[i_y][i_x] = 1
-            elif r>R+dict_material['w']/2:
-                etai_M_IC[i_y][i_x] = 0
-            else :
-                etai_M_IC[i_y][i_x] = 0.5*(1 + np.cos(math.pi*(r-R+dict_material['w']/2)/dict_material['w']))
-
-    #create real grain
-    grain = Grain.Grain(grain_tempo,etai_M_IC,None,np.array([0,0]),np.array([0,0]))
-
-    return grain

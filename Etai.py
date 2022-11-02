@@ -88,7 +88,6 @@ def etai_distribution(dict_algorithm,dict_sample):
 
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
-    factor = dict_algorithm['factor_distribution_etai']
     L_g = dict_sample['L_g']
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
@@ -101,7 +100,7 @@ def etai_distribution(dict_algorithm,dict_sample):
         grain1 = L_g[i_grain1]
         for i_grain2 in range(0,i_grain1):
             grain2 = L_g[i_grain2]
-            if np.linalg.norm(grain1.center - grain2.center) < 1.5 * (grain1.r_max+grain2.r_max):
+            if np.linalg.norm(grain1.center - grain2.center) < dict_algorithm['factor_distribution_etai'] * (grain1.r_max+grain2.r_max):
                 grain1.ig_near_L.append(i_grain2)
                 grain2.ig_near_L.append(i_grain1)
     #first try

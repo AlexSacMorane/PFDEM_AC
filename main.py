@@ -98,8 +98,9 @@ User.Add_SpatialDiscretisation(dict_geometry,dict_sample)
 #PF parameters
 User.Add_WidthInt_DoubleWellBarrier(dict_material, dict_sample)
 
-#Dissolution energy
+#Dissolution energy and creation of the dissolution .txt
 User.Add_DissolutionEnergy(dict_algorithm,dict_geometry,dict_material,dict_sollicitations)
+Owntools.Write_e_dissolution_txt(dict_sample,dict_sollicitations)
 
 simulation_report.tac_tempo(datetime.now(),'Initialisation')
 
@@ -110,16 +111,9 @@ simulation_report.tac_tempo(datetime.now(),'Initialisation')
 simulation_report.tic_tempo(datetime.now())
 
 # Creation of the real list of grains
-From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample, simulation_report)
+From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample, simulation_report)#creation pf the dissolution .txt
 
-#creation pf the dissolution .txt
-Owntools.Write_e_dissolution_txt(dict_sample,dict_sollicitations)
-
-#Study the grain and saving the grain surface
-for grain in dict_sample['L_g']:
-    grain.Geometricstudy(dict_geometry,dict_sample,simulation_report)
-
-simulation_report.tac_tempo(datetime.now(),'Creation and study of polygonal particles')
+simulation_report.tac_tempo(datetime.now(),'Creation of polygonal particles')
 
 #-------------------------------------------------------------------------------
 #Distribution etai
@@ -364,18 +358,11 @@ while not User.Criteria_StopSimulation(dict_algorithm):
       simulation_report.tic_tempo(datetime.now())
 
       if dict_algorithm['MovePF_selector'] == 'DeconstructRebuild':
-          for grain in dict_sample['L_g']:
-              grain.DEMtoPF_Decons_rebuild(dict_material,dict_sample)
-
-          for etai in dict_sample['L_etai_undissolved']+dict_sample['L_etai_dissolved']:
+          for i_grain in dict_sample['L_ig_etai_dissolved']:
+              dict_sample['L_g'][i_grain].DEMtoPF_Decons_rebuild(dict_material,dict_sample)
+          for etai in dict_sample['L_etai_dissolved']:
               etai.update_etai_M(dict_sample['L_g'])
               etai.Write_txt_Decons_rebuild(dict_algorithm,dict_sample)
-      #does not work for multiple grain by etai
-      #elif MovePF_selector == 'Interpolation':
-      #  for id_grain in range(len(dict_sample['L_g'])):
-      #      rbm = dict_sample['L_g'][id_grain].center - L_center_g[id_grain]
-      #      grain = dict_sample['L_g'][id_grain]
-      #      grain.DEMtoPF_Interpolation(x_L,y_L,i_PF,rbm)
       else :
           simulation_report.write('Method to move phase field not available !')
           raise ValueError('Method to move phase field not available !')
@@ -388,32 +375,19 @@ while not User.Criteria_StopSimulation(dict_algorithm):
 
       simulation_report.tic_tempo(datetime.now())
 
-      #Create the .i for moose
-      Create_i_AC(dict_algorithm, dict_material, dict_sample)
-
-      #Running moose
-      os.system('mpiexec -n '+str(dict_algorithm['np_proc'])+' ~/projects/moose/modules/combined/combined-opt -i PF_'+str(dict_algorithm['i_PF'])+'.i')
-
-      #sorting files
-      j_str = Owntools.Sort_Files(dict_algorithm)
-
-      simulation_report.tac_tempo(datetime.now(),'PF '+str(dict_algorithm['i_PF']))
-
-      #-----------------------------------------------------------------------------
-      # Conversion PF to DEM
-      #-----------------------------------------------------------------------------
-
-      simulation_report.tic_tempo(datetime.now())
-
-      #Convert PF data into DEM data
-      FileToRead = 'Output/PF_'+str(dict_algorithm['i_PF'])+'/PF_'+str(dict_algorithm['i_PF'])+'_other_'+j_str
-      PFtoDEM_Multi(FileToRead,dict_algorithm,dict_material,dict_sample)
+      for grain in dict_sample['L_g']:
+          if grain.dissolved :
+              Create_i_AC_local(grain,dict_algorithm, dict_material, dict_sample)
+              os.system('mpiexec -n '+str(dict_algorithm['np_proc'])+' ~/projects/moose/modules/combined/combined-opt -i PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'.i')
+              j_str = Owntools.Sort_Files('PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id),dict_algorithm)
+              Owntools.Stop_Debug(simulation_report)
+              grain.PFtoDEM_Multi_local()
+              grain.Geometricstudy(dict_geometry,dict_sample,simulation_report)
 
       #Geometric study
       S_grains = 0
       S_grains_dissolvable = 0
       for grain in dict_sample['L_g']:
-          grain.Geometricstudy(dict_geometry,dict_sample,simulation_report)
           S_grains = S_grains + grain.surface
           if grain.dissolved :
               S_grains_dissolvable = S_grains_dissolvable + grain.surface
@@ -429,7 +403,7 @@ while not User.Criteria_StopSimulation(dict_algorithm):
       dict_tracker['S_grains_dissolvable_L'].append(S_grains_dissolvable)
       dict_tracker['S_dissolved_perc_dissolvable_L'].append((dict_tracker['S_grains_dissolvable_L'][0]-S_grains_dissolvable)/(dict_tracker['S_grains_dissolvable_L'][0])*100)
 
-      simulation_report.tac_tempo(datetime.now(),'From PF to DEM iteration '+str(dict_algorithm['i_PF']))
+      simulation_report.tac_tempo(datetime.now(),'PF iteration '+str(dict_algorithm['i_PF']))
 
       #-----------------------------------------------------------------------------
       # Reinitialisation of contact for the next step

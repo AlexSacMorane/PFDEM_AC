@@ -137,6 +137,7 @@ def All_parameters():
     n_t_PF = 5 #number of iterations PF-DEM
     factor_distribution_etai = 1.5 #margin to distribute etai
     MovePF_selector = 'DeconstructRebuild' #Move PF
+    n_local = 30 #number of node inside local PF simulation
 
     #DEM parameters
     if N_grain_square == 0 :

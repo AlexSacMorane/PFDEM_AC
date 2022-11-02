@@ -27,31 +27,38 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def __init__(self, Grain_Tempo, etai_M_IC, Id_Eta, V, A):
+  def __init__(self, dict_ic_to_real, Id_Eta = None, V = np.array([0,0]), A = np.array([0,0])):
     #defining the grain
-    #each grain is described by an id (an integer)
-    #                           a field of phase variable (an array of float)
-    #                           an id of the phase variable (an integer)
-    #                           a velocity (an array [Vx,Vy])
-    #                           a acceleration (an array [Ax, Ay])
-    #                           an Young modulus (a float)
-    #                           a Poisson's ratio (a float)
-    #                           a surface mass (a float)
+    #each grain is described from a tempo grain (see Create_LG_IC)
 
-    self.id = Grain_Tempo.id
-    self.etai_M = etai_M_IC
+    #Id of the grain
+    self.id = dict_ic_to_real['Id']
     self.id_eta = Id_Eta
-    self.y = Grain_Tempo.y
-    self.nu = Grain_Tempo.nu
-    self.g = Grain_Tempo.y /2/(1+Grain_Tempo.nu) #shear modulus
-    self.rho_surf = Grain_Tempo.rho_surf
+    #Material property
+    self.dissolved = False
+    self.y = dict_ic_to_real['Y']
+    self.nu = dict_ic_to_real['Nu']
+    self.g = self.y /2/(1+self.nu) #shear modulus
+    self.rho_surf = dict_ic_to_real['Rho_surf']
+    #kinematic
     self.v = V
     self.a = A
     self.theta = 0
     self.w = 0 #dtheta/dt
-    self.dissolved = False
-    self.center = Grain_Tempo.center
-    self.r_max = Grain_Tempo.r_max
+    #position
+    self.center = dict_ic_to_real['Center']
+    self.l_border = dict_ic_to_real['L_border']
+    self.l_border_x = dict_ic_to_real['L_border_x']
+    self.l_border_y = dict_ic_to_real['L_border_y']
+    #characteristic
+    self.l_r = dict_ic_to_real['L_r']
+    self.l_theta_r = dict_ic_to_real['L_theta_r']
+    self.r_min = dict_ic_to_real['R_min']
+    self.r_max = dict_ic_to_real['R_max']
+    self.r_mean = dict_ic_to_real['R_mean']
+    self.surface = dict_ic_to_real['Surface']
+    self.m = dict_ic_to_real['Mass']
+    self.inertia = dict_ic_to_real['Inertia']
 
 #-------------------------------------------------------------------------------
 
@@ -378,6 +385,97 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
+  def Write_e_dissolution_local_txt(self,dict_algorithm,dict_sollicitations):
+      #write an .txt file for MOOSE
+      #this file described an homogenous dissolution field
+
+      file_to_write = open(f"Data/e_diss_g{self.id}_ite{dict_algorithm['i_PF']}.txt",'w')
+      file_to_write.write('AXIS X\n')
+      line = ''
+      for x in self.x_L_local:
+          line = line + str(x)+ ' '
+      line = line + '\n'
+      file_to_write.write(line)
+
+      file_to_write.write('AXIS Y\n')
+      line = ''
+      for y in self.y_L:
+        line = line + str(y)+ ' '
+      line = line + '\n'
+      file_to_write.write(line)
+
+      file_to_write.write('DATA\n')
+      for l in range(len(y_L)):
+          for c in range(len(y_L_local)):
+              file_to_write.write(str(dict_sollicitations['Dissolution_Energy'])+'\n')
+
+      file_to_write.close()
+
+#-------------------------------------------------------------------------------
+
+  def Compute_etaiM_local(self,dict_algorithm,dict_material):
+
+      x_min_local = min(self.l_border_x)-dict_material['w']
+      x_max_local = max(self.l_border_x)+dict_material['w']
+      y_min_local = min(self.l_border_y)-dict_material['w']
+      y_max_local = max(self.l_border_y)+dict_material['w']
+      x_L_local = np.linspace(x_min_local,x_max_local,dict_algorithm['n_local'])
+      y_L_local = np.linspace(x_min_local,x_max_local,dict_algorithm['n_local'])
+      grain.x_L_local = x_L_local
+      grain.y_L_local = y_L_local
+
+      # compute phase field
+      etai_M = np.array(np.zeros((dict_algorithm['n_local'],dict_algorithm['n_local'])))
+      for i_x in range(dict_algorithm['n_local']):
+          for i_y in range(dict_algorithm['n_local']):
+              p = np.array([x_L_local[i_x],y_L_local[len(y_L_local)-1-i_y]])
+              r = np.linalg.norm(self.center - p)
+              if p[1]>self.center[1]:
+                  theta = math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
+              else :
+                  theta= 2*math.pi - math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
+
+              L_theta_R_i = list(abs(np.array(self.l_theta_r)-theta))
+              R = self.l_r[L_theta_R_i.index(min(L_theta_R_i))]
+              #Cosine_Profile
+              if r<R-dict_material['w']/2:
+                  etai_M_new[i_y][i_x] = 1
+              elif r>R+dict_material['w']/2:
+                  etai_M_new[i_y][i_x] = 0
+              else :
+                  etai_M_new[i_y][i_x] = 0.5*(1 + np.cos(math.pi*(r-R+dict_material['w']/2)/dict_material['w']))
+      self.etai_M = etai_M.copy()
+
+#-------------------------------------------------------------------------------
+
+  def Write_txt_Decons_rebuild_local(self,dict_algorithm):
+      #write a .txt file
+      #this file is used to define initial condition of MOOSE simulation
+
+      file_to_write = open('Data/g'+str(self.id)+'_'+str(dict_algorithm['i_PF'])+'.txt','w')
+      file_to_write.write('AXIS X\n')
+      line = ''
+      for x in self.x_L_local:
+          line = line + str(x)+ ' '
+      line = line + '\n'
+      file_to_write.write(line)
+
+      file_to_write.write('AXIS Y\n')
+      line = ''
+      for y in self.y_L_local:
+        line = line + str(y)+ ' '
+      line = line + '\n'
+      file_to_write.write(line)
+
+      file_to_write.write('DATA\n')
+      for l in range(len(self.y_L_local)):
+          for c in range(len(self.x_L_local)):
+              file_to_write.write(str(self.etai_M[-l-1][c])+'\n')
+
+      file_to_write.close()
+
+#-------------------------------------------------------------------------------
+
   def DEMtoPF_Interpolation(self):
 
       pass
@@ -385,4 +483,3 @@ class Grain:
 #-------------------------------------------------------------------------------
 #Function
 #-------------------------------------------------------------------------------
-
