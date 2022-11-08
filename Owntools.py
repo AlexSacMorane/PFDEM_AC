@@ -21,8 +21,7 @@ import os
 import pickle
 from pathlib import Path
 from datetime import datetime
-from multiprocessing import Pool
-from functools import partial
+import random
 import imageio
 import Contact
 import Contact_gw
@@ -156,8 +155,6 @@ def Debug_DEM_f(dict_algorithm, dict_sample):
             M = np.array([contact.limit,contact.g.center[1]])
         plt.plot([M[0], M[0]+contact.nwg[0]*alpha], [M[1], M[1]+contact.nwg[1]*alpha],'k')
         plt.plot([M[0], M[0]+contact.twg[0]*alpha], [M[1], M[1]+contact.twg[1]*alpha],'k')
-    plt.xlim([min(dict_sample['x_L']), max(dict_sample['x_L'])])
-    plt.ylim([min(dict_sample['y_L']), max(dict_sample['y_L'])])
     plt.plot([x_min,x_max,x_max,x_min,x_min],[y_min,y_min,y_max,y_max,y_min],'k')
     plt.axis("equal")
     fig.savefig('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/png/Config_'+str(dict_algorithm['i_DEM'])+'.png')
@@ -183,8 +180,6 @@ def Debug_f(dict_algorithm,dict_sample):
           plt.plot(grain.l_border_x,grain.l_border_y,'k-.')
       else:
           plt.plot(grain.l_border_x,grain.l_border_y,'k')
-  plt.xlim([min(dict_sample['x_L']), max(dict_sample['x_L'])])
-  plt.ylim([min(dict_sample['y_L']), max(dict_sample['y_L'])])
   plt.plot([x_min,x_max,x_max,x_min,x_min],[y_min,y_min,y_max,y_max,y_min],'k')
   plt.axis("equal")
   fig.savefig('Debug/DEM_ite/PF_ite_'+str(int(2*dict_algorithm['i_PF']-1))+'.png')
@@ -210,50 +205,10 @@ def Debug_f2(dict_algorithm,dict_sample):
           plt.plot(grain.l_border_x,grain.l_border_y,'k-.')
       else:
           plt.plot(grain.l_border_x,grain.l_border_y,'k')
-  plt.xlim([min(dict_sample['x_L']), max(dict_sample['x_L'])])
-  plt.ylim([min(dict_sample['y_L']), max(dict_sample['y_L'])])
   plt.plot([x_min,x_max,x_max,x_min,x_min],[y_min,y_min,y_max,y_max,y_min],'k')
   plt.axis("equal")
   fig.savefig('Debug/DEM_ite/PF_ite_'+str(int(2*dict_algorithm['i_PF']))+'.png')
   plt.close(1)
-
-#-------------------------------------------------------------------------------
-
-def Debug_etai_f(dict_sample):
-    #plot the etai distribution
-    #only for Debug
-
-    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
-    #load data needed
-    L_g = dict_sample['L_g']
-    x_min = dict_sample['x_box_min']
-    x_max = dict_sample['x_box_max']
-    y_min = dict_sample['y_box_min']
-    y_max = dict_sample['y_box_max']
-    x_L = dict_sample['x_L']
-    y_L = dict_sample['y_L']
-    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
-
-    eta_max = 0
-    for grain in L_g:
-        if grain.id_eta > eta_max:
-            eta_max = grain.id_eta
-    L_color_eta = ['blue','orange','green','red','purple','brown','pink','gray','olive','cyan']
-    fig = plt.figure(1,figsize=(16,9.12))
-    for i_color in range(min(len(L_color_eta),eta_max+1)):
-        plt.plot([],[],color = L_color_eta[i_color],label = 'eta'+str(i_color+1))
-    plt.legend()
-    for grain in L_g:
-        if grain.dissolved:
-            plt.plot(grain.l_border_x,grain.l_border_y,color=L_color_eta[grain.id_eta],linestyle='-.')
-        else:
-            plt.plot(grain.l_border_x,grain.l_border_y,color=L_color_eta[grain.id_eta])
-    plt.plot([x_min, x_max, x_max, x_min, x_min],[y_min, y_min, y_max, y_max, y_min],'k')
-    plt.xlim([min(x_L), max(x_L)])
-    plt.ylim([min(y_L), max(y_L)])
-    plt.axis("equal")
-    fig.savefig('Debug/Distribution_etai.png')
-    plt.close(1)
 
 #-------------------------------------------------------------------------------
 
@@ -309,6 +264,21 @@ def Sort_Files(name_template,dict_algorithm):
          folderpath = Path(name_template+'_other_'+j_str+'.pvtu')
 
      return index_to_str(j-1)
+
+#-------------------------------------------------------------------------------
+
+def Dissolution_Distribution(dict_sample,dict_sollicitations,simulation_report):
+
+    i = 0
+    while i < int(dict_sollicitations['frac_dissolved']*len(dict_sample['L_g'])):
+        print(i,int(dict_sollicitations['frac_dissolved']*len(dict_sample['L_g'])))
+        grain = random.choice(dict_sample['L_g'])
+        while grain.dissolved:
+            grain = random.choice(dict_sample['L_g'])
+        grain.dissolved = True
+        i = i + 1
+
+    simulation_report.write_and_print(f"{int(100*i/len(dict_sample['L_g']))} % dissolvable (asked {int(100*dict_sollicitations['frac_dissolved'])})",f"{int(100*i/len(dict_sample['L_g']))} % dissolvable (asked {int(100*dict_sollicitations['frac_dissolved'])})")
 
 #-------------------------------------------------------------------------------
 

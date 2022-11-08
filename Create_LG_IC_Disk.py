@@ -981,7 +981,7 @@ def Plot_Trackers(Force_tracker, Ecin_tracker, Ymax_tracker, i_DEM):
 
 #-------------------------------------------------------------------------------
 
-def From_LG_tempo_to_usable(dict_ic, dict_material, dict_sample):
+def From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample):
     #from a tempo configuration (circular grains), an initial configuration (polygonal grains) is generated
 
     L_g = []
@@ -1001,6 +1001,8 @@ def From_LG_tempo_to_usable(dict_ic, dict_material, dict_sample):
             L_r.append(grain_tempo.radius)
             L_theta_r = [theta]
         L_border.append(L_border[0])
+        L_border_x.append(L_border_x[0])
+        L_border_y.append(L_border_y[0])
 
         dict_ic_to_real = {
         'Id' : grain_tempo.id,

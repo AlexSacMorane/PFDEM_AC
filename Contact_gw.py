@@ -215,7 +215,7 @@ class Contact_gw:
 # Functions
 #-------------------------------------------------------------------------------
 
-def Grains_Polyhedral_Wall_contact_Neighbourood(dict_material,dict_sample):
+def Grains_Polyhedral_Wall_contact_Neighborhood(dict_material,dict_sample):
   #detect contact grain in the neighbourood of the wall and  the wall
   #the neighbourood is updated with Update_wall_Neighbouroods()
   #we realize iterations on the grain list and compare with the coordinate of the different walls
@@ -282,7 +282,7 @@ def Grains_Polyhedral_Wall_contact_Neighbourood(dict_material,dict_sample):
 
 #-------------------------------------------------------------------------------
 
-def Update_wall_Neighbouroods(dict_algorithm, dict_sample):
+def Update_wall_Neighborhoods(dict_algorithm, dict_sample):
     #determine a neighbouroods for wall. This function is called every x time step
     #grain_wall contact is determined by Grains_Polyhedral_Wall_contact_Neighbourood
     #factor determines the size of the neighbourood window

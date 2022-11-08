@@ -19,18 +19,13 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 import random
-from multiprocessing import Pool
-from functools import partial
-import time
 
 #Own function and class
 from Write_txt import Write_txt
-from PFtoDEM_Multi import PFtoDEM_Multi
-from Create_i_AC import Create_i_AC
+from Create_i_AC import Create_i_AC_local
 from Create_LG_IC import LG_tempo, From_LG_tempo_to_usable
 import Owntools
 import Grain
-import Etai
 import Contact
 import Contact_gw
 import Report
@@ -92,16 +87,6 @@ if dict_algorithm['SaveData'] or dict_algorithm['Debug'] or dict_algorithm['Debu
 simulation_report.write_and_print('Creation of the grains\n','\nCREATION OF THE GRAINS\n')
 LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
-#Spatial discretisation
-User.Add_SpatialDiscretisation(dict_geometry,dict_sample)
-
-#PF parameters
-User.Add_WidthInt_DoubleWellBarrier(dict_material, dict_sample)
-
-#Dissolution energy and creation of the dissolution .txt
-User.Add_DissolutionEnergy(dict_algorithm,dict_geometry,dict_material,dict_sollicitations)
-Owntools.Write_e_dissolution_txt(dict_sample,dict_sollicitations)
-
 simulation_report.tac_tempo(datetime.now(),'Initialisation')
 
 #-------------------------------------------------------------------------------
@@ -121,20 +106,7 @@ simulation_report.tac_tempo(datetime.now(),'Creation of polygonal particles')
 
 simulation_report.tic_tempo(datetime.now())
 
-Etai.etai_distribution_dissolution(dict_algorithm,dict_sample, dict_sollicitations, simulation_report)
-
-#create eta for undissolved
-L_etai_undissolved = []
-for etai in range(0,len(dict_sample['L_ig_etai_undissolved'])):
-    L_etai_undissolved.append(Etai.Etai(etai,dict_sample['L_ig_etai_undissolved'][etai]))
-#create eta for dissolved
-L_etai_dissolved = []
-for etai in range(0,len(dict_sample['L_ig_etai_dissolved'])):
-    L_etai_dissolved.append(Etai.Etai(len(dict_sample['L_ig_etai_undissolved'])+etai,dict_sample['L_ig_etai_dissolved'][etai]))
-
-#Add elements in dict
-dict_sample['L_etai_undissolved'] = L_etai_undissolved
-dict_sample['L_etai_dissolved'] = L_etai_dissolved
+Owntools.Dissolution_Distribution(dict_sample,dict_sollicitations,simulation_report)
 
 #Saving the grain surface
 S_grains_dissolvable = 0
@@ -145,12 +117,7 @@ for grain in dict_sample['L_g']:
         S_grains_dissolvable = S_grains_dissolvable + grain.surface
 simulation_report.write('Total Surface '+str(round(S_grains,0))+' µm2\n')
 simulation_report.write('Total Surface dissolvable '+str(round(S_grains_dissolvable,0))+' µm2\n')
-
-#Plot etai distribution
-if dict_algorithm['Debug'] :
-    Owntools.Debug_etai_f(dict_sample)
-
-simulation_report.tac_tempo(datetime.now(),'Etai distribution')
+simulation_report.tac_tempo(datetime.now(),'Dissolution distribution')
 
 #-------------------------------------------------------------------------------
 #Main
@@ -180,18 +147,6 @@ dict_sample['id_contact'] = 0
 
 if dict_algorithm['Debug'] :
     Owntools.Debug_f2(dict_algorithm,dict_sample)
-
-#To delete !!!
-outfile = open('save_dicts_to_work','wb')
-dict_save = {}
-dict_save['algorithm'] = dict_algorithm,
-dict_save['geometry'] = dict_geometry,
-dict_save['ic'] = dict_ic,
-dict_save['material'] = dict_material,
-dict_save['sample'] = dict_sample,
-dict_save['sollicitations'] = dict_sollicitations
-pickle.dump(dict_save,outfile)
-outfile.close()
 
 while not User.Criteria_StopSimulation(dict_algorithm):
       # update element in dict
@@ -249,8 +204,8 @@ while not User.Criteria_StopSimulation(dict_algorithm):
 
           # Detection of contacts between grain and walls
           if dict_algorithm['i_DEM'] % dict_algorithm['i_update_neighborhoods']  == 0:
-              Contact_gw.Update_wall_Neighbouroods(dict_algorithm, dict_sample)
-          Contact_gw.Grains_Polyhedral_Wall_contact_Neighbourood(dict_material,dict_sample)
+              Contact_gw.Update_wall_Neighborhoods(dict_algorithm, dict_sample)
+          Contact_gw.Grains_Polyhedral_Wall_contact_Neighborhood(dict_material,dict_sample)
 
           #Compute contact interactions (g-g and g-w)
           for contact in dict_sample['L_contact']:
@@ -352,24 +307,6 @@ while not User.Criteria_StopSimulation(dict_algorithm):
       simulation_report.tac_tempo(datetime.now(),'DEM loop '+str(dict_algorithm['i_PF']))
 
       #-----------------------------------------------------------------------------
-      # Move PF
-      #-----------------------------------------------------------------------------
-
-      simulation_report.tic_tempo(datetime.now())
-
-      if dict_algorithm['MovePF_selector'] == 'DeconstructRebuild':
-          for i_grain in dict_sample['L_ig_etai_dissolved']:
-              dict_sample['L_g'][i_grain].DEMtoPF_Decons_rebuild(dict_material,dict_sample)
-          for etai in dict_sample['L_etai_dissolved']:
-              etai.update_etai_M(dict_sample['L_g'])
-              etai.Write_txt_Decons_rebuild(dict_algorithm,dict_sample)
-      else :
-          simulation_report.write('Method to move phase field not available !')
-          raise ValueError('Method to move phase field not available !')
-
-      simulation_report.tac_tempo(datetime.now(),'Move phase-field iteration '+str(dict_algorithm['i_PF']))
-
-      #-----------------------------------------------------------------------------
       # PF Simulation
       #-----------------------------------------------------------------------------
 
@@ -377,12 +314,11 @@ while not User.Criteria_StopSimulation(dict_algorithm):
 
       for grain in dict_sample['L_g']:
           if grain.dissolved :
-              Create_i_AC_local(grain,dict_algorithm, dict_material, dict_sample)
+              Create_i_AC_local(grain,dict_algorithm, dict_material, dict_sample,dict_sollicitations)
               os.system('mpiexec -n '+str(dict_algorithm['np_proc'])+' ~/projects/moose/modules/combined/combined-opt -i PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'.i')
               j_str = Owntools.Sort_Files('PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id),dict_algorithm)
-              Owntools.Stop_Debug(simulation_report)
-              grain.PFtoDEM_Multi_local()
-              grain.Geometricstudy(dict_geometry,dict_sample,simulation_report)
+              grain.PFtoDEM_Multi_local('Output/PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'/PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'_other_'+str(j_str),dict_algorithm)
+              grain.Geometricstudy_local(dict_geometry,dict_sample,simulation_report)
 
       #Geometric study
       S_grains = 0

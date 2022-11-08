@@ -1166,7 +1166,7 @@ def Plot_Config_Loaded_End(L_g,x_min,x_max,y_min,y_max):
 
 #-------------------------------------------------------------------------------
 
-def From_LG_tempo_to_usable(dict_ic,dict_material,dict_sample):
+def From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample):
     #from the grain geometry the phase variable is rebuilt
     #the distance between the point of the mesh and the particle center determines the value of the variable
     #a cosine profile is applied inside the interface

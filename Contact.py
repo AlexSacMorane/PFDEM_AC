@@ -62,49 +62,6 @@ class Contact:
     #compute the normal reaction of a contact grain-grain
     #Here a pontual spring is considered
 
-    '''#extract vertices inside of an angular window
-    angular_window = math.pi*5/8 #window
-    v12 = (self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center)
-    if v12[1] >= 0:
-        angle12 = math.acos(v12[0])
-    else :
-        angle12 = 2*math.pi - math.acos(v12[0])
-    angle12_min = angle12 - angular_window/2
-    angle12_max = angle12 + angular_window/2
-    #grain i
-    L_i_border_extract = []
-    for i in range(len(self.g1.l_border[:-1])):
-        angle = self.g1.l_theta_r[i]
-        if angle12_min < 0:
-            if angle < angle12_max or angle12_min + 2*math.pi < angle :
-                L_i_border_extract.append(i)
-        elif angle12_max >= 2*math.pi:
-            if angle < angle12_max - 2*math.pi or angle12_min < angle:
-                L_i_border_extract.append(i)
-        else:
-            if angle12_min < angle and angle < angle12_max:
-                L_i_border_extract.append(i)
-
-    if angle12 < math.pi:
-        angle21 = angle12 + math.pi
-    else :
-        angle21 = angle12 - math.pi
-    angle21_min = angle21 - angular_window/2
-    angle21_max = angle21 + angular_window/2
-    #grain j
-    L_j_border_extract = []
-    for j in range(len(self.g2.l_border[:-1])):
-        angle = self.g2.l_theta_r[j]
-        if angle21_min < 0:
-            if angle < angle21_max or angle21_min + 2*math.pi < angle :
-                L_j_border_extract.append(j)
-        elif angle21_max >= 2*math.pi:
-            if angle < angle21_max - 2*math.pi or angle21_min < angle:
-                L_j_border_extract.append(j)
-        else:
-            if angle21_min < angle and angle < angle21_max:
-                L_j_border_extract.append(j)'''
-
     #looking for the nearest nodes
     d_virtual = max(self.g1.r_max,self.g2.r_max)
     ij_min = [0,0]
