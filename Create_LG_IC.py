@@ -48,8 +48,8 @@ def From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample, 
 
     #simulation with squares
     elif dict_geometry['N_grain_disk'] == 0:
-        Create_LG_IC_Square.From_LG_tempo_to_usable(dict_ic, dict_material, dict_sample)
+        Create_LG_IC_Square.From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample)
 
     #simulation with disk
     elif dict_geometry['N_grain_square'] == 0:
-        Create_LG_IC_Disk.From_LG_tempo_to_usable(dict_ic, dict_material, dict_sample)
+        Create_LG_IC_Disk.From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample)

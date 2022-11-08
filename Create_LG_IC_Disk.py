@@ -981,45 +981,52 @@ def Plot_Trackers(Force_tracker, Ecin_tracker, Ymax_tracker, i_DEM):
 
 #-------------------------------------------------------------------------------
 
-def From_LG_tempo_to_usable(dict_ic, dict_material, dict_sample):
+def From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample):
     #from a tempo configuration (circular grains), an initial configuration (polygonal grains) is generated
 
-    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
-    #load data needed
-    L_g_tempo = dict_ic['L_g_tempo']
-    w = dict_material['w']
-    x_L = dict_sample['x_L']
-    y_L = dict_sample['y_L']
-    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
-
     L_g = []
-    for grain_tempo in L_g_tempo:
-        #compute phase field
-        etai_M_IC = IC(x_L,y_L,w,grain_tempo)
+    for grain_tempo in dict_ic['L_g_tempo']:
+
+        L_border = []
+        L_border_x = []
+        L_border_y = []
+        L_r = []
+        L_theta_r = []
+        for i_border in range(dict_geometry['grain_discretisation']):
+            theta = 2*math.pi*i_border/dict_geometry['grain_discretisation']
+            p = np.array(grain_tempo.center)+grain_tempo.radius*np.array([math.cos(theta),math.sin(theta)])
+            L_border.append(p)
+            L_border_x.append(p[0])
+            L_border_y.append(p[1])
+            L_r.append(grain_tempo.radius)
+            L_theta_r = [theta]
+        L_border.append(L_border[0])
+        L_border_x.append(L_border_x[0])
+        L_border_y.append(L_border_y[0])
+
+        dict_ic_to_real = {
+        'Id' : grain_tempo.id,
+        'Y' : grain_tempo.y,
+        'Nu' : grain_tempo.nu,
+        'Rho_surf' : grain_tempo.rho_surf,
+        'Center' : grain_tempo.center,
+        'L_border' : L_border,
+        'L_border_x' : L_border_x,
+        'L_border_y' : L_border_y,
+        'L_r' : L_r,
+        'L_theta_r' : L_theta_r,
+        'R_min' : grain_tempo.radius,
+        'R_max' : grain_tempo.radius,
+        'R_mean' : grain_tempo.radius,
+        'Surface' : math.pi*grain_tempo.radius**2,
+        'Mass' : math.pi*grain_tempo.radius**2*grain_tempo.rho_surf,
+        'Inertia' : math.pi*grain_tempo.radius**2*grain_tempo.rho_surf*grain_tempo.radius**2
+        }
         #create real grain
-        L_g.append(Grain.Grain(grain_tempo,etai_M_IC,None,np.array([0,0]),np.array([0,0])))
+        L_g.append(Grain.Grain(dict_ic_to_real))
 
     #Add element in dict
     dict_sample['L_g'] = L_g
-
-#-------------------------------------------------------------------------------
-
-def From_tempo_to_usable(dict_ic, dict_material, dict_sample, grain_tempo):
-    #from a tempo configuration (circular grains), an initial configuration (polygonal grains) is generated
-
-    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
-    #load data needed
-    w = dict_material['w']
-    x_L = dict_sample['x_L']
-    y_L = dict_sample['y_L']
-    #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
-
-    #compute hase field
-    etai_M_IC = IC(x_L,y_L,w,grain_tempo)
-    #create real grain
-    grain = Grain.Grain(grain_tempo,etai_M_IC,None,np.array([0,0]),np.array([0,0]))
-
-    return grain
 
 #-------------------------------------------------------------------------------
 
