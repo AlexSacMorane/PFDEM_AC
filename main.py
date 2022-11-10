@@ -146,7 +146,7 @@ dict_sample['L_ij_contact'] = []
 dict_sample['id_contact'] = 0
 
 if dict_algorithm['Debug'] :
-    Owntools.Debug_f2(dict_algorithm,dict_sample)
+    Owntools.Debug_configuration(dict_algorithm,dict_sample)
 
 while not User.Criteria_StopSimulation(dict_algorithm):
       # update element in dict
@@ -284,8 +284,8 @@ while not User.Criteria_StopSimulation(dict_algorithm):
       #-----------------------------------------------------------------------------
 
       if dict_algorithm['Debug'] :
-        Owntools.Debug_f(dict_algorithm,dict_sample)
-        Owntools.Debug_Trackers(dict_algorithm,dict_sollicitations,dict_tracker)
+        Owntools.Debug_configuration(dict_algorithm,dict_sample)
+        Owntools.Debug_Trackers_DEM(dict_algorithm,dict_sollicitations,dict_tracker)
         Write_txt(dict_algorithm,dict_sample)
         Owntools.Plot_chain_force(dict_algorithm['i_PF'],dict_algorithm['i_DEM'])
 
@@ -355,7 +355,9 @@ while not User.Criteria_StopSimulation(dict_algorithm):
       #-----------------------------------------------------------------------------
 
       if dict_algorithm['Debug'] :
-        Owntools.Debug_f2(dict_algorithm,dict_sample)
+        Owntools.Debug_configuration(dict_algorithm,dict_sample)
+        #Trackers
+        Owntools.Debug_Trackers(dict_tracker)
 
       #-----------------------------------------------------------------------------
       # Save tempo
@@ -363,6 +365,8 @@ while not User.Criteria_StopSimulation(dict_algorithm):
 
       if dict_algorithm['SaveData'] :
         Owntools.save_tempo(dict_algorithm,dict_tracker)
+        shutil.copy('User.py','../'+dict_algorithm['main_folder_name']+'/User_'+dict_algorithm['name_folder']+'_tempo.txt')
+        shutil.copy('Debug/Report.txt','../'+dict_algorithm['main_folder_name']+'/Report_'+dict_algorithm['name_folder']+'_tempo.txt')
 
 #-------------------------------------------------------------------------------
 # toc
@@ -377,30 +381,10 @@ simulation_report.end(datetime.now())
 if dict_algorithm['Debug'] :
 
     #Making movies
-    Owntools.make_mp4(int(2*dict_algorithm['i_PF']))
+    Owntools.make_mp4()
 
     #Trackers
-    fig = plt.figure(1,figsize=(16,9.12))
-    plt.plot(dict_tracker['t_L'],dict_tracker['S_grains_L'])
-    plt.title('Evolution of the grains surface')
-    fig.savefig('Debug/Evolution_Surface.png')
-    plt.close(1)
-
-    fig = plt.figure(1,figsize=(16,9.12))
-    plt.plot(dict_tracker['S_dissolved_L'][:-1],dict_tracker['k0_xmin_L'],label='k0 with xmin')
-    plt.plot(dict_tracker['S_dissolved_L'][:-1],dict_tracker['k0_xmax_L'],label='k0 with xmax')
-    plt.title('Evolution of the k0')
-    plt.xlabel('Grains surface dissolved (µm2)')
-    fig.savefig('Debug/Evolution_k0_with_TotalSurface.png')
-    plt.close(1)
-
-    fig = plt.figure(1,figsize=(16,9.12))
-    plt.plot(dict_tracker['S_dissolved_perc_L'][:-1],dict_tracker['k0_xmin_L'],label='k0 with xmin')
-    plt.plot(dict_tracker['S_dissolved_perc_L'][:-1],dict_tracker['k0_xmax_L'],label='k0 with xmax')
-    plt.title('Evolution of the k0')
-    plt.xlabel('Percentage of grains surface dissolved (%)')
-    fig.savefig('Debug/Evolution_k0_with_percentage_dissolved.png')
-    plt.close(1)
+    Owntools.Debug_Trackers(dict_tracker)
 
 #-------------------------------------------------------------------------------
 #Saving data
@@ -410,5 +394,7 @@ if dict_algorithm['SaveData'] :
 
     name_actual_folder = os.path.dirname(os.path.realpath(__file__))
     shutil.copytree(name_actual_folder, '../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['name_folder'])
+    os.remove('../'+dict_algorithm['main_folder_name']+'/User_'+dict_algorithm['name_folder']+'_tempo.txt')
+    os.remove('../'+dict_algorithm['main_folder_name']+'/Report_'+dict_algorithm['name_folder']+'_tempo.txt')
 
     Owntools.save_final(dict_algorithm,dict_tracker)

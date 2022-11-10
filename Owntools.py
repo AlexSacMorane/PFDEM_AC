@@ -18,6 +18,7 @@ import math
 import Report
 import matplotlib.pyplot as plt
 import os
+from pathlib import Path
 import pickle
 from pathlib import Path
 from datetime import datetime
@@ -162,9 +163,8 @@ def Debug_DEM_f(dict_algorithm, dict_sample):
 
 #-------------------------------------------------------------------------------
 
-def Debug_f(dict_algorithm,dict_sample):
+def Debug_configuration(dict_algorithm,dict_sample):
   #plot the configuration of the grains after the DEM step
-  #same as Debug_f2 but with id odd
 
   #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
   #load data needed
@@ -174,6 +174,16 @@ def Debug_f(dict_algorithm,dict_sample):
   y_max = dict_sample['y_box_max']
   #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
 
+  #look for the name of the new plot
+  template_name = 'Debug/DEM_ite/PF_ite_'
+  j = 0
+  plotpath = Path(template_name+str(j)+'.png')
+  while plotpath.exists():
+      j = j + 1
+      plotpath = Path(template_name+str(j)+'.png')
+  name = template_name+str(j)+'.png'
+
+  #create the plot
   fig = plt.figure(1,figsize=(16,9.12))
   for grain in dict_sample['L_g']:
       if grain.dissolved:
@@ -182,37 +192,41 @@ def Debug_f(dict_algorithm,dict_sample):
           plt.plot(grain.l_border_x,grain.l_border_y,'k')
   plt.plot([x_min,x_max,x_max,x_min,x_min],[y_min,y_min,y_max,y_max,y_min],'k')
   plt.axis("equal")
-  fig.savefig('Debug/DEM_ite/PF_ite_'+str(int(2*dict_algorithm['i_PF']-1))+'.png')
+  fig.savefig(name)
   plt.close(1)
 
 #-------------------------------------------------------------------------------
 
-def Debug_f2(dict_algorithm,dict_sample):
-  #plot the configuration of the grains after the PF step
-  #same as Debug_f but with id pair
+def Debug_Trackers(dict_tracker):
+    #plot the trakers used during DEM simulation
+    #only for debug
 
-  #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
-  #load data needed
-  x_min = dict_sample['x_box_min']
-  x_max = dict_sample['x_box_max']
-  y_min = dict_sample['y_box_min']
-  y_max = dict_sample['y_box_max']
-  #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
+    #Trackers
+    fig = plt.figure(1,figsize=(16,9.12))
+    plt.plot(dict_tracker['t_L'],dict_tracker['S_grains_L'])
+    plt.title('Evolution of the grains surface')
+    fig.savefig('Debug/Evolution_Surface.png')
+    plt.close(1)
 
-  fig = plt.figure(1,figsize=(16,9.12))
-  for grain in dict_sample['L_g']:
-      if grain.dissolved:
-          plt.plot(grain.l_border_x,grain.l_border_y,'k-.')
-      else:
-          plt.plot(grain.l_border_x,grain.l_border_y,'k')
-  plt.plot([x_min,x_max,x_max,x_min,x_min],[y_min,y_min,y_max,y_max,y_min],'k')
-  plt.axis("equal")
-  fig.savefig('Debug/DEM_ite/PF_ite_'+str(int(2*dict_algorithm['i_PF']))+'.png')
-  plt.close(1)
+    fig = plt.figure(1,figsize=(16,9.12))
+    plt.plot(dict_tracker['S_dissolved_L'][:-1],dict_tracker['k0_xmin_L'],label='k0 with xmin')
+    plt.plot(dict_tracker['S_dissolved_L'][:-1],dict_tracker['k0_xmax_L'],label='k0 with xmax')
+    plt.title('Evolution of the k0')
+    plt.xlabel('Grains surface dissolved (µm2)')
+    fig.savefig('Debug/Evolution_k0_with_TotalSurface.png')
+    plt.close(1)
+
+    fig = plt.figure(1,figsize=(16,9.12))
+    plt.plot(dict_tracker['S_dissolved_perc_L'][:-1],dict_tracker['k0_xmin_L'],label='k0 with xmin')
+    plt.plot(dict_tracker['S_dissolved_perc_L'][:-1],dict_tracker['k0_xmax_L'],label='k0 with xmax')
+    plt.title('Evolution of the k0')
+    plt.xlabel('Percentage of grains surface dissolved (%)')
+    fig.savefig('Debug/Evolution_k0_with_percentage_dissolved.png')
+    plt.close(1)
 
 #-------------------------------------------------------------------------------
 
-def Debug_Trackers(dict_algorithm,dict_sollicitations,dict_tracker):
+def Debug_Trackers_DEM(dict_algorithm,dict_sollicitations,dict_tracker):
     #plot the trakers used during DEM simulation
     #only for debug
 
@@ -659,14 +673,21 @@ def Plot_chain_force(i_PF,i_DEM):
 
 #-------------------------------------------------------------------------------
 
-def make_mp4(i_f):
+def make_mp4():
     #The goal of this function is to create a movie with all configuration pictures
     #from https://www.blog.pythonlibrary.org/2021/06/23/creating-an-animated-gif-with-python/
 
+    #look for the largest iteration
+    template_name = 'Debug/DEM_ite/PF_ite_'
+    i_f = 0
+    plotpath = Path(template_name+str(i_f)+'.png')
+    while plotpath.exists():
+        i_f = i_f + 1
+        plotpath = Path(template_name+str(i_f)+'.png')
 
     fileList = []
-    for i in range(0,i_f+1):
-        fileList.append('Debug/DEM_ite/PF_ite_'+str(i)+'.png')
+    for i in range(0,i_f):
+        fileList.append(template_name+str(i)+'.png')
 
     duration_movie  = 10 #sec
     writer = imageio.get_writer('Debug/PF_ite.mp4', fps=int(i_f/duration_movie))
