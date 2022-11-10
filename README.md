@@ -1,6 +1,5 @@
 # PFDEM_AC
 
-hello
 Phase-Field Discrete Element Modelisation applied to granular material.
 
 ## Simulation presentation
