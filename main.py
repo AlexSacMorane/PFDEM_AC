@@ -13,7 +13,6 @@ This is the main file.
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-import pickle
 import os
 import shutil
 from datetime import datetime

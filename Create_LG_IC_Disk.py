@@ -14,7 +14,6 @@ We have 2 temporary classes about grains and contact."""
 import numpy as np
 import math
 import random
-import pickle
 import matplotlib.pyplot as plt
 import Grain
 
