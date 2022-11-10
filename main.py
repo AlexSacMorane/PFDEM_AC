@@ -79,6 +79,9 @@ if dict_algorithm['SaveData'] :
     #add element in dict
     dict_algorithm['name_folder'] = dict_algorithm['template_simulation_name']+str(i_run)
 
+    #tempo save of the user file
+    shutil.copy('User.py','../'+dict_algorithm['main_folder_name']+'/User_'+dict_algorithm['name_folder']+'_tempo.txt')
+
 if dict_algorithm['SaveData'] or dict_algorithm['Debug'] or dict_algorithm['Debug_DEM']:
     simulation_report.write('\n')
 
@@ -364,7 +367,6 @@ while not User.Criteria_StopSimulation(dict_algorithm):
 
       if dict_algorithm['SaveData'] :
         Owntools.save_tempo(dict_algorithm,dict_tracker)
-        shutil.copy('User.py','../'+dict_algorithm['main_folder_name']+'/User_'+dict_algorithm['name_folder']+'_tempo.txt')
         shutil.copy('Debug/Report.txt','../'+dict_algorithm['main_folder_name']+'/Report_'+dict_algorithm['name_folder']+'_tempo.txt')
 
 #-------------------------------------------------------------------------------
