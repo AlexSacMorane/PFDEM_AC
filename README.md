@@ -29,3 +29,4 @@ Some next releases are presented here.
 - create AI to select algorithm parameters (as neighborhood update frequency, time step, stop criteria, etc...)
 - change the initial shape of grain
 - add some quick tests to check the script
+- correct the functions P_is_inside() because if the coordinate y = the coordinate of the vertex, the point is considered outside (even  if it is not the case)
