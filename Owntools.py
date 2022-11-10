@@ -285,7 +285,6 @@ def Dissolution_Distribution(dict_sample,dict_sollicitations,simulation_report):
 
     i = 0
     while i < int(dict_sollicitations['frac_dissolved']*len(dict_sample['L_g'])):
-        print(i,int(dict_sollicitations['frac_dissolved']*len(dict_sample['L_g'])))
         grain = random.choice(dict_sample['L_g'])
         while grain.dissolved:
             grain = random.choice(dict_sample['L_g'])
