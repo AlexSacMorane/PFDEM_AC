@@ -610,6 +610,7 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
     dict_ic['L_n_grain_dimension_try_one'] = L_n_grain_dimension_try_one
     dict_ic['L_n_grain_dimension'] = L_n_grain_dimension
     dict_ic['L_n_grain_dimension_done'] = L_n_grain_dimension_done
+    dict_ic['last_id'] = 0
     dict_sample['y_box_min_ic'] = dict_sample['y_box_min']
     dict_sample['dy_creation'] = dy_creation
 
@@ -843,7 +844,7 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, id_generat
         radius = L_radius[i]
         n_grain = L_n_grain_radius[i]
         n_grain_done = L_n_grain_radius_done[i]
-        last_id_grain_created = len(L_g_tempo)
+        last_id_grain_created = dict_ic['last_id']
         for id_grain in range(last_id_grain_created, last_id_grain_created + n_grain - n_grain_done):
             i_test = 0
             grain_created = False
@@ -861,11 +862,12 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, id_generat
             else :
                 L_g_tempo.append(g_tempo)
                 L_n_grain_dimension_done[i] = L_n_grain_dimension_done[i] + 1
+                dict_ic['last_id'] = dict_ic['last_id'] + 1
     for i in range(len(L_dimension)):
         dimension = L_dimension[i]
         n_grain = L_n_grain_dimension[i]
         n_grain_done = L_n_grain_dimension_done[i]
-        last_id_grain_created = len(L_g_tempo)
+        last_id_grain_created = dict_ic['last_id']
         for id_grain in range(last_id_grain_created, last_id_grain_created + n_grain - n_grain_done):
             i_test = 0
             grain_created = False
@@ -883,6 +885,7 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, id_generat
             else :
                 L_g_tempo.append(g_tempo)
                 L_n_grain_dimension_done[i] = L_n_grain_dimension_done[i] + 1
+                dict_ic['last_id'] = dict_ic['last_id'] + 1
 
     #Update dict
     dict_ic['L_g_tempo'] = L_g_tempo
