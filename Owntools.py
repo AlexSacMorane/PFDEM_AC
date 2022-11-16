@@ -701,23 +701,23 @@ def save_DEM_tempo(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker):
     #with FollowSimulation.py, the user can follow live the simulation
 
     outfile = open('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/save_tempo','wb')
-    dict = {}
-    dict['E_cin_stop'] = dict_algorithm['Ecin_stop']
-    dict['n_window_stop'] = dict_algorithm['n_window_stop']
-    dict['dy_box_max_stop'] = dict_algorithm['dy_box_max_stop']
-    dict['dk0_stop'] = dict_algorithm['dk0_stop']
-    dict['L_g'] = dict_sample['L_g']
-    dict['L_contact'] = dict_sample['L_contact']
-    dict['L_ij_contact'] = dict_sample['L_ij_contact']
-    dict['L_contact_gw'] = dict_sample['L_contact_gw']
-    dict['L_ij_contact_gw'] = dict_sample['L_ij_contact_gw']
-    dict['F_on_ymax'] = dict_sollicitations['Force_on_upper_wall']
-    dict['E_cin'] = dict_tracker['Ecin']
-    dict['Force'] = dict_tracker['Force_applied']
-    dict['k0_xmin_tracker'] = dict_tracker['k0_xmin']
-    dict['k0_xmax_tracker'] = dict_tracker['k0_xmax']
-    dict['y_box_max'] = dict_tracker['y_box_max'][:-1]
-    pickle.dump(dict,outfile)
+    dict_save = {}
+    dict_save['E_cin_stop'] = dict_algorithm['Ecin_stop']
+    dict_save['n_window_stop'] = dict_algorithm['n_window_stop']
+    dict_save['dy_box_max_stop'] = dict_algorithm['dy_box_max_stop']
+    dict_save['dk0_stop'] = dict_algorithm['dk0_stop']
+    dict_save['L_g'] = dict_sample['L_g']
+    dict_save['L_contact'] = dict_sample['L_contact']
+    dict_save['L_ij_contact'] = dict_sample['L_ij_contact']
+    dict_save['L_contact_gw'] = dict_sample['L_contact_gw']
+    dict_save['L_ij_contact_gw'] = dict_sample['L_ij_contact_gw']
+    dict_save['F_on_ymax'] = dict_sollicitations['Force_on_upper_wall']
+    dict_save['E_cin'] = dict_tracker['Ecin']
+    dict_save['Force'] = dict_tracker['Force_applied']
+    dict_save['k0_xmin_tracker'] = dict_tracker['k0_xmin']
+    dict_save['k0_xmax_tracker'] = dict_tracker['k0_xmax']
+    dict_save['y_box_max'] = dict_tracker['y_box_max'][:-1]
+    pickle.dump(dict_save,outfile)
     outfile.close()
 
 #-------------------------------------------------------------------------------
@@ -727,23 +727,38 @@ def save_DEM_final(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker):
 
     os.remove('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/save_tempo')
     outfile = open('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/save','wb')
-    dict = {}
-    dict['E_cin_stop'] = dict_algorithm['Ecin_stop']
-    dict['n_window_stop'] = dict_algorithm['n_window_stop']
-    dict['dy_box_max_stop'] = dict_algorithm['dy_box_max_stop']
-    dict['dk0_stop'] = dict_algorithm['dk0_stop']
-    dict['L_g'] = dict_sample['L_g']
-    dict['L_contact'] = dict_sample['L_contact']
-    dict['L_ij_contact'] = dict_sample['L_ij_contact']
-    dict['L_contact_gw'] = dict_sample['L_contact_gw']
-    dict['L_ij_contact_gw'] = dict_sample['L_ij_contact_gw']
-    dict['F_on_ymax'] = dict_sollicitations['Force_on_upper_wall']
-    dict['E_cin'] = dict_tracker['Ecin']
-    dict['Force'] = dict_tracker['Force_applied']
-    dict['k0_xmin_tracker'] = dict_tracker['k0_xmin']
-    dict['k0_xmax_tracker'] = dict_tracker['k0_xmax']
-    dict['y_box_max'] = dict_tracker['y_box_max'][:-1]
-    pickle.dump(dict,outfile)
+    dict_save = {}
+    dict_save['E_cin_stop'] = dict_algorithm['Ecin_stop']
+    dict_save['n_window_stop'] = dict_algorithm['n_window_stop']
+    dict_save['dy_box_max_stop'] = dict_algorithm['dy_box_max_stop']
+    dict_save['dk0_stop'] = dict_algorithm['dk0_stop']
+    dict_save['L_g'] = dict_sample['L_g']
+    dict_save['L_contact'] = dict_sample['L_contact']
+    dict_save['L_ij_contact'] = dict_sample['L_ij_contact']
+    dict_save['L_contact_gw'] = dict_sample['L_contact_gw']
+    dict_save['L_ij_contact_gw'] = dict_sample['L_ij_contact_gw']
+    dict_save['F_on_ymax'] = dict_sollicitations['Force_on_upper_wall']
+    dict_save['E_cin'] = dict_tracker['Ecin']
+    dict_save['Force'] = dict_tracker['Force_applied']
+    dict_save['k0_xmin_tracker'] = dict_tracker['k0_xmin']
+    dict_save['k0_xmax_tracker'] = dict_tracker['k0_xmax']
+    dict_save['y_box_max'] = dict_tracker['y_box_max'][:-1]
+    pickle.dump(dict_save,outfile)
+    outfile.close()
+
+#-------------------------------------------------------------------------------
+
+def save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations):
+    #save dicts during PFDEM interations
+
+    outfile = open(dict_algorithm['name_folder']+'_save_dicts','wb')
+    dict_save = {}
+    dict_save['algorithm'] = dict_algorithm
+    dict_save['geometry'] = dict_geometry
+    dict_save['material'] = dict_material
+    dict_save['sample'] = dict_sample
+    dict_save['sollicitations'] = dict_sollicitations
+    pickle.dump(dict_save,outfile)
     outfile.close()
 
 #-------------------------------------------------------------------------------
@@ -752,13 +767,13 @@ def save_tempo(dict_algorithm,dict_tracker):
     #save trackers during PFDEM interations
 
     outfile = open('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['name_folder']+'_save_tempo','wb')
-    dict = {}
-    dict['k0_xmin_L'] = dict_tracker['k0_xmin_L']
-    dict['k0_xmax_L'] = dict_tracker['k0_xmax_L']
-    dict['S_dissolved_L'] = dict_tracker['S_dissolved_L']
-    dict['S_dissolved_perc_L'] = dict_tracker['S_dissolved_perc_L']
-    dict['S_grains_L'] = dict_tracker['S_grains_L']
-    pickle.dump(dict,outfile)
+    dict_save = {}
+    dict_save['k0_xmin_L'] = dict_tracker['k0_xmin_L']
+    dict_save['k0_xmax_L'] = dict_tracker['k0_xmax_L']
+    dict_save['S_dissolved_L'] = dict_tracker['S_dissolved_L']
+    dict_save['S_dissolved_perc_L'] = dict_tracker['S_dissolved_perc_L']
+    dict_save['S_grains_L'] = dict_tracker['S_grains_L']
+    pickle.dump(dict_save,outfile)
     outfile.close()
 
 #-------------------------------------------------------------------------------
@@ -768,11 +783,11 @@ def save_final(dict_algorithm,dict_tracker):
 
     os.remove('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['name_folder']+'_save_tempo')
     outfile = open('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['name_folder']+'_save','wb')
-    dict = {}
-    dict['k0_xmin_L'] = dict_tracker['k0_xmin_L']
-    dict['k0_xmax_L'] = dict_tracker['k0_xmax_L']
-    dict['S_dissolved_L'] = dict_tracker['S_dissolved_L']
-    dict['S_dissolved_perc_L'] = dict_tracker['S_dissolved_perc_L']
-    dict['S_grains_L'] = dict_tracker['S_grains_L']
-    pickle.dump(dict,outfile)
+    dict_save = {}
+    dict_save['k0_xmin_L'] = dict_tracker['k0_xmin_L']
+    dict_save['k0_xmax_L'] = dict_tracker['k0_xmax_L']
+    dict_save['S_dissolved_L'] = dict_tracker['S_dissolved_L']
+    dict_save['S_dissolved_perc_L'] = dict_tracker['S_dissolved_perc_L']
+    dict_save['S_grains_L'] = dict_tracker['S_grains_L']
+    pickle.dump(dict_save,outfile)
     outfile.close()
