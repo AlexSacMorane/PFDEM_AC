@@ -217,10 +217,9 @@ def All_parameters():
     Vertical_Confinement_Pressure = 500*10**5 #Pa used to compute the Vertical_Confinement_Force
     Vertical_Confinement_Force = Vertical_Confinement_Pressure*(x_box_max-x_box_min)*(2*Lenght_mean)*10**(-6) #µN
     gravity = 0 #µm/s2
-    frac_dissolved = 0.15 #Percentage of grain dissolved
 
     #Add energy to dissolved grain
-    frac_Rmean0 = 0.000002 #approximatively the percentage of the initial R_mean dissolved at each iteration
+    frac_Rmean0 = 0.00002 #approximatively the percentage of the initial R_mean dissolved at each iteration
 
     Dissolution_Energy = frac_Rmean0*dict_geometry['Dimension_mean']/2*2/3*dict_material['w']/(dict_algorithm['dt_PF']*dict_algorithm['n_t_PF'])
 
