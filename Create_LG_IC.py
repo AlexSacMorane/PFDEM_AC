@@ -54,7 +54,7 @@ class Grain_Tempo:
         L_border.append(L_border[0])
         L_border_x.append(L_border_x[0])
         L_border_y.append(L_border_y[0])
-        self.radius = Length
+        self.radius = Lenght
         self.theta = 0
         self.rho_surf = dict_material['rho_surf_disk']
         self.mass = math.pi*Lenght**2*dict_material['rho_surf_disk']
@@ -70,7 +70,7 @@ class Grain_Tempo:
             angle_to_determine_R = angle%(math.pi/2)
             if angle_to_determine_R > math.pi/4:
                 angle_to_determine_R = angle_to_determine_R - math.pi/2
-            p = np.array([Length/2/math.cos(angle_to_determine_R),0]) #compute the radius, considering the grain as a square
+            p = np.array([Lenght/2/math.cos(angle_to_determine_R),0]) #compute the radius, considering the grain as a square
             P_rot_p = np.array([[math.cos(angle), -math.sin(angle)],
                                 [math.sin(angle),  math.cos(angle)]])
             p = np.dot(P_rot_p,p)
@@ -79,7 +79,7 @@ class Grain_Tempo:
             L_border.append(p)
             L_border_x.append(p[0])
             L_border_y.append(p[1])
-            L_r.append(Length/2/math.cos(angle_to_determine_R))
+            L_r.append(Lenght/2/math.cos(angle_to_determine_R))
             angle_r = Theta + angle
             while angle_r >= 2*math.pi:
                 angle_r = angle_r - 2*math.pi
@@ -89,11 +89,11 @@ class Grain_Tempo:
         L_border.append(L_border[0])
         L_border_x.append(L_border_x[0])
         L_border_y.append(L_border_y[0])
-        self.dimension = Length
+        self.dimension = Lenght
         self.theta = Theta
         self.rho_surf = dict_material['rho_surf_square']
-        self.mass = Length**2*dict_material['rho_surf_square']
-        self.inertia = 1/6*self.mass*Length**2
+        self.mass = Lenght**2*dict_material['rho_surf_square']
+        self.inertia = 1/6*self.mass*Lenght**2
     #save
     self.id = ID
     self.type = Type
@@ -142,8 +142,12 @@ class Grain_Tempo:
     #translation
     a_i = np.array([self.fx,self.fy])/self.mass
     self.v = self.v + a_i*dt_DEM
-    if np.linalg.norm(self.v) > self.dimension*factor/dt_DEM: #limitation of the speed
-        self.v = self.v * self.dimension*factor/dt_DEM/np.linalg.norm(self.v)
+    if self.type == 'Disk':
+        if np.linalg.norm(self.v) > self.radius*factor/dt_DEM: #limitation of the speed
+            self.v = self.v * self.radius*factor/dt_DEM/np.linalg.norm(self.v)
+    elif self.type == 'Square':
+        if np.linalg.norm(self.v) > self.dimension*factor/dt_DEM: #limitation of the speed
+            self.v = self.v * self.dimension*factor/dt_DEM/np.linalg.norm(self.v)
     for i in range(len(self.l_border)):
         self.l_border[i] = self.l_border[i] + self.v*dt_DEM
         self.l_border_x[i] = self.l_border_x[i] + self.v[0]*dt_DEM
@@ -600,7 +604,7 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
     dict_ic['i_DEM_IC'] = i_DEM
     dict_ic['L_n_grain_radius_try_one'] = L_n_grain_radius_try_one
     dict_ic['L_n_grain_radius'] = L_n_grain_radius
-    dict_ic['L_n_grain_radius_done'] = L_n_grain_radius_dones
+    dict_ic['L_n_grain_radius_done'] = L_n_grain_radius_done
     dict_ic['L_n_grain_dimension_try_one'] = L_n_grain_dimension_try_one
     dict_ic['L_n_grain_dimension'] = L_n_grain_dimension
     dict_ic['L_n_grain_dimension_done'] = L_n_grain_dimension_done
@@ -843,7 +847,7 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, id_generat
             grain_created = False
             while (not grain_created) and i_test < N_test_max:
                 i_test = i_test + 1
-                center = np.array([random.uniform(x_min+1.1*dimension/2,x_max-1.1*dimension/2),random.uniform(y_min+1.1*dimension/2,y_max)])
+                center = np.array([random.uniform(x_min+1.1*radius,x_max-1.1*radius),random.uniform(y_min+1.1*radius,y_max)])
                 g_tempo = Grain_Tempo(id_grain-n_not_created,center,radius,dict_material,'Disk')
                 grain_created = True
                 for grain in L_g_tempo:
@@ -1249,9 +1253,9 @@ def From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample):
         'L_border_y' : grain_tempo.l_border_y,
         'L_r' : grain_tempo.l_r,
         'L_theta_r' : grain_tempo.l_theta_r,
-        'R_min' : grain_tempo.radius,
-        'R_max' : grain_tempo.radius,
-        'R_mean' : grain_tempo.radius,
+        'R_min' : min(grain_tempo.l_r),
+        'R_max' : max(grain_tempo.l_r),
+        'R_mean' : np.mean(grain_tempo.l_r),
         'Mass' : grain_tempo.mass,
         'Inertia' : grain_tempo.inertia
         }
