@@ -57,6 +57,7 @@ class Grain_Tempo:
         self.radius = Lenght
         self.theta = 0
         self.rho_surf = dict_material['rho_surf_disk']
+        self.surface = math.pi*Lenght**2
         self.mass = math.pi*Lenght**2*dict_material['rho_surf_disk']
         self.inertia = self.mass*Lenght**2
     if Type == 'Square':
@@ -92,6 +93,7 @@ class Grain_Tempo:
         self.dimension = Lenght
         self.theta = Theta
         self.rho_surf = dict_material['rho_surf_square']
+        self.surface = Lenght**2
         self.mass = Lenght**2*dict_material['rho_surf_square']
         self.inertia = 1/6*self.mass*Lenght**2
     #save
@@ -1255,6 +1257,7 @@ def From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample):
         'R_min' : min(grain_tempo.l_r),
         'R_max' : max(grain_tempo.l_r),
         'R_mean' : np.mean(grain_tempo.l_r),
+        'Surface' : grain_tempo.surface,
         'Mass' : grain_tempo.mass,
         'Inertia' : grain_tempo.inertia
         }
