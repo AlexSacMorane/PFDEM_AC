@@ -95,7 +95,7 @@ simulation_report.tac_tempo(datetime.now(),'Initialisation')
 simulation_report.tic_tempo(datetime.now())
 
 # Creation of the real list of grains
-From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample, simulation_report)#creation pf the dissolution .txt
+From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample)#creation pf the dissolution .txt
 
 simulation_report.tac_tempo(datetime.now(),'Creation of polygonal particles')
 
