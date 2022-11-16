@@ -47,7 +47,6 @@ def All_parameters():
 
     #write dict
     dict_geometry = {
-    'type' : type_sample_selector,
     'N_grain_disk' : N_grain_disk,
     'R_mean' : R_mean,
     'L_R' : L_R,
@@ -80,8 +79,8 @@ def All_parameters():
     'Y' : Y,
     'nu' : nu,
     'rho' : rho,
-    'rho_surf_disk', rho_surf_disk,
-    'rho_surf_square', rho_surf_square,
+    'rho_surf_disk' : rho_surf_disk,
+    'rho_surf_square' : rho_surf_square,
     'mu_friction_gg' : mu_friction_gg,
     'mu_friction_gw' : mu_friction_gw,
     'coeff_restitution' : coeff_restitution,
@@ -188,7 +187,7 @@ def All_parameters():
     #/!\ Work only for 2 /!\
     factor_ymax_box = 2.5 #margin to generate grains
     N_test_max = 5000 # maximum number of tries to generate a grain without overlap
-    i_DEM_stop_IC = 3000 #stop criteria for DEM during IC
+    i_DEM_stop_IC = 2000 #stop criteria for DEM during IC
     Debug_DEM_IC = False #plot configuration inside DEM during IC
     i_print_plot_IC = 100 #frenquency of the print and plot (if Debug_DEM_IC) for IC
     dt_DEM_IC = dt_DEM_crit/5 #s time step during IC
