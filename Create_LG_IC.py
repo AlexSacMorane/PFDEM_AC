@@ -861,7 +861,7 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, id_generat
                 simulation_report.write_and_print('Grain '+str(id_grain)+' has not been created after '+str(i_test)+' tries\n','Grain '+str(id_grain)+' has not been created after '+str(i_test)+' tries')
             else :
                 L_g_tempo.append(g_tempo)
-                L_n_grain_dimension_done[i] = L_n_grain_dimension_done[i] + 1
+                L_n_grain_radius_done[i] = L_n_grain_radius_done[i] + 1
                 dict_ic['last_id'] = dict_ic['last_id'] + 1
     for i in range(len(L_dimension)):
         dimension = L_dimension[i]
@@ -890,6 +890,7 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, id_generat
     #Update dict
     dict_ic['L_g_tempo'] = L_g_tempo
     dict_ic['L_n_grain_dimension_done'] = L_n_grain_dimension_done
+    dict_ic['L_n_grain_radius_done'] = L_n_grain_radius_done
 
 #-------------------------------------------------------------------------------
 

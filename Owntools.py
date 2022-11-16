@@ -734,7 +734,7 @@ def save_DEM_final(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker):
 
 #-------------------------------------------------------------------------------
 
-def save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations):
+def save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker):
     #save dicts during PFDEM interations
 
     outfile = open(dict_algorithm['name_folder']+'_save_dicts','wb')
@@ -744,6 +744,7 @@ def save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_s
     dict_save['material'] = dict_material
     dict_save['sample'] = dict_sample
     dict_save['sollicitations'] = dict_sollicitations
+    dict_save['tracker'] = dict_tracker
     pickle.dump(dict_save,outfile)
     outfile.close()
 
