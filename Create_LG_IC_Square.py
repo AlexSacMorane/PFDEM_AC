@@ -1184,9 +1184,9 @@ def From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample):
         'L_border_y' : grain_tempo.l_border_y,
         'L_r' : grain_tempo.l_r,
         'L_theta_r' : grain_tempo.l_theta_r,
-        'R_min' : grain_tempo.radius,
-        'R_max' : grain_tempo.radius,
-        'R_mean' : grain_tempo.radius,
+        'R_min' : min(grain_tempo.l_r),
+        'R_max' : max(grain_tempo.l_r),
+        'R_mean' : np.mean(grain_tempo.l_r),
         'Mass' : grain_tempo.dimension**2*grain_tempo.rho_surf,
         'Inertia' : 1/6*grain_tempo.dimension**2*grain_tempo.rho_surf*grain_tempo.Dimension**2
         }
