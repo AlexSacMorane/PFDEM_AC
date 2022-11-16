@@ -843,7 +843,7 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, id_generat
         radius = L_radius[i]
         n_grain = L_n_grain_radius[i]
         n_grain_done = L_n_grain_radius_done[i]
-        last_id_grain_created = np.sum(L_n_grain_radius_done)+ np.sum(L_n_grain_dimension_done)
+        last_id_grain_created = len(L_g_tempo)
         for id_grain in range(last_id_grain_created, last_id_grain_created + n_grain - n_grain_done):
             i_test = 0
             grain_created = False
@@ -865,7 +865,7 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, id_generat
         dimension = L_dimension[i]
         n_grain = L_n_grain_dimension[i]
         n_grain_done = L_n_grain_dimension_done[i]
-        last_id_grain_created = np.sum(L_n_grain_radius_done)+ np.sum(L_n_grain_dimension_done)
+        last_id_grain_created = len(L_g_tempo)
         for id_grain in range(last_id_grain_created, last_id_grain_created + n_grain - n_grain_done):
             i_test = 0
             grain_created = False
