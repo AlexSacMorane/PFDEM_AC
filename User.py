@@ -228,8 +228,7 @@ def All_parameters():
     'Vertical_Confinement_Pressure' : Vertical_Confinement_Pressure,
     'Dissolution_Energy' : Dissolution_Energy,
     'Vertical_Confinement_Force' : Vertical_Confinement_Force,
-    'gravity' : gravity,
-    'frac_dissolved' : frac_dissolved
+    'gravity' : gravity
     }
 
     #---------------------------------------------------------------------------
