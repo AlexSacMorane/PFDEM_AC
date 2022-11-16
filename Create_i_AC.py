@@ -11,8 +11,6 @@ The function use PF_base_AC.i as a template
 #Librairy
 #-------------------------------------------------------------------------------
 
-import numpy as np
-import math
 import Grain
 
 #-------------------------------------------------------------------------------

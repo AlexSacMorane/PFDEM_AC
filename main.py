@@ -11,13 +11,10 @@ This is the main file.
 #-------------------------------------------------------------------------------
 
 import numpy as np
-import matplotlib.pyplot as plt
-import math
 import os
 import shutil
 from datetime import datetime
 from pathlib import Path
-import random
 
 #Own function and class
 from Write_txt import Write_txt

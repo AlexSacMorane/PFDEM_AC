@@ -23,42 +23,89 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #Geometric parameters
 
-    #for disk particles
-    N_grain_disk = 30 #number of grains
-    R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
-    L_R = [1.1*R_mean, 1*R_mean, 0.9*R_mean] #from larger to smaller
-    L_percentage_R = [1/3, 1/3, 1/3] #distribution of the different radius
-    #Recompute the mean radius
-    R_mean = 0
-    for i in range(len(L_R)):
-        R_mean = R_mean + L_R[i]*L_percentage_R[i]
-
-    #for square particles
-    N_grain_square = 0 #number of grains
-    Dimension_mean = 350 #µm radius
-    L_Dimension = [1.1*Dimension_mean, 1*Dimension_mean, 0.9*Dimension_mean] #from larger to smaller
-    L_percentage_Dimension = [1/3, 1/3, 1/3] #distribution of the different radius
-    #Recompute the mean dimension
-    Dimension_mean = 0
-    for i in range(len(L_Dimension)):
-        Dimension_mean = Dimension_mean + L_Dimension[i]*L_percentage_Dimension[i]
-
     #approximatively the number of vertices for one grain during DEM simulation
     grain_discretisation = 20 # = grain_discretisation_square
 
-    #write dict
-    dict_geometry = {
-    'N_grain_disk' : N_grain_disk,
-    'R_mean' : R_mean,
-    'L_R' : L_R,
-    'L_percentage_R' : L_percentage_R,
-    'grain_discretisation' : grain_discretisation,
-    'N_grain_square' : N_grain_square,
-    'Dimension_mean' : Dimension_mean,
-    'L_Dimension' : L_Dimension,
-    'L_percentage_Dimension' : L_percentage_Dimension,
-    'grain_discretisation_square' : grain_discretisation,
-    }
+    type_sample_selector = 'AllDisk' #AllDisk or AllSquare or Mix
+
+    #for disk particles
+    if type_sample_selector == 'AllDisk':
+        N_grain_disk = 30 #number of grains
+        R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
+        L_R = [1.1*R_mean, 1*R_mean, 0.9*R_mean] #from larger to smaller
+        L_percentage_R = [1/3, 1/3, 1/3] #distribution of the different radius
+        #Recompute the mean radius
+        R_mean = 0
+        for i in range(len(L_R)):
+            R_mean = R_mean + L_R[i]*L_percentage_R[i]
+
+        #write dict
+        dict_geometry = {
+        'type' : type_sample_selector,
+        'N_grain_disk' : N_grain_disk,
+        'R_mean' : R_mean,
+        'L_R' : L_R,
+        'L_percentage_R' : L_percentage_R,
+        'grain_discretisation' : grain_discretisation,
+        }
+
+    #for square particles
+    elif type_sample_selector == 'AllSquare':
+        N_grain_square = 30 #number of grains
+        Dimension_mean = 350 #µm radius
+        L_Dimension = [1.1*Dimension_mean, 1*Dimension_mean, 0.9*Dimension_mean] #from larger to smaller
+        L_percentage_Dimension = [1/3, 1/3, 1/3] #distribution of the different radius
+        #Recompute the mean dimension
+        Dimension_mean = 0
+        for i in range(len(L_Dimension)):
+            Dimension_mean = Dimension_mean + L_Dimension[i]*L_percentage_Dimension[i]
+
+        #write dict
+        dict_geometry = {
+        'type' : type_sample_selector,
+        'N_grain_square' : N_grain_square,
+        'Dimension_mean' : Dimension_mean,
+        'L_Dimension' : L_Dimension,
+        'L_percentage_Dimension' : L_percentage_Dimension,
+        'grain_discretisation_square' : grain_discretisation,
+        'grain_discretisation' : grain_discretisation,
+        }
+
+    #for mix square and disk
+    elif type_sample_selector == 'Mix':
+        #Disk
+        N_grain_disk = 27 #number of grains
+        R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
+        L_R = [1*R_mean] #from larger to smaller
+        L_percentage_R = [1] #distribution of the different radius
+        #Recompute the mean radius
+        R_mean = 0
+        for i in range(len(L_R)):
+            R_mean = R_mean + L_R[i]*L_percentage_R[i]
+        #Square
+        N_grain_square = 3 #number of grains
+        Dimension_mean = 150 #µm radius
+        L_Dimension = [1*Dimension_mean] #from larger to smaller
+        L_percentage_Dimension = [1] #distribution of the different radius
+        #Recompute the mean dimension
+        Dimension_mean = 0
+        for i in range(len(L_Dimension)):
+            Dimension_mean = Dimension_mean + L_Dimension[i]*L_percentage_Dimension[i]
+
+        #write dict
+        dict_geometry = {
+        'type' : type_sample_selector,
+        'N_grain_disk' : N_grain_disk,
+        'R_mean' : R_mean,
+        'L_R' : L_R,
+        'L_percentage_R' : L_percentage_R,
+        'grain_discretisation' : grain_discretisation,
+        'N_grain_square' : N_grain_square,
+        'Dimension_mean' : Dimension_mean,
+        'L_Dimension' : L_Dimension,
+        'L_percentage_Dimension' : L_percentage_Dimension,
+        'grain_discretisation_square' : grain_discretisation,
+        }
 
     #---------------------------------------------------------------------------
     #Material parameters
@@ -66,10 +113,6 @@ def All_parameters():
     Y = 70*(10**9)*(10**6)*(10**(-12)) #Young Modulus µN/µm2
     nu = 0.3 #Poisson's ratio
     rho = 2500*10**(-6*3) #density kg/µm3
-    if N_grain_square == 0:
-        rho_surf = 4/3*rho*R_mean #kg/µm2
-    elif N_grain_disk == 0 :
-        rho_surf = rho*Dimension_mean #kg/µm2
     mu_friction_gg = 0.5 #grain-grain
     mu_friction_gw = 0 #grain-wall
     coeff_restitution = 0.2 #1 is perfect elastic
@@ -82,7 +125,6 @@ def All_parameters():
     'Y' : Y,
     'nu' : nu,
     'rho' : rho,
-    'rho_surf' : rho_surf,
     'mu_friction_gg' : mu_friction_gg,
     'mu_friction_gw' : mu_friction_gw,
     'coeff_restitution' : coeff_restitution,
@@ -90,15 +132,31 @@ def All_parameters():
     'kc_pf' : kc_pf
     }
 
+    #add element in dict
+    if type_sample_selector == 'AllDisk':
+        rho_surf = 4/3*rho*R_mean #kg/µm2
+        dict_material['rho_surf'] = rho_surf
+    elif type_sample_selector == 'AllSquare':
+        rho_surf = rho*Dimension_mean #kg/µm2
+        dict_material['rho_surf'] = rho_surf
+    elif type_sample_selector == 'Mix':
+        rho_surf_disk = 4/3*rho*R_mean #kg/µm2
+        rho_surf_square = rho*Dimension_mean #kg/µm2
+        dict_material['rho_surf_disk'] = rho_surf_disk
+        dict_material['rho_surf_square'] = rho_surf_square
+
     #---------------------------------------------------------------------------
     #Sample definition
 
-    if N_grain_disk == 0:
-        Lenght_mean = Dimension_mean/2
-        N_grain = N_grain_square
-    elif N_grain_square == 0:
+    if type_sample_selector == 'AllDisk':
         Lenght_mean = R_mean
         N_grain = N_grain_disk
+    elif type_sample_selector == 'AllSquare':
+        Lenght_mean = Dimension_mean/2
+        N_grain = N_grain_square
+    elif type_sample_selector == 'Mix':
+        N_grain = N_grain_square + N_grain_disk
+        Lenght_mean = (R_mean*N_grain_disk + Dimension_mean/2*N_grain_square)/N_grain #mean characteristic lenght
 
     #Box définition
     x_box_min = 0 #µm
@@ -121,14 +179,15 @@ def All_parameters():
     factor_distribution_etai = 1.5 #margin to distribute etai
     MovePF_selector = 'DeconstructRebuild' #Move PF
     n_local = 40 #number of node inside local PF simulation
-    if dict_geometry['N_grain_square'] == 0:
+    if type_sample_selector == 'AllDisk':
         dx_local = 2*min(dict_geometry['L_R'])/(n_local-1)
         dy_local = 2*min(dict_geometry['L_R'])/(n_local-1)
-    elif dict_geometry['N_grain_disk'] == 0:
+    elif type_sample_selector == 'AllSquare':
         dx_local = min(dict_geometry['L_Dimension'])/(n_local-1)
         dy_local = min(dict_geometry['L_Dimension'])/(n_local-1)
-    else :
-        raise ValueError('A sample composed by square and disk is not available!')
+    elif type_sample_selector == 'Mix' :
+        dx_local = min(2*min(dict_geometry['L_R']),min(dict_geometry['L_Dimension']))/(n_local-1)
+        dy_local = min(2*min(dict_geometry['L_R']),min(dict_geometry['L_Dimension']))/(n_local-1)
     #add into material dict from this data
     w = 4*math.sqrt(dx_local**2+dy_local**2)
     double_well_height = 10*dict_material['kc_pf']/w/w
@@ -136,10 +195,13 @@ def All_parameters():
     dict_material['double_well_height'] = double_well_height
 
     #DEM parameters
-    if N_grain_square == 0 :
+    if type_sample_selector == 'AllDisk' :
         dt_DEM_crit = math.pi*min(L_R)/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
-    elif N_grain_disk == 0 :
+    elif type_sample_selector == 'AllSquare' :
         dt_DEM_crit = math.pi*min(L_Dimension)/2/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
+    elif type_sample_selector == 'Mix':
+        dt_DEM_crit = math.pi*min(min(L_Dimension)/2,min(L_R))/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
+
     dt_DEM = dt_DEM_crit/8 #s time step during DEM simulation
     factor_neighborhood = 1.5 #margin to detect a grain into a neighborhood
     i_update_neighborhoods = 100 #the frequency of the update of the neighborhood of the grains and the walls
@@ -229,14 +291,19 @@ def All_parameters():
     #External sollicitations
 
     Vertical_Confinement_Pressure = 500*10**5 #Pa used to compute the Vertical_Confinement_Force
-    Vertical_Confinement_Force = Vertical_Confinement_Pressure*(x_box_max-x_box_min)*(2*R_mean)*10**(-6) #µN
+    Vertical_Confinement_Force = Vertical_Confinement_Pressure*(x_box_max-x_box_min)*(2*Lenght_mean)*10**(-6) #µN
     gravity = 0 #µm/s2
     frac_dissolved = 0.15 #Percentage of grain dissolved
 
     #Add energy to dissolved grain
     frac_Rmean0 = 0.000002 #approximatively the percentage of the initial R_mean dissolved at each iteration
 
-    Dissolution_Energy = frac_Rmean0*dict_geometry['R_mean']*2/3*dict_material['w']/(dict_algorithm['dt_PF']*dict_algorithm['n_t_PF'])
+    if type_sample_selector == 'AllDisk':
+        Dissolution_Energy = frac_Rmean0*dict_geometry['R_mean']*2/3*dict_material['w']/(dict_algorithm['dt_PF']*dict_algorithm['n_t_PF'])
+    elif type_sample_selector == 'AllSquare':
+        Dissolution_Energy = frac_Rmean0*dict_geometry['Dimension_mean']/2*2/3*dict_material['w']/(dict_algorithm['dt_PF']*dict_algorithm['n_t_PF'])
+    elif type_sample_selector == 'Mix':
+        Dissolution_Energy = frac_Rmean0*dict_geometry['Dimension_mean']/2*2/3*dict_material['w']/(dict_algorithm['dt_PF']*dict_algorithm['n_t_PF'])
 
     #write dict
     dict_sollicitations = {

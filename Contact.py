@@ -13,10 +13,7 @@ The new class is about the contact between two grains
 
 import numpy as np
 import math
-import matplotlib.pyplot as plt
 import random
-from multiprocessing import Pool
-from functools import partial
 import Grain
 
 #-------------------------------------------------------------------------------

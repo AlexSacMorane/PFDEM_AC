@@ -13,8 +13,6 @@ The new class is about the contact between a wall and a grain
 
 import numpy as np
 import math
-import matplotlib.pyplot as plt
-import random
 
 #-------------------------------------------------------------------------------
 #Class

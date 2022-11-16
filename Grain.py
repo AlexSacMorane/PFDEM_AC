@@ -13,11 +13,7 @@ The new class is about the grains
 
 import numpy as np
 import math
-from PIL import Image as im
 import random
-from multiprocessing import Pool
-from functools import partial
-import matplotlib.pyplot as plt
 
 #-------------------------------------------------------------------------------
 #Class
