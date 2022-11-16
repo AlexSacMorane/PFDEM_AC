@@ -3,7 +3,8 @@
 Phase-Field Discrete Element Modelisation applied to granular material.
 
 ## Simulation presentation
-This simulation is about a 2D test under oedometrical conditions with an acid injection.
+The goal is to reproduce result from <i>Shin, H., Santamarina, J.C. (2009) Mineral Dissolution and the Evolution of k0, Journal of Geotechnical and Geoenvironmental Engineering, 135, 1141-1147</i>.
+This simulation is about a 2D test under oedometrical conditions with an acid injection to dissolve square particles.
 The chain force and the k0 (= &sigma;<sub>1</sub>/&sigma;<sub>2</sub>) evolves with the material dissolution.
 
 ## Technical description
@@ -27,7 +28,6 @@ Some next releases are presented here.
 - add rolling resistance
 - increase the user experience (homogenize names, correct english)
 - create a database of initial condition
-- create AI to select algorithm parameters (as neighborhood update frequency, time step, stop criteria, etc...)
-- change the initial shape of grain
+- create AI to select algorithm parameters (as neighborhood update frequency, time step, stop criteria, etc...)n
 - add some quick tests to check the script
 - correct the functions P_is_inside() because if the coordinate y = the coordinate of the vertex, the point is considered outside (even  if it is not the case)

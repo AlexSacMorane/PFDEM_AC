@@ -105,8 +105,6 @@ simulation_report.tac_tempo(datetime.now(),'Creation of polygonal particles')
 
 simulation_report.tic_tempo(datetime.now())
 
-Owntools.Dissolution_Distribution(dict_sample,dict_sollicitations,simulation_report)
-
 #Saving the grain surface
 S_grains_dissolvable = 0
 S_grains = 0

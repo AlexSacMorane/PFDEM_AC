@@ -281,20 +281,6 @@ def Sort_Files(name_template,dict_algorithm):
 
 #-------------------------------------------------------------------------------
 
-def Dissolution_Distribution(dict_sample,dict_sollicitations,simulation_report):
-
-    i = 0
-    while i < int(dict_sollicitations['frac_dissolved']*len(dict_sample['L_g'])):
-        grain = random.choice(dict_sample['L_g'])
-        while grain.dissolved:
-            grain = random.choice(dict_sample['L_g'])
-        grain.dissolved = True
-        i = i + 1
-
-    simulation_report.write_and_print(f"{int(100*i/len(dict_sample['L_g']))} % dissolvable (asked {int(100*dict_sollicitations['frac_dissolved'])})\n",f"{int(100*i/len(dict_sample['L_g']))} % dissolvable (asked {int(100*dict_sollicitations['frac_dissolved'])})")
-
-#-------------------------------------------------------------------------------
-
 def error_on_ymax_f(dy,overlap_L,k_L,Force_target) :
     #compute the function f to control the upper wall
     #difference between the force applied and the target value

@@ -31,7 +31,7 @@ class Grain:
     self.id = dict_ic_to_real['Id']
     self.id_eta = Id_Eta
     #Material property
-    self.dissolved = False
+    self.dissolved = dict_ic_to_real['Type'] == 'Square'
     self.y = dict_ic_to_real['Y']
     self.nu = dict_ic_to_real['Nu']
     self.g = self.y /2/(1+self.nu) #shear modulus
