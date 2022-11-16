@@ -33,3 +33,4 @@ Some next releases are presented here.
 - correct the functions P_is_inside() because if the coordinate y = the coordinate of the vertex, the point is considered outside (even  if it is not the case)
 
 test
+retest
