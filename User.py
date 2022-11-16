@@ -37,7 +37,7 @@ def All_parameters():
         R_mean = R_mean + L_R[i]*L_percentage_R[i]
     #Square
     N_grain_square = 3 #number of grains
-    Dimension_mean = 150 #µm radius
+    Dimension_mean = 300 #µm radius
     L_Dimension = [1*Dimension_mean] #from larger to smaller
     L_percentage_Dimension = [1] #distribution of the different radius
     #Recompute the mean dimension
