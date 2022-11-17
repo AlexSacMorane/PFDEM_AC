@@ -26,20 +26,23 @@ def All_parameters():
     #approximatively the number of vertices for one grain during DEM simulation
     grain_discretisation = 20 # = grain_discretisation_square
 
+    N_grain = 300 #total number of grains
+    frac_dissolved = 0.05
+
     #Disk
-    N_grain_disk = 27 #number of grains
+    N_grain_disk = int(N_grain*(1-frac_dissolved)) #number of grains
     R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
-    L_R = [1*R_mean] #from larger to smaller
-    L_percentage_R = [1] #distribution of the different radius
+    L_R = [1.1*R_mean,1*R_mean,0.9*R_mean] #from larger to smaller
+    L_percentage_R = [1/3,1/3,1/3] #distribution of the different radius
     #Recompute the mean radius
     R_mean = 0
     for i in range(len(L_R)):
         R_mean = R_mean + L_R[i]*L_percentage_R[i]
     #Square
-    N_grain_square = 3 #number of grains
+    N_grain_square = int(N_grain*frac_dissolved) #number of grains
     Dimension_mean = 300 #µm radius
-    L_Dimension = [1*Dimension_mean] #from larger to smaller
-    L_percentage_Dimension = [1] #distribution of the different radius
+    L_Dimension = [1.2*Dimension_mean,1*Dimension_mean,0.8*Dimension_mean] #from larger to smaller
+    L_percentage_Dimension = [1/3,1/3,1/3] #distribution of the different radius
     #Recompute the mean dimension
     Dimension_mean = 0
     for i in range(len(L_Dimension)):
@@ -91,7 +94,6 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #Sample definition
 
-    N_grain = N_grain_square + N_grain_disk
     Lenght_mean = (R_mean*N_grain_disk + Dimension_mean/2*N_grain_square)/N_grain #mean characteristic lenght
 
     #Box définition
@@ -214,8 +216,8 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #External sollicitations
 
-    Vertical_Confinement_Pressure = 500*10**5 #Pa used to compute the Vertical_Confinement_Force
-    Vertical_Confinement_Force = Vertical_Confinement_Pressure*(x_box_max-x_box_min)*(2*Lenght_mean)*10**(-6) #µN
+    Vertical_Confinement_Linear_Force = Y*2*R_mean/1000 #µN/µm used to compute the Vertical_Confinement_Force
+    Vertical_Confinement_Force = Vertical_Confinement_Pressure*(x_box_max-x_box_min) #µN
     gravity = 0 #µm/s2
 
     #Add energy to dissolved grain
