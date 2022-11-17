@@ -148,10 +148,10 @@ def All_parameters():
     #Debugging
     Debug = True #plot configuration before and after DEM simulation
     Debug_DEM = False #plot configuration inside DEM
-    i_print_plot = 50 #frenquency of the print and plot (if Debug_DEM) in DEM step
-    SaveData = False #save simulation
-    main_folder_name = 'Data_MG_Box_AC_M' #where data are saved
-    template_simulation_name = 'Run_' #template of the simulation name
+    i_print_plot = 100 #frenquency of the print and plot (if Debug_DEM) in DEM step
+    SaveData = True #save simulation
+    main_folder_name = 'Data_Santamarina' #where data are saved
+    template_simulation_name = 'frac_'+str(int(frac_dissolved*100))+'_run_' #template of the simulation name
 
     #write dict
     dict_algorithm = {
