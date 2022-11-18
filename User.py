@@ -140,7 +140,7 @@ def All_parameters():
     dy_box_max_stop = 0.5
 
     #PF-DEM
-    n_t_PFDEM = 3 #number of cycle PF-DEM
+    n_t_PFDEM = 15 #number of cycle PF-DEM
 
     #Number of processor
     np_proc = 4
@@ -217,17 +217,16 @@ def All_parameters():
     #External sollicitations
 
     Vertical_Confinement_Linear_Force = Y*2*R_mean/1000 #µN/µm used to compute the Vertical_Confinement_Force
-    Vertical_Confinement_Force = Vertical_Confinement_Pressure*(x_box_max-x_box_min) #µN
+    Vertical_Confinement_Force = Vertical_Confinement_Linear_Force*(x_box_max-x_box_min) #µN
     gravity = 0 #µm/s2
 
     #Add energy to dissolved grain
-    frac_Rmean0 = 0.00002 #approximatively the percentage of the initial R_mean dissolved at each iteration
+    frac_Rmean0 = 0.000005 #approximatively the percentage of the initial R_mean dissolved at each iteration
 
     Dissolution_Energy = frac_Rmean0*dict_geometry['Dimension_mean']/2*2/3*dict_material['w']/(dict_algorithm['dt_PF']*dict_algorithm['n_t_PF'])
 
     #write dict
     dict_sollicitations = {
-    'Vertical_Confinement_Pressure' : Vertical_Confinement_Pressure,
     'Dissolution_Energy' : Dissolution_Energy,
     'Vertical_Confinement_Force' : Vertical_Confinement_Force,
     'gravity' : gravity
