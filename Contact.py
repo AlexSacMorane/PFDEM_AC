@@ -701,20 +701,6 @@ def Grains_Polyhedral_contact_Neighborhoods_bool(g1,g2):
   L_i_vertices_1 = extract_vertices(g1, angle_g1_to_g2)
   L_i_vertices_2 = extract_vertices(g2, angle_g2_to_g1)
 
-  #looking for the nearest nodes
-  d_virtual = max(g1.r_max,g2.r_max)
-  ij_min = [0,0]
-  d_ij_min = 100*d_virtual #Large
-  for i in L_i_vertices_1:
-    for j in L_i_vertices_2:
-        d_ij = np.linalg.norm(g2.l_border[:-1][j]-g1.l_border[:-1][i]+d_virtual*(g2.center-g1.center)/np.linalg.norm(g2.center-g1.center))
-        if d_ij < d_ij_min :
-            d_ij_min = d_ij
-            ij_min = [i,j]
-
-  d_ij_min = np.dot(g2.l_border[:-1][ij_min[1]]-g1.l_border[:-1][ij_min[0]],-(g2.center-g1.center)/np.linalg.norm(g2.center-g1.center))
-  return d_ij_min > 0
-
 #-------------------------------------------------------------------------------
 
 def Grains_Polyhedral_contact_Neighborhoods(dict_material,dict_sample):
