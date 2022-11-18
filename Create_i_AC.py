@@ -18,6 +18,12 @@ import Grain
 #-------------------------------------------------------------------------------
 
 def Create_i_AC_local(grain,dict_algorithm, dict_material, dict_sample,dict_sollicitations):
+    '''
+    Create a .i file for MOOSE simulation (PF)
+
+    There is a simulation for every dissolvable grain (one by one)
+    The file generated is created from a basis file PF_base_AC.i
+    '''
 
     # create spatial discretisation
     grain.Compute_etaiM_local(dict_algorithm,dict_material)
