@@ -22,10 +22,11 @@ class Report:
 #-------------------------------------------------------------------------------
 
     def __init__(self, Name, Datetime):
-        #defining a report
-        #a report is described by a name (a string)
-        #                         a start time (Datetime class)
+        '''defining a report
 
+        a report is described by a name (a string)
+                                 a start time (Datetime class)
+        '''
         if type(Name) == str:
             if Name[-4:] != '.txt':
                 Name = Name + '.txt'
@@ -51,7 +52,7 @@ class Report:
 #-------------------------------------------------------------------------------
 
     def write(self, Text):
-        #write Text (a string) in the report
+        '''write Text (a string) in the report'''
 
         file_to_write = open(self.name,'a')
         file_to_write.write(Text)
@@ -60,8 +61,7 @@ class Report:
 #-------------------------------------------------------------------------------
 
     def write_and_print(self, Text_to_write, Text_to_print):
-        #write Text_to_write (a string) in the report and print Text_to_print (a string)
-
+        '''write Text_to_write (a string) in the report and print Text_to_print (a string)'''
         file_to_write = open(self.name,'a')
         file_to_write.write(Text_to_write)
         file_to_write.close()
@@ -70,16 +70,15 @@ class Report:
 #-------------------------------------------------------------------------------
 
     def tic_tempo(self, Datetime):
-        #save a temporary start time.
-        #work with tac_tempo to compute a time cost for a simulation step
+        '''save a temporary start time.
 
+        work with tac_tempo to compute a time cost for a simulation step'''
         self.datetimestart_tempo = str(Datetime)
 
 #-------------------------------------------------------------------------------
 
     def tac_tempo(self, Datetime, Step_name):
-        #work with tic_tempo to compute a time cost for a simulation step
-
+        '''work with tic_tempo to compute a time cost for a simulation step'''
         self.datetimeend_tempo = str(Datetime)
 
         dyear = int(self.datetimeend_tempo[:4])-int(self.datetimestart_tempo[:4])
@@ -105,8 +104,7 @@ class Report:
 #-------------------------------------------------------------------------------
 
     def end(self, Datetime):
-     #work with init to compute the total time cost of the simulation
-
+     '''work with init to compute the total time cost of the simulation'''
      self.datetimeend = str(Datetime)
 
      dyear = int(self.datetimeend[:4])-int(self.datetimestart[:4])

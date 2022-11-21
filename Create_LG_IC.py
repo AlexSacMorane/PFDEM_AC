@@ -19,7 +19,7 @@ import Create_LG_IC_Mix
 #-------------------------------------------------------------------------------
 
 def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report):
-    #Create an initial configuration with tempo grains
+    '''Create an initial configuration with tempo grains'''
 
     #simulation with disk
     if dict_geometry['type'] == 'AllDisk':
@@ -36,7 +36,7 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
 #-------------------------------------------------------------------------------
 
 def From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample, simulation_report):
-    #Convert an initial configuration with tempo grains to current configuration with real grain
+    '''Convert an initial configuration with tempo grains to current configuration with real grain'''
 
     #simulation with disk
     if dict_geometry['type'] == 'AllDisk':

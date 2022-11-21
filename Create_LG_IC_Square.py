@@ -26,15 +26,14 @@ class Grain_Tempo:
 #-------------------------------------------------------------------------------
 
   def __init__(self, ID, Center, Dimension, Theta, dict_material):
-    #defining the grain
-    #each grain is described by a id (an integer class)
-    #                           a center (a array class [X,Y])
-    #                           a dimension (a float)
-    #                           an initial rotation (a float between 0 and 2pi)
-    #                           a Young modulus (a float)
-    #                           a Poisson's ratio (a float)
-    #                           a surface mass (a float)
+    '''defining the grain
 
+    each grain is described by a id (an integer class)
+                               a center (a array class [X,Y])
+                               a dimension (a float)
+                               an initial rotation (a float between 0 and 2pi)
+                               a material dictionnary (a dict)
+    '''
     #Build the border
     n_border = 20 #number of vertices
     L_border = []
@@ -94,8 +93,7 @@ class Grain_Tempo:
 #-------------------------------------------------------------------------------
 
   def add_F(self, F, p_application):
-      #add a force (an array [Fx,Fy]) to the grain
-
+      '''add a force (an array [Fx,Fy]) to the grain'''
       self.fx = self.fx + F[0]
       self.fy = self.fy + F[1]
       v1 = np.array([p_application[0]-self.center[0], p_application[1]-self.center[1], 0])
@@ -105,9 +103,8 @@ class Grain_Tempo:
 #-------------------------------------------------------------------------------
 
   def init_F_control(self,g):
-      #initialize the force applied to the grain
-      #a gravity of g is applied
-
+      '''initialize the force applied to the grain
+      a gravity of g is applied'''
       self.fx = 0
       self.fy = -g*self.mass
       self.mz = 0
@@ -115,8 +112,7 @@ class Grain_Tempo:
 #-------------------------------------------------------------------------------
 
   def euler_semi_implicite(self,dt_DEM,factor):
-    #move the grain following a semi implicit euler scheme
-
+    '''move the grain following a semi implicit euler scheme'''
     #translation
     a_i = np.array([self.fx,self.fy])/self.mass
     self.v = self.v + a_i*dt_DEM
@@ -157,12 +153,12 @@ class Contact_Tempo:
 #-------------------------------------------------------------------------------
 
   def __init__(self, ID, G1, G2, dict_material):
-    #defining the contact grain-grain
-    #each contact is described by a id (an integer class)
-    #                             two grains (a grain class)
-    #                             a friction coefficient (a float)
-    #                             a restitution coefficient (a float) : 1 = restitution of all energy, 0 = reestituion of any energy
+    '''defining the contact grain-grain
 
+    each contact is described by a id (an integer class)
+                                 two grains (a grain class)
+                                 a material dictionnary (a dict)
+    '''
     self.id = ID
     self.g1 = G1
     self.g2 = G2
@@ -175,9 +171,9 @@ class Contact_Tempo:
 #-------------------------------------------------------------------------------
 
   def normal(self):
-    #compute the normal reaction of a contact grain-grain
-    #Here a pontual spring is considered
-
+    '''compute the normal reaction of a contact grain-grain
+    Here a pontual spring is considered
+    '''
     #looking for the nearest nodes
     d_virtual = max(self.g1.r_max,self.g2.r_max)
     ij_min = [0,0]
@@ -300,9 +296,9 @@ class Contact_Tempo:
 #-------------------------------------------------------------------------------
 
   def tangential(self,dt_DEM):
-    #compute the tangential reaction of a contact grain-grain
-    #Here a pontual spring is considered
-
+    '''compute the tangential reaction of a contact grain-grain
+    Here a pontual spring is considered
+    '''
     if self.overlap_normal > 0 and self.mu > 0:
 
         if self.tangential_old_statut:
@@ -353,15 +349,15 @@ class Contact_gw_Tempo:
 #-------------------------------------------------------------------------------
 
   def __init__(self, ID, G, dict_material, Nature, Limit, Overlap):
-    #defining the contact grain-wall
-    #each contact is described by a id (an integer class)
-    #                             a grain (a grain class)
-    #                             a friction coefficient (a float)
-    #                             a restitution coefficient (a float) : 1 = restitution of all energy, 0 = reestituion of any energy
-    #                             a nature description (a float) : identify the wall
-    #                             a coordinate of the wall (a float) : x or y depending of the wall nature
-    #                             an overlap (a float)
+    '''defining the contact grain-wall
 
+    each contact is described by a id (an integer class)
+                                 a grain (a grain class)
+                                 a material dictionnary (a dict)
+                                 a nature description (a float) : identify the wall
+                                 a coordinate of the wall (a float) : x or y depending of the wall nature
+                                 an overlap (a float)
+    '''
     self.id = ID
     self.g = G
     factor = 5 #factor just to increase the stiffness
@@ -379,17 +375,17 @@ class Contact_gw_Tempo:
 #-------------------------------------------------------------------------------
 
   def update_overlap(self,new_overlap):
-    #update the overlap of a contact already created.
-
+    '''update the overlap of a contact already created.'''
     self.overlap = new_overlap
 
 #-------------------------------------------------------------------------------
 
   def  normal(self):
-    #compute the normal reaction of a contact grain-wall
-    #Here a pontual spring is considered
-    #conditions "if" are defined and same for each wall nature
+    '''compute the normal reaction of a contact grain-wall
 
+    Here a pontual spring is considered
+    conditions "if" are defined and same for each wall nature
+    '''
     if self.nature == 'gwy_min':
         #unlinear stiffness
         nwg = np.array([0,1])
@@ -456,10 +452,11 @@ class Contact_gw_Tempo:
 #-------------------------------------------------------------------------------
 
   def tangential(self, dt_DEM):
-   #compute the tangential reaction of a contact grain-wall
-   #Here a pontual spring is considered
-   #conditions "if" are defined and same for each wall nature
+   '''compute the tangential reaction of a contact grain-wall
 
+   Here a pontual spring is considered
+   conditions "if" are defined and same for each wall nature
+   '''
    if self.nature == 'gwy_min':
        #unlinear stiffness
        twg = np.array([-1, 0])
@@ -517,8 +514,7 @@ class Contact_gw_Tempo:
 #-------------------------------------------------------------------------------
 
 def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report):
-    #create an initial condition
-
+    '''create an initial condition'''
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     n_generation = dict_ic['n_generation']
@@ -642,8 +638,7 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
 #-------------------------------------------------------------------------------
 
 def DEM_loading(dict_ic, dict_material, dict_sample, dict_sollicitations, multi_generation, simulation_report):
-    #loading the granular
-
+    '''loading the granular'''
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     L_g_tempo = dict_ic['L_g_tempo']
@@ -767,9 +762,10 @@ def DEM_loading(dict_ic, dict_material, dict_sample, dict_sollicitations, multi_
 #-------------------------------------------------------------------------------
 
 def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, id_generation,simulation_report):
-    #generate the grains
-    #a position is tried, then we verify this new grain does not overlap with previously created ones
+    '''generate the grains
 
+    a position is tried, then we verify this new grain does not overlap with previously created ones
+    '''
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     L_g_tempo = dict_ic['L_g_tempo']
@@ -820,8 +816,7 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, id_generat
 #-------------------------------------------------------------------------------
 
 def Grains_Polyhedral_contact_f(g1,g2):
-  #detect contact grain-grain
-
+  '''detect contact grain-grain'''
   if np.linalg.norm(g1.center-g2.center) < 1.5*(g1.r_max+g2.r_max):
 
       #looking for the nearest nodes
@@ -844,8 +839,7 @@ def Grains_Polyhedral_contact_f(g1,g2):
 #-------------------------------------------------------------------------------
 
 def E_cin_total(L_g):
-    #compute total kinetic energy
-
+    '''compute total kinetic energy'''
     Ecin = 0
     for grain in L_g:
         Ecin = Ecin + 1/2*grain.mass*np.dot(grain.v,grain.v)
@@ -854,8 +848,7 @@ def E_cin_total(L_g):
 #-------------------------------------------------------------------------------
 
 def F_total(L_g):
-    #compute total force applied on grain
-
+    '''compute total force applied on grain'''
     F = 0
     for grain in L_g:
         F = F + np.linalg.norm([grain.fx, grain.fy])
@@ -864,9 +857,8 @@ def F_total(L_g):
 #-------------------------------------------------------------------------------
 
 def Control_y_max_NR(y_max,Force_target,L_contact_gw,L_g):
-    #Control the upper wall to apply force
-    #a Newton-Raphson method is applied
-
+    '''Control the upper wall to apply force
+    a Newton-Raphson method is applied'''
     F = 0
     overlap_L = []
     k_L = []
@@ -907,9 +899,9 @@ def Control_y_max_NR(y_max,Force_target,L_contact_gw,L_g):
 #-------------------------------------------------------------------------------
 
 def error_on_ymax_f(dy,overlap_L,k_L,Force_target) :
-    #compute the function f to control the upper wall
-    #difference between the force applied and the target value
-
+    '''compute the function f to control the upper wall
+    difference between the force applied and the target value
+    '''
     f = Force_target
     for i in range(len(overlap_L)):
         f = f - k_L[i]*(max(overlap_L[i]-dy,0))**(3/2)
@@ -918,8 +910,7 @@ def error_on_ymax_f(dy,overlap_L,k_L,Force_target) :
 #-------------------------------------------------------------------------------
 
 def error_on_ymax_df(dy,overlap_L,k_L) :
-    #compute the derivative function df to control the upper wall
-
+    '''compute the derivative function df to control the upper wall'''
     df = 0
     for i in range(len(overlap_L)):
         df = df + 3/2*k_L[i]*(max(overlap_L[i]-dy,0))**(1/2)
@@ -928,8 +919,7 @@ def error_on_ymax_df(dy,overlap_L,k_L) :
 #-------------------------------------------------------------------------------
 
 def Reset_y_max(L_g,Force):
-    #the upper wall is located as a single contact verify the target value
-
+    '''the upper wall is located as a single contact verify the target value'''
     y_max = None
     id_grain_max = None
     for id_grain in range(len(L_g)):
@@ -952,8 +942,7 @@ def Reset_y_max(L_g,Force):
 #-------------------------------------------------------------------------------
 
 def Grains_Polyhedral_contact_Neighborhoods_f(g1,g2):
-  #detect contact grain-grain
-
+  '''detect contact grain-grain'''
   #looking for the nearest nodes
   d_virtual = max(g1.r_max,g2.r_max)
   ij_min = [0,0]
@@ -971,14 +960,14 @@ def Grains_Polyhedral_contact_Neighborhoods_f(g1,g2):
 #-------------------------------------------------------------------------------
 
 def Update_Neighbouroods(dict_ic):
-    #determine a neighbouroods for each grain. This function is called every x time step
-    #grain contact is determined by Grains_Polyhedral_contact_Neighbouroods
-    #
-    #notice that if there is a potential contact between grain_i and grain_j
-    #grain_i is not in the neighbourood of grain_j
-    #whereas grain_j is in the neighbourood of grain_i
-    #with i_grain < j_grain
+    '''determine a neighbouroods for each grain. This function is called every x time step
+    grain contact is determined by Grains_Polyhedral_contact_Neighbouroods
 
+    notice that if there is a potential contact between grain_i and grain_j
+    grain_i is not in the neighbourood of grain_j
+    whereas grain_j is in the neighbourood of grain_i
+    with i_grain < j_grain
+    '''
     for i_grain in range(len(dict_ic['L_g_tempo'])-1) :
         neighbourood = []
         for j_grain in range(i_grain+1,len(dict_ic['L_g_tempo'])):
@@ -989,9 +978,9 @@ def Update_Neighbouroods(dict_ic):
 #-------------------------------------------------------------------------------
 
 def Grains_Polyhedral_contact_Neighbouroods(dict_ic,dict_material):
-    #detect contact between a grain and grains from its neighbourood
-    #the neighbourood is updated with Update_Neighbouroods()
-
+    '''detect contact between a grain and grains from its neighbourood
+    the neighbourood is updated with Update_Neighbouroods()
+    '''
     for i_grain in range(len(dict_ic['L_g_tempo'])-1) :
         grain_i = dict_ic['L_g_tempo'][i_grain]
         for neighbour in dict_ic['L_g_tempo'][i_grain].neighbourood:
@@ -1012,10 +1001,10 @@ def Grains_Polyhedral_contact_Neighbouroods(dict_ic,dict_material):
 #-------------------------------------------------------------------------------
 
 def Update_wall_Neighborhoods(L_g_tempo,factor_neighborhood_IC,x_min,x_max,y_min,y_max):
-    #determine a neighbouroods for wall. This function is called every x time step
-    #grain_wall contact is determined by Grains_Polyhedral_Wall_contact_Neighborhood
-    #factor determines the size of the neighbourood window
-
+    '''determine a neighbouroods for wall. This function is called every x time step
+    grain_wall contact is determined by Grains_Polyhedral_Wall_contact_Neighborhood
+    factor determines the size of the neighbourood window
+    '''
     wall_neighborhood = []
     for grain in L_g_tempo:
 
@@ -1042,10 +1031,10 @@ def Update_wall_Neighborhoods(L_g_tempo,factor_neighborhood_IC,x_min,x_max,y_min
 #-------------------------------------------------------------------------------
 
 def Grains_Polyhedral_Wall_contact_Neighborhood(wall_neighborhood,x_box_min,x_box_max,y_box_min,y_box_max, dict_ic, dict_material):
-  #detect contact grain in the neighbourood of the wall and  the wall
-  #the neighbourood is updated with Update_wall_Neighborhoods()
-  #we realize iterations on the grain list and compare with the coordinate of the different walls
-
+  '''detect contact grain in the neighbourood of the wall and  the wall
+  the neighbourood is updated with Update_wall_Neighborhoods()
+  we realize iterations on the grain list and compare with the coordinate of the different walls
+  '''
   #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
   #load data needed
   L_ij_contact_gw = dict_ic['L_contact_gw_ij']
@@ -1121,8 +1110,7 @@ def Grains_Polyhedral_Wall_contact_Neighborhood(wall_neighborhood,x_box_min,x_bo
 #-------------------------------------------------------------------------------
 
 def Plot_Config_Loaded(L_g,x_min,x_max,y_min,y_max,i):
-    #plot loading configuration
-
+    '''plot loading configuration'''
     plt.figure(1,figsize=(16,9))
     L_x = []
     L_y = []
@@ -1144,8 +1132,7 @@ def Plot_Config_Loaded(L_g,x_min,x_max,y_min,y_max,i):
 #-------------------------------------------------------------------------------
 
 def Plot_Config_Loaded_End(L_g,x_min,x_max,y_min,y_max):
-    #plot final loading configuration
-
+    '''plot final loading configuration'''
     plt.figure(1,figsize=(16,9))
     L_x = []
     L_y = []
@@ -1166,10 +1153,10 @@ def Plot_Config_Loaded_End(L_g,x_min,x_max,y_min,y_max):
 #-------------------------------------------------------------------------------
 
 def From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample):
-    #from the grain geometry the phase variable is rebuilt
-    #the distance between the point of the mesh and the particle center determines the value of the variable
-    #a cosine profile is applied inside the interface
-
+    '''from the grain geometry the phase variable is rebuilt
+    the distance between the point of the mesh and the particle center determines the value of the variable
+    a cosine profile is applied inside the interface
+    '''
     L_g = []
     for grain_tempo in dict_ic['L_g_tempo']:
 

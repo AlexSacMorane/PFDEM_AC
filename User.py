@@ -18,7 +18,7 @@ import numpy as np
 #-------------------------------------------------------------------------------
 
 def All_parameters():
-    #this function is called in main.py to have all the parameters needed in the simulation
+    '''this function is called in main.py to have all the parameters needed in the simulation'''
 
     #---------------------------------------------------------------------------
     #Geometric parameters
@@ -321,8 +321,7 @@ def All_parameters():
 #-------------------------------------------------------------------------------
 
 def Criteria_StopSimulation(dict_algorithm):
-    #Criteria to stop simulation (PF and DEM)
-
+    '''Criteria to stop simulation (PF and DEM)'''
     Criteria_Verified = False
     if dict_algorithm['i_PF'] >= dict_algorithm['n_t_PFDEM']:
         Criteria_Verified = True

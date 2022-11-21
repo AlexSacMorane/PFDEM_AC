@@ -24,8 +24,8 @@ class Grain:
 #-------------------------------------------------------------------------------
 
   def __init__(self, dict_ic_to_real, Id_Eta = None, V = np.array([0,0]), A = np.array([0,0])):
-    #defining the grain
-    #each grain is described from a tempo grain (see Create_LG_IC)
+    '''defining the grain
+    each grain is described from a tempo grain (see Create_LG_IC)'''
 
     #Id of the grain
     self.id = dict_ic_to_real['Id']
@@ -64,9 +64,8 @@ class Grain:
 #-------------------------------------------------------------------------------
 
   def update_geometry_kinetic(self, V, A, W, DT):
-    #update the acceleration and the velocity of a grain
-    #update geometrical parameters as border and center nodes
-
+    '''update the acceleration and the velocity of a grain
+    update geometrical parameters as border and center nodes'''
     #translation
     self.v = V
     self.a = A
@@ -101,9 +100,8 @@ class Grain:
 #-------------------------------------------------------------------------------
 
   def init_f_control(self,dict_sollicitations):
-      #initialize the force applied to the grain
-      #a gravity of g is applied
-
+      '''initialize the force applied to the grain
+      a gravity of g is applied'''
       #-------------------------------------------------------------------------
       #load data needed
       g = dict_sollicitations['gravity']
@@ -117,8 +115,7 @@ class Grain:
 #-------------------------------------------------------------------------------
 
   def update_f(self, Fx, Fy, p_application):
-    #add a force (an array [Fx,Fy]) to the grain
-
+    '''add a force (an array [Fx,Fy]) to the grain'''
     self.fx = self.fx + Fx
     self.fy = self.fy + Fy
     self.f = np.array([self.fx,self.fy])
@@ -130,12 +127,12 @@ class Grain:
 #-------------------------------------------------------------------------------
 
   def Geometricstudy_local(self,dict_geometry,dict_sample,simulation_report):
-      #Searching limits
-      #Not best method but first approach
-      #We iterate on y constant, we look for a value under and over 0.5
-      #If both conditions are verified, there is a limit at this y
-      #Same with iteration on x constant
-
+      '''Searching limits
+      Not best method but first approach
+      We iterate on y constant, we look for a value under and over 0.5
+      If both conditions are verified, there is a limit at this y
+      Same with iteration on x constant
+      '''
       #-------------------------------------------------------------------------
       #load data needed
       n = dict_geometry['grain_discretisation']
@@ -308,10 +305,10 @@ class Grain:
 #-------------------------------------------------------------------------------
 
   def P_is_inside(self,P):
-      #Franklin 1994, see Alonso-Marroquin 2009
-      #determine if a point P is inside of a grain
-      #slide on y constant
-
+      '''Franklin 1994, see Alonso-Marroquin 2009
+      determine if a point P is inside of a grain
+      slide on y constant
+      '''
       counter = 0
       for i_p_border in range(len(self.l_border)-1):
           #consider only points if the coordinates frame the y-coordinate of the point
@@ -327,9 +324,8 @@ class Grain:
 #-------------------------------------------------------------------------------
 
   def Write_e_dissolution_local_txt(self,dict_algorithm,dict_sollicitations):
-      #write an .txt file for MOOSE
-      #this file described an homogenous dissolution field
-
+      '''write an .txt file for MOOSE
+      this file described an homogenous dissolution field'''
       file_to_write = open(f"Data/e_diss_g{self.id}_ite{dict_algorithm['i_PF']}.txt",'w')
       file_to_write.write('AXIS X\n')
       line = ''
@@ -355,10 +351,10 @@ class Grain:
 #-------------------------------------------------------------------------------
 
   def Compute_etaiM_local(self,dict_algorithm,dict_material):
-      #from the grain geometry the phase variable is rebuilt
-      #the distance between the point of the mesh and the particle center determines the value of the variable
-      #a cosine profile is applied inside the interface
-
+      '''from the grain geometry the phase variable is rebuilt
+      the distance between the point of the mesh and the particle center determines the value of the variable
+      a cosine profile is applied inside the interface
+      '''
       x_min_local = min(self.l_border_x)-dict_material['w']
       x_max_local = max(self.l_border_x)+dict_material['w']
       y_min_local = min(self.l_border_y)-dict_material['w']
@@ -394,9 +390,9 @@ class Grain:
 #-------------------------------------------------------------------------------
 
   def Write_txt_Decons_rebuild_local(self,dict_algorithm):
-      #write a .txt file
-      #this file is used to define initial condition of MOOSE simulation
-
+      '''write a .txt file
+      this file is used to define initial condition of MOOSE simulation
+      '''
       file_to_write = open('Data/g'+str(self.id)+'_'+str(dict_algorithm['i_PF'])+'.txt','w')
       file_to_write.write('AXIS X\n')
       line = ''
@@ -422,7 +418,7 @@ class Grain:
 #-------------------------------------------------------------------------------
 
   def PFtoDEM_Multi_local(self,FileToRead,dict_algorithm):
-
+    '''Convert result from phase-field simulation to a discrete element modelization'''
     #---------------------------------------------------------------------------
     #Global parameters
     #---------------------------------------------------------------------------
