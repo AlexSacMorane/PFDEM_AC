@@ -22,15 +22,11 @@ class Report:
 #-------------------------------------------------------------------------------
 
     def __init__(self, Name, Datetime):
-        """
-        Defining a report
+        '''defining a report
 
-            Input :
-                a name (a string)
-                a time (a datetime)
-            Output :
-                Nothing, but a .txt file and a report are generated (a file and a report)
-        """
+        a report is described by a name (a string)
+                                 a start time (Datetime class)
+        '''
         if type(Name) == str:
             if Name[-4:] != '.txt':
                 Name = Name + '.txt'
@@ -40,7 +36,7 @@ class Report:
             Last_modification = 0
             L_file = os.listdir()
             for file in L_file:
-                if file[-3:] == '.py' and file !='User.py':
+                if file[-3:] == '.py' and file !='main.py':
                     if os.path.getmtime(file) > Last_modification:
                         Last_modification =  os.path.getmtime(file)
 
@@ -56,15 +52,8 @@ class Report:
 #-------------------------------------------------------------------------------
 
     def write(self, Text):
-        '''
-        Write a text in the report.
+        '''write Text (a string) in the report'''
 
-            Input :
-                itself (a report)
-                a text (a string)
-            Output :
-                Nothing, but the .txt file is updated
-        '''
         file_to_write = open(self.name,'a')
         file_to_write.write(Text)
         file_to_write.close()
@@ -72,15 +61,7 @@ class Report:
 #-------------------------------------------------------------------------------
 
     def write_and_print(self, Text_to_write, Text_to_print):
-        '''
-        Write a text in the report and print another one.
-
-            Input :
-                itself (a report)
-                two texts (two strings)
-            Output :
-                Nothing, but the .txt file is updated and print is done
-        '''
+        '''write Text_to_write (a string) in the report and print Text_to_print (a string)'''
         file_to_write = open(self.name,'a')
         file_to_write.write(Text_to_write)
         file_to_write.close()
@@ -89,30 +70,15 @@ class Report:
 #-------------------------------------------------------------------------------
 
     def tic_tempo(self, Datetime):
-        """
-        Save a temporary start time.
-        It works with tac_tempo() to compute a time cost for a simulation step.
+        '''save a temporary start time.
 
-            Input :
-                itself (a report)
-                a time (a datetime)
-            Output :
-                Nothing, but the report gets a new attribut (a datetime)
-        """
+        work with tac_tempo to compute a time cost for a simulation step'''
         self.datetimestart_tempo = str(Datetime)
 
 #-------------------------------------------------------------------------------
 
     def tac_tempo(self, Datetime, Step_name):
-        """
-        Work with tic_tempo() to compute a time cost for a simulation step.
-
-            Input :
-                itself (a report)
-                a time (adatetime)
-            Output :
-                Nothing, but the .txt file is updated
-        """
+        '''work with tic_tempo to compute a time cost for a simulation step'''
         self.datetimeend_tempo = str(Datetime)
 
         dyear = int(self.datetimeend_tempo[:4])-int(self.datetimestart_tempo[:4])
@@ -138,15 +104,7 @@ class Report:
 #-------------------------------------------------------------------------------
 
     def end(self, Datetime):
-     """
-     Work with init() to compute the total time cost of the simulation.
-
-        Input :
-            itself (a report)
-            a time (a datetime)
-        Output :
-            Nothing, but the .txt file is updated
-     """
+     '''work with init to compute the total time cost of the simulation'''
      self.datetimeend = str(Datetime)
 
      dyear = int(self.datetimeend[:4])-int(self.datetimestart[:4])
