@@ -27,13 +27,13 @@ def All_parameters():
     grain_discretisation = 20 # = grain_discretisation_square
 
     N_grain = 300 #total number of grains
-    frac_dissolved = 0.05
+    frac_dissolved = 0.15
 
     #Disk
     N_grain_disk = int(N_grain*(1-frac_dissolved)) #number of grains
     R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
-    L_R = [1.1*R_mean,1*R_mean,0.9*R_mean] #from larger to smaller
-    L_percentage_R = [1/3,1/3,1/3] #distribution of the different radius
+    L_R = [1.2*R_mean,1.1*R_mean,0.9*R_mean,0.8*R_mean] #from larger to smaller
+    L_percentage_R = [1/6,1/3,1/3,1/6] #distribution of the different radius
     #Recompute the mean radius
     R_mean = 0
     for i in range(len(L_R)):
@@ -41,8 +41,8 @@ def All_parameters():
     #Square
     N_grain_square = int(N_grain*frac_dissolved) #number of grains
     Dimension_mean = 300 #µm radius
-    L_Dimension = [1.2*Dimension_mean,1*Dimension_mean,0.8*Dimension_mean] #from larger to smaller
-    L_percentage_Dimension = [1/3,1/3,1/3] #distribution of the different radius
+    L_Dimension = [1.2*Dimension_mean,1.1*Dimension_mean,0.9*Dimension_mean,0.8*Dimension_mean] #from larger to smaller
+    L_percentage_Dimension = [1/6,1/3,1/3,1/6] #distribution of the different radius
     #Recompute the mean dimension
     Dimension_mean = 0
     for i in range(len(L_Dimension)):
@@ -112,7 +112,7 @@ def All_parameters():
     #Algorithm parameters
 
     #Phase field
-    dt_PF = 0.05 #s time step during MOOSE simulation
+    dt_PF = 0.02 #s time step during MOOSE simulation
     n_t_PF = 10 #number of iterations PF-DEM
     factor_distribution_etai = 1.5 #margin to distribute etai
     MovePF_selector = 'DeconstructRebuild' #Move PF
@@ -140,7 +140,7 @@ def All_parameters():
     dy_box_max_stop = 0.5
 
     #PF-DEM
-    n_t_PFDEM = 15 #number of cycle PF-DEM
+    n_t_PFDEM = 30 #number of cycle PF-DEM
 
     #Number of processor
     np_proc = 4
@@ -148,7 +148,7 @@ def All_parameters():
     #Debugging
     Debug = True #plot configuration before and after DEM simulation
     Debug_DEM = False #plot configuration inside DEM
-    i_print_plot = 100 #frenquency of the print and plot (if Debug_DEM) in DEM step
+    i_print_plot = 200 #frenquency of the print and plot (if Debug_DEM) in DEM step
     SaveData = True #save simulation
     main_folder_name = 'Data_Santamarina' #where data are saved
     template_simulation_name = 'frac_'+str(int(frac_dissolved*100))+'_run_' #template of the simulation name
@@ -191,7 +191,7 @@ def All_parameters():
     N_test_max = 5000 # maximum number of tries to generate a grain without overlap
     i_DEM_stop_IC = 2000 #stop criteria for DEM during IC
     Debug_DEM_IC = False #plot configuration inside DEM during IC
-    i_print_plot_IC = 100 #frenquency of the print and plot (if Debug_DEM_IC) for IC
+    i_print_plot_IC = 200 #frenquency of the print and plot (if Debug_DEM_IC) for IC
     dt_DEM_IC = dt_DEM_crit/5 #s time step during IC
     Ecin_ratio_IC = 0.0005
     factor_neighborhood_IC = 1.5 #margin to detect a grain into a neighborhood
@@ -221,9 +221,7 @@ def All_parameters():
     gravity = 0 #µm/s2
 
     #Add energy to dissolved grain
-    frac_Rmean0 = 0.000005 #approximatively the percentage of the initial R_mean dissolved at each iteration
-
-    Dissolution_Energy = frac_Rmean0*dict_geometry['Dimension_mean']/2*2/3*dict_material['w']/(dict_algorithm['dt_PF']*dict_algorithm['n_t_PF'])
+    Dissolution_Energy = 0.2
 
     #write dict
     dict_sollicitations = {
