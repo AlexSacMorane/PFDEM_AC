@@ -25,12 +25,17 @@ class Contact:
 #-------------------------------------------------------------------------------
 
   def __init__(self, ID, G1, G2, dict_material):
-    #defining the contact grain-grain
-    #each contact is described by a id (an integer class)
-    #                             two grains (a grain class)
-    #                             a friction coefficient (a float)
-    #                             a restitution coefficient (a float) : 1 = restitution of all energy, 0 = reestituion of any energy
+    """
+    Defining the contact grain-grain.
 
+        Input :
+            itself (a contact grain - grain)
+            an id (a int)
+            two grains (two grains)
+            a material dictionnary (a dict)
+        Output :
+            Nothing, but the contact grain - grain is generated
+    """
     self.id = ID
     self.g1 = G1
     self.g2 = G2
@@ -43,10 +48,17 @@ class Contact:
 #-------------------------------------------------------------------------------
 
   def init_contact(self,L_g):
-    #initialize the contact with updating the grains,
-    #                            putting at 0 the tangential reaction
-    #                            saying the boolean at False (new contact grain-grain)
+    """
+    Initialize the contact.
 
+    The grains are updated, the tangetial reaction is set to 0 and a boolean attribute is set to False (new contact grain - grain).
+
+        Input :
+            itself (a contact grain - grain)
+            a list of grains (a list)
+        Output :
+            Nothing, but attributes are updated (two grains, two floats and a boolean)
+    """
     self.g1 = L_g[self.g1.id]
     self.g2 = L_g[self.g2.id]
     self.ft = 0
@@ -56,15 +68,20 @@ class Contact:
 #-------------------------------------------------------------------------------
 
   def DEM_2grains_Polyhedral_normal(self):
-    #compute the normal reaction of a contact grain-grain
-    #Here a pontual spring is considered
+    """
+    Compute the normal reaction of a contact grain-grain
 
+    Here a pontual spring is considered
+
+        Input :
+            itself (a contact grain - grain)
+        Output :
+            Nothing, but attributes are updated
+    """
     #looking for the nearest nodes
     d_virtual = max(self.g1.r_max,self.g2.r_max)
     ij_min = [0,0]
     d_ij_min = 100*d_virtual #Large
-    '''for i in L_i_border_extract:
-        for j in L_j_border_extract:'''
     for i in range(len(self.g1.l_border[:-1])):
         for j in range(len(self.g2.l_border[:-1])):
             d_ij = np.linalg.norm(self.g2.l_border[:-1][j]-self.g1.l_border[:-1][i]+d_virtual*(self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center))
@@ -183,9 +200,17 @@ class Contact:
 #-------------------------------------------------------------------------------
 
   def DEM_2grains_Polyhedral_tangential(self,dt_DEM):
-    #compute the tangential reaction of a contact grain-grain
-    #Here a pontual spring is considered
+    """
+    Compute the tangential reaction of a contact grain-grain.
 
+    Here a pontual spring is considered.
+
+        Input :
+            itself (a contact grain - grain)
+            a time step (a float)
+        Output :
+            Nothing, but attributes are updated
+    """
     if self.overlap_normal > 0:
 
         if self.tangential_old_statut:
@@ -232,9 +257,16 @@ class Contact:
 #-------------------------------------------------------------------------------
 
   def DEM_2grains_Polyhedral_normal_surface(self):
-    #compute the normal reaction of a contact grain-grain
-    #Here a surface spring is considered
+    """
+    Compute the normal reaction of a contact grain-grain.
 
+    Here a surface spring is considered.
+
+        Input :
+            itself (a contact grain - grain)
+        Output :
+            Nothing, but attributes are updated
+    """
     #looking for the nearest nodes
     d_virtual = max(self.g1.r_max,self.g2.r_max) #virtual distance
     ij_min = [0,0]
@@ -353,9 +385,17 @@ class Contact:
 #-------------------------------------------------------------------------------
 
   def DEM_2grains_Polyhedral_tangential_surface(self,dt_DEM):
-    #compute the tangential reaction of a contact grain-grain
-    #Here a surface spring is considered
+    """
+    Compute the tangential reaction of a contact grain-grain.
 
+    Here a surface spring is considered.
+
+        Input :
+            itself (a contact grain - grain)
+            a time step (a float)
+        Output :
+            Nothing, but attributes are updated
+    """
     if self.overlap_normal > 0:
 
         if self.tangential_old_statut:
@@ -406,7 +446,14 @@ class Contact:
 #-------------------------------------------------------------------------------
 
   def S_inter(self):
+      """
+      Compute the intersection surface of the contact grain - grain.
 
+        Input :
+            itself (a contact grain - grain)
+        Output :
+            Nothing, but attributes are updated (three floats)
+      """
       L_border = []
       #looking for vertices from grain 2 if they are inside of the grain 1
       for p in self.g2.l_border[:-1] :
@@ -480,8 +527,16 @@ class Contact:
 #-------------------------------------------------------------------------------
 
 def DetermineSurfacePolyhedral(L_border):
-      #Use the Monte-Carlo method to compute the surface of a grain
+      """
+      Use the Monte-Carlo method to compute the surface of a grain.
 
+      Used in S_inter() to compute the surface of the intersection.
+
+        Input :
+            a list of coordinates (a list)
+        Output :
+            a surface (a float)
+      """
       #Determine the study box
       min_max_defined = False
       for p in L_border :
@@ -516,10 +571,18 @@ def DetermineSurfacePolyhedral(L_border):
 #-------------------------------------------------------------------------------
 
 def P_is_inside(P,L_border):
-  #Franklin 1994, see Alonso-Marroquin 2009
-  #determine if a point P is inside of a grain
-  #slide on y constant
+  """
+  Determine if a point P is inside of a grain.
 
+  See Franklin 1994, see Alonso-Marroquin 2009
+
+    Input :
+        a point (a 1 x 2 numpy array)
+        a list of coordinates (a list)
+    Output :
+        a Boolean (True if the point is inside the grain)
+  """
+  #slide on y constant
   counter = 0
   for i_p_border in range(len(L_border)-1):
       #consider only points if the coordinates frame the y-coordinate of the point
@@ -535,14 +598,20 @@ def P_is_inside(P,L_border):
 #-------------------------------------------------------------------------------
 
 def Update_Neighborhoods(dict_algorithm,dict_sample):
-    #determine a neighbouroods for each grain. This function is called every x time step
-    #grain contact is determined by Grains_Polyhedral_contact_Neighbouroods
-    #
-    #notice that if there is a potential contact between grain_i and grain_j
-    #grain_i is not in the neighbourood of grain_j
-    #whereas grain_j is in the neighbourood of grain_i
-    #with i_grain < j_grain
+    """
+    Determine a neighborhood for each grain.
 
+    This function is called every x time step. The contact is determined by Grains_Polyhedral_contact_Neighborhoods().
+
+    Notice that if there is a potential contact between grain_i and grain_j, grain_i is not in the neighborhood of grain_j.
+    Whereas grain_j is in the neighbourood of grain_i, with i_grain < j_grain
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a sample dictionnary (a dict)
+        Output :
+            Nothing, but attribut is updated for each grains (a list)
+    """
     for i_grain in range(len(dict_sample['L_g'])-1) :
         neighborhood = []
         for j_grain in range(i_grain+1,len(dict_sample['L_g'])):
@@ -553,8 +622,14 @@ def Update_Neighborhoods(dict_algorithm,dict_sample):
 #-------------------------------------------------------------------------------
 
 def Grains_Polyhedral_contact_Neighborhoods_bool(g1,g2):
-  #detect contact grain-grain
+  """
+  Detect contact grain-grain.
 
+    Input :
+        two grains (two grains)
+    Output :
+        a Boolean (True if there is a contact)
+  """
   #looking for the nearest nodes
   d_virtual = max(g1.r_max,g2.r_max)
   ij_min = [0,0]
@@ -572,9 +647,17 @@ def Grains_Polyhedral_contact_Neighborhoods_bool(g1,g2):
 #-------------------------------------------------------------------------------
 
 def Grains_Polyhedral_contact_Neighborhoods(dict_material,dict_sample):
-    #detect contact between a grain and grains from its neighbourood
-    #the neighbourood is updated with Update_Neighborhoods_f()
+    """
+    Detect contact between a grain and grains from its neighborhood.
 
+    The neighbourood is updated with Update_Neighborhoods_f()
+
+        Input :
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+        Output :
+            Nothing, but the sample dictionnary is updated with a list of contacts grain - grain
+    """
     for i_grain in range(len(dict_sample['L_g'])-1) :
         for neighbour in dict_sample['L_g'][i_grain].neighbourood:
             j_grain = neighbour.id
