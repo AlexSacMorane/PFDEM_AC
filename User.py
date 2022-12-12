@@ -18,8 +18,19 @@ import numpy as np
 #-------------------------------------------------------------------------------
 
 def All_parameters():
-    #this function is called in main.py to have all the parameters needed in the simulation
+    """
+    This function is called in main() to have all the parameters needed in the simulation
 
+        Input :
+            Nothing
+        Output :
+            an algorithm dictionnary (a dict)
+            a geometry dictionnary (a dict)
+            an initial condition dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+    """
     #---------------------------------------------------------------------------
     #Geometric parameters
 
@@ -237,8 +248,14 @@ def All_parameters():
 #-------------------------------------------------------------------------------
 
 def Criteria_StopSimulation(dict_algorithm):
-    #Criteria to stop simulation (PF and DEM)
+    """
+    Criteria to stop simulation (PF and DEM).
 
+        Input :
+            an algorithm dictionnary (a dict)
+        Output :
+            a Booean (True if the simulation must be stopped)
+    """
     Criteria_Verified = False
     if dict_algorithm['i_PF'] >= dict_algorithm['n_t_PFDEM']:
         Criteria_Verified = True
