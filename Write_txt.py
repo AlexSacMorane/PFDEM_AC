@@ -4,7 +4,7 @@
 alexandre.sac-morane@uclouvain.be
 
 This file allow to create a .txt.
-The .txt contains data about grains, contact grain-wall and contact wall-wall
+The .txt contains data about grains, contact grain-wall and contact wall-wall.
 """
 
 #-------------------------------------------------------------------------------
@@ -20,7 +20,15 @@ import Contact_gw
 #-------------------------------------------------------------------------------
 
 def Write_txt(dict_algorithm,dict_sample):
+    """
+    Write a .txt file to give information about grains and contacts.
 
+        Input :
+            an algorithm dictionnary (a dict)
+            a sample dictionnary (a dict)
+        Output :
+            Nothing, but a .txt file is generated (a .txt)
+    """
     file_to_write = open('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/txt/ite_DEM_'+str(dict_algorithm['i_DEM'])+'.txt','w')
     file_to_write.write('Iteration PF : '+str(dict_algorithm['i_PF'])+'\n'+\
                         'Iteration DEM : '+str(dict_algorithm['i_DEM'])+'\n')
