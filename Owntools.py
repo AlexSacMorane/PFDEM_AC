@@ -33,12 +33,18 @@ import Grain
 class Grain_pp:
 
     def __init__(self, Id, Dissolved, Center, Coordinate_x, Coordinate_y):
-        #defining a grain for the postprocess
-        #each grain is described by a id (an integer class)
-        #                           a center (an array [x,y])
-        #                           a list of x-coordinate of border (a list)
-        #                           a list of y-coordinate of border (a list)
+        """
+        Defining a grain for the postprocess
 
+            Input :
+                itself (a grain_pp)
+                an id (a int)
+                a Boolean to know if the grain is dissolvable (a Boolean)
+                a center (a 1 x 2 numpy array)
+                two lists of vertices coordinates x and y (two lists)
+            Output :
+                Nothing, but a post process grain is generated
+        """
         self.id = Id
         self.dissolved = Dissolved
         self.center = Center
@@ -50,12 +56,17 @@ class Grain_pp:
 class Contact_pp:
 
     def __init__(self, Id_g1, Id_g2, L_g, Normal):
-        #defining a contact grain-grain for the postprocess
-        #each contact is described by a grain 1 id (an integer class)
-        #                             a grain 2 id (an integer class)
-        #                             the list of all grain (list of grain_pp)
-        #                             the value of the normal reaction (a float)
+        """
+        Defining a contact grain - grain for the postprocess.
 
+            Input :
+                itself (a contact_pp)
+                the ids of the grains (two int)
+                a list of post process grains (a list)
+                the value of normal reaction of the contact (a float)
+            Output :
+                Nothing, but a post process contact grain - grain is generated
+        """
         for g in L_g:
             if g.id == Id_g1:
                 self.g1 = g
@@ -64,8 +75,15 @@ class Contact_pp:
         self.normal = Normal
 
     def plot(self, normal_ref):
-        #prepare the chain force plot
+        """
+        Prepare the chain force plot.
 
+            Input :
+                itself (a contact_pp)
+                a reference value (a float)
+            Output :
+                Nothing, but the post process contact gets the ratio of the normal force with the reference value as a new attribut (a float)
+        """
         L_x = [self.g1.center[0], self.g2.center[0]]
         L_y = [self.g1.center[1], self.g2.center[1]]
         ratio_normal = self.normal/normal_ref
@@ -76,13 +94,16 @@ class Contact_pp:
 class Contact_gw_pp:
 
     def __init__(self, Id_g, L_g, Nature, Limit, Normal):
-        #defining a contact grain-wall for the postprocess
-        #each contact is described by a grain id (an integer class)
-        #                             the list of all grain (list of grain_pp)
-        #                             the contact nature (a string)
-        #                             the wall coordinate (a float)
-        #                             the value of the normal reaction (a float)
+        """
+        Defining a contact grain-wall for the postprocess.
 
+            Input :
+                itself (a contact_gw_pp)
+                a id of the grain (a float)
+                the list of the post process grain (a list)
+                the nature of the wall (a string)
+                the value of normal reaction of the contact (a float)
+        """
         for g in L_g:
             if g.id == Id_g:
                 self.g = g
@@ -91,8 +112,15 @@ class Contact_gw_pp:
         self.normal = Normal
 
     def plot(self, normal_ref):
-        #prepare the chain force plot
+        """
+        Prepare the chain force plot.
 
+            Input :
+                itself (a contact_gw_pp)
+                a reference value (a float)
+            Output :
+                Nothing, but the post process contact gets the ratio of the normal force with the reference value as a new attribut (a float)
+        """
         if self.nature == 'gwx_min' or self.nature == 'gwx_max':
             virtual_center = [self.limit, self.g.center[1]]
         elif self.nature == 'gwy_min' or self.nature == 'gwy_max':
@@ -107,8 +135,14 @@ class Contact_gw_pp:
 #-------------------------------------------------------------------------------
 
 def index_to_str(j):
-      #an integer is converted to a float with 3 components
+      """
+      Convert an integer to a float with 3 components
 
+        Input :
+            an integer (a int)
+        Output :
+            a string (a string)
+      """
       if j < 10:
           j_str = '00'+str(j)
       elif 10 <= j and j < 100:
@@ -120,8 +154,14 @@ def index_to_str(j):
 #-------------------------------------------------------------------------------
 
 def Stop_Debug(simulation_report):
-      #stop simulation
+      """
+      Stop simulation for debugging.
 
+        Input :
+            the simulation report (a report)
+        Output :
+            Nothing, but simulations stops
+      """
       simulation_report.write('Stop because after it is not corrected !\n')
       simulation_report.end(datetime.now())
       raise ValueError('Stop because after it is not corrected !')
@@ -129,9 +169,15 @@ def Stop_Debug(simulation_report):
 #-------------------------------------------------------------------------------
 
 def Debug_DEM_f(dict_algorithm, dict_sample):
-    #plot the configuration of the grains during a DEM step
-    #only for debug
+    """
+    Plot the configuration of the grains during a DEM step.
 
+        Input:
+            an algorithm dictionnary (a dict)
+            a sample dictionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
     #load data needed
     x_min = dict_sample['x_box_min']
@@ -164,8 +210,15 @@ def Debug_DEM_f(dict_algorithm, dict_sample):
 #-------------------------------------------------------------------------------
 
 def Debug_configuration(dict_algorithm,dict_sample):
-  #plot the configuration of the grains after the DEM step
+    """
+    Plot the configuration of the grains before / after the DEM step.
 
+        Input:
+            an algorithm dictionnary (a dict)
+            a sample dictionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
   #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
   #load data needed
   x_min = dict_sample['x_box_min']
@@ -198,9 +251,14 @@ def Debug_configuration(dict_algorithm,dict_sample):
 #-------------------------------------------------------------------------------
 
 def Debug_Trackers(dict_tracker):
-    #plot the trakers used during DEM simulation
-    #only for debug
+    """
+    Plot the trakers used during PFDEM simulation
 
+        Input :
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but severals .png files are generated (files)
+    """
     #Trackers
     fig = plt.figure(1,figsize=(16,9.12))
     plt.plot(dict_tracker['t_L'],dict_tracker['S_grains_L'])
@@ -227,9 +285,16 @@ def Debug_Trackers(dict_tracker):
 #-------------------------------------------------------------------------------
 
 def Debug_Trackers_DEM(dict_algorithm,dict_sollicitations,dict_tracker):
-    #plot the trakers used during DEM simulation
-    #only for debug
+    """
+    Plot the trakers used during DEM simulation.
 
+        Input :
+            an algorithm dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but .png file is generated (a file)
+    """
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9),num=1)
 
     ax1.set_title('Mean kinetic energy (e-12 J)')
@@ -260,8 +325,15 @@ def Debug_Trackers_DEM(dict_algorithm,dict_sollicitations,dict_tracker):
 #-------------------------------------------------------------------------------
 
 def Sort_Files(name_template,dict_algorithm):
-     #sort files generated by MOOSE to different directories
+     """
+     Sort files generated by MOOSE to different directories.
 
+        Input :
+            a template of the simulation files (a string)
+            an algorithm dictionnary (a dict)
+        Output :
+            Nothing, but files are sorted
+     """
      #master simulation
      os.rename(name_template+'_out.e','Output/'+name_template+'_out.e')
      os.rename(name_template+'.i','Input/'+name_template+'.i')
@@ -282,9 +354,17 @@ def Sort_Files(name_template,dict_algorithm):
 #-------------------------------------------------------------------------------
 
 def error_on_ymax_f(dy,overlap_L,k_L,Force_target) :
-    #compute the function f to control the upper wall
-    #difference between the force applied and the target value
+    """
+    Compute the function f to control the upper wall. It is the difference between the force applied and the target value.
 
+        Input :
+            an increment of the upper wall position (a float)
+            a list of overlap for contact between grain and upper wall (a list)
+            a list of spring for contact between grain and upper wall (a list)
+            a confinement force (a float)
+        Output :
+            the difference between the force applied and the confinement (a float)
+    """
     f = Force_target
     for i in range(len(overlap_L)):
         f = f - k_L[i]*(max(overlap_L[i]-dy,0))**(3/2)
@@ -293,8 +373,16 @@ def error_on_ymax_f(dy,overlap_L,k_L,Force_target) :
 #-------------------------------------------------------------------------------
 
 def error_on_ymax_df(dy,overlap_L,k_L) :
-    #compute the derivative function df to control the upper wall
+    """
+    Compute the derivative function df to control the upper wall (error_on_ymax_f()).
 
+        Input :
+            an increment of the upper wall position (a float)
+            a list of overlap for contact between grain and upper wall (a list)
+            a list of spring for contact between grain and upper wall (a list)
+        Output :
+            the derivative of error_on_ymax_f() (a float)
+    """
     df = 0
     for i in range(len(overlap_L)):
         df = df + 3/2*k_L[i]*(max(overlap_L[i]-dy,0))**(1/2)
@@ -303,9 +391,16 @@ def error_on_ymax_df(dy,overlap_L,k_L) :
 #-------------------------------------------------------------------------------
 
 def Control_y_max_NR(dict_sample,dict_sollicitations):
-    #Control the upper wall to apply force
-    #a Newton-Raphson method is applied
+    """
+    Control the upper wall to apply force.
 
+    A Newton-Raphson method is applied to verify the confinement.
+        Input :
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+        Output :
+            Nothing, but the sample dictionnary is updated, concerning the upper wall position and force applied (two floats)
+    """
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     Force_target = dict_sollicitations['Vertical_Confinement_Force']
@@ -351,8 +446,15 @@ def Control_y_max_NR(dict_sample,dict_sollicitations):
 #-------------------------------------------------------------------------------
 
 def Reset_y_max(L_g,Force):
-    #the upper wall is located as a single contact verify the target value
+    """
+    The upper wall is located as a single contact verify the target value.
 
+        Input :
+            the list of temporary grains (a list)
+            the confinement force (a float)
+        Output :
+            the upper wall position (a float)
+    """
     print('Reset of the y_max on the upper grain')
     y_max = None
     id_grain_max = None
@@ -374,25 +476,16 @@ def Reset_y_max(L_g,Force):
 
 #-------------------------------------------------------------------------------
 
-def Debug_Control_y_max_NR(L_g,y_max,mu,eta):
-    #recompute the force applied on upper wall after the control step
-    #debug function
-
-    F = 0
-    for grain in L_g:
-        p_y_max = max(grain.l_border_y)
-        #grain-wall y_max
-        if p_y_max > y_max :
-            overlap = p_y_max - y_max
-            k = 5*4/3*grain.y/(1-grain.nu*grain.nu)*math.sqrt(grain.r_mean)
-            F = F + k*overlap**(3/2)
-
-    return F
-
-#-------------------------------------------------------------------------------
-
 def Compute_k0(dict_sample,dict_sollicitations):
+    """
+    Compute the k0 = sigma_2 / sigma_1 ratio.
 
+        Input :
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+        Output :
+            Nothing, but the sample dictionnary gets updated value concerning the k0
+    """
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #Load data needed
     L_contact_gw = dict_sample['L_contact_gw']
@@ -431,9 +524,15 @@ def Compute_k0(dict_sample,dict_sollicitations):
 #-------------------------------------------------------------------------------
 
 def Write_e_dissolution_txt(dict_sample,dict_sollicitations):
-      #write an .txt file for MOOSE
-      #this file described an homogenous dissolution field
+      """
+      Write an .txt file for MOOSE. This file described an homogenous dissolution field.
 
+        Input :
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+        Output :
+            Nothing, but a .txt file is generated (a file)
+      """
       #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
       #Load data needed
       x_L = dict_sample['x_L']
@@ -466,8 +565,15 @@ def Write_e_dissolution_txt(dict_sample,dict_sollicitations):
 #-------------------------------------------------------------------------------
 
 def Plot_chain_force(i_PF,i_DEM):
-    #plot the chain force
+    """
+    Plot the chain force.
 
+        Input :
+            the iteration PFDEM (a int)
+            the iteration DEM (a int)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
     normal_ref = 5*10**6 #can be changed
 
     file_name = 'Debug/DEM_ite/PF_'+str(i_PF)+'/txt/ite_DEM_'+str(i_DEM)+'.txt'
@@ -659,9 +765,16 @@ def Plot_chain_force(i_PF,i_DEM):
 #-------------------------------------------------------------------------------
 
 def make_mp4():
-    #The goal of this function is to create a movie with all configuration pictures
-    #from https://www.blog.pythonlibrary.org/2021/06/23/creating-an-animated-gif-with-python/
+    """
+    The goal of this function is to create a movie with all configuration pictures.
 
+    From https://www.blog.pythonlibrary.org/2021/06/23/creating-an-animated-gif-with-python/
+
+        Input :
+            Nothing
+        Output :
+            Nothing, but a .mp4 file is generated (a file)
+    """
     #look for the largest iteration
     template_name = 'Debug/DEM_ite/PF_ite_'
     i_f = 0
@@ -683,9 +796,17 @@ def make_mp4():
 #-------------------------------------------------------------------------------
 
 def save_DEM_tempo(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker):
-    #save trackers and configuration during DEM interations
-    #with FollowSimulation.py, the user can follow live the simulation
+    """
+    Save trackers and configuration during DEM interations.
 
+        Input :
+            an algorithm dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a save file is generated (a file)
+    """
     outfile = open('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/save_tempo','wb')
     dict_save = {}
     dict_save['E_cin_stop'] = dict_algorithm['Ecin_stop']
@@ -709,8 +830,17 @@ def save_DEM_tempo(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker):
 #-------------------------------------------------------------------------------
 
 def save_DEM_final(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker):
-    #save trackers and configuration at the end of DEM iteration
+    """
+    Save trackers and configuration at the end of DEM iteration.
 
+        Input :
+            an algorithm dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a save file is generated (a file)
+    """
     os.remove('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/save_tempo')
     outfile = open('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/save','wb')
     dict_save = {}
@@ -735,8 +865,19 @@ def save_DEM_final(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker):
 #-------------------------------------------------------------------------------
 
 def save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker):
-    #save dicts during PFDEM interations
+    """
+    Save dictionnaries at the end of PFDEM iteration.
 
+        Input :
+            an algorithm dictionnary (a dict)
+            a geometry dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a save file is generated (a file)
+    """
     outfile = open(dict_algorithm['name_folder']+'_save_dicts','wb')
     dict_save = {}
     dict_save['algorithm'] = dict_algorithm
@@ -751,8 +892,15 @@ def save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_s
 #-------------------------------------------------------------------------------
 
 def save_tempo(dict_algorithm,dict_tracker):
-    #save trackers during PFDEM interations
+    """
+    Save trackers and configuration during  PFDEM iteration.
 
+        Input :
+            an algorithm dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a save file is generated (a file)
+    """
     outfile = open('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['name_folder']+'_save_tempo','wb')
     dict_save = {}
     dict_save['k0_xmin_L'] = dict_tracker['k0_xmin_L']
@@ -766,8 +914,15 @@ def save_tempo(dict_algorithm,dict_tracker):
 #-------------------------------------------------------------------------------
 
 def save_final(dict_algorithm,dict_tracker):
-    #save trackers at the end of the simulation
+    """
+    Save trackers and configuration at the end of simulation.
 
+        Input :
+            an algorithm dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a save file is generated (a file)
+    """
     os.remove('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['name_folder']+'_save_tempo')
     outfile = open('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['name_folder']+'_save','wb')
     dict_save = {}
