@@ -30,9 +30,22 @@ import User
 #-------------------------------------------------------------------------------
 
 def main_iteration(dict_algorithm, dict_geometry, dict_material, dict_sollicitations, dict_sample, dict_tracker, simulation_report):
-    """
-    to write...
-    """
+    '''
+    Description of one PDEM iteration.
+
+    The iteration is composed by a DEM step (to obtain a steady state configuration) and a PF step (to obtain dissolution and precipitation).
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a geometry dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sollicitation dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a tracker dictionnary (a dict)
+            a simulation report (a Report)
+        Output :
+            Nothing but the dictionnaies and the report are updated
+    '''
     # update element in dict
     dict_algorithm['i_PF'] = dict_algorithm['i_PF'] + 1
 
@@ -254,9 +267,16 @@ def main_iteration(dict_algorithm, dict_geometry, dict_material, dict_sollicitat
 #-------------------------------------------------------------------------------
 
 def close_simulation(dict_algorithm, dict_tracker, simulation_report):
-    """
-    to write...
-    """
+    '''
+    Close the PFDEM.
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a tracker dictionnary (a dict)
+            a simulation report (a Report)
+        Output :
+            Nothing but the dictionnaries and the report are updated
+    '''
     # toc
     simulation_report.end(datetime.now())
 
