@@ -23,15 +23,20 @@ class Contact_gw:
 #-------------------------------------------------------------------------------
 
   def __init__(self, ID, G, dict_material, Nature, Limit, Overlap):
-    #defining the contact grain-wall
-    #each contact is described by a id (an integer class)
-    #                             a grain (a grain class)
-    #                             a friction coefficient (a float)
-    #                             a restitution coefficient (a float) : 1 = restitution of all energy, 0 = reestituion of any energy
-    #                             a nature description (a float) : identify the wall
-    #                             a coordinate of the wall (a float) : x or y depending of the wall nature
-    #                             an overlap (a float)
+    """
+    Defining the contact grain - wall.
 
+        Input :
+            itself (a contact grain - wall)
+            an id (a int)
+            a grain (a grain)
+            a material dictionnary (a dict)
+            a nature to identify the wall (a string)
+            the coordinate of the wall (a float)
+            an overlap (a float)
+        Output :
+            a contact grain - wall is generated
+    """
     self.id = ID
     self.g = G
     factor = 5 #factor just to increase the stiffness
@@ -49,17 +54,31 @@ class Contact_gw:
 #-------------------------------------------------------------------------------
 
   def update_overlap(self,new_overlap):
-    #update the overlap of a contact already created.
+    """
+    Update the overlap of a contact already created.
 
+        Input :
+            itself (a contact grain - wall)
+            a new overlap (a float)
+        Output :
+            Nothing, but the attribute is updated (a float)
+    """
     self.overlap = new_overlap
 
 #-------------------------------------------------------------------------------
 
   def init_contact_gw(self,L_g):
-    #initialize the contact with updating the grain,
-    #                            putting at 0 the tangential reaction
-    #                            saying the boolean at False (new contact grain-w&all)
+    """
+    Initialize the contact.
 
+    The grain is updated, the tangential reaction is set at 0 and a boolean is set at False (new contact grain-wall)
+
+        Input :
+            itself (a contact grain - wall)
+            the list of the grain (a list)
+        Output :
+            Nothing, but the attributes are updated (a grain, a float and a boolean)
+    """
     self.g = L_g[self.g.id]
     self.ft = 0
     self.tangential_old_statut = False
@@ -67,10 +86,17 @@ class Contact_gw:
 #-------------------------------------------------------------------------------
 
   def  DEM_gw_Polyhedral_normal(self):
-    #compute the normal reaction of a contact grain-wall
-    #Here a pontual spring is considered
-    #conditions "if" are defined and same for each wall nature
+    """
+    Compute the normal reaction of a contact grain-wall.
 
+    Here a pontual spring is considered.
+
+        Input :
+            itself (a contact grain - wall)
+        Output :
+            Nothing, but the interaction between grain and wall is computed. Differents attributes are updated.
+    """
+    #conditions "if" are defined and same for each wall nature
     if self.nature == 'gwy_min':
         #unlinear stiffness
         nwg = np.array([0,1])
@@ -137,10 +163,17 @@ class Contact_gw:
 #-------------------------------------------------------------------------------
 
   def DEM_gw_Polyhedral_tangential(self, dt_DEM):
-   #compute the tangential reaction of a contact grain-wall
-   #Here a pontual spring is considered
-   #conditions "if" are defined and same for each wall nature
+    """
+    Compute the tangential reaction of a contact grain-wall.
 
+    Here a pontual spring is considered.
+
+        Input :
+            itself (a contact grain - wall)
+        Output :
+            Nothing, but the interaction between grain and wall is computed. Differents attributes are updated.
+    """
+   #conditions "if" are defined and same for each wall nature
    if self.nature == 'gwy_min':
        #unlinear stiffness
        twg = np.array([-1, 0])
@@ -194,30 +227,22 @@ class Contact_gw:
        self.g.update_f(Fwg[0],Fwg[1],self.g.l_border[self.g.l_border_x.index(max(self.g.l_border_x))])
 
 #-------------------------------------------------------------------------------
-
-  def DEM_gw_Polyhedral_normal_surface(self,simulation_report):
-   #compute the tangential reaction of a contact grain-wall
-   #Here a surface spring is considered
-   #conditions "if" are defined and same for each wall nature
-   pass
-
-#-------------------------------------------------------------------------------
-
-  def DEM_gw_Polyhedral_tangential_surface(self,simulation_report):
-   #compute the tangential reaction of a contact grain-wall
-   #Here a surface spring is considered
-   #conditions "if" are defined and same for each wall nature
-   pass
-
-#-------------------------------------------------------------------------------
 # Functions
 #-------------------------------------------------------------------------------
 
 def Grains_Polyhedral_Wall_contact_Neighborhood(dict_material,dict_sample):
-  #detect contact grain in the neighbourood of the wall and  the wall
-  #the neighbourood is updated with Update_wall_Neighbouroods()
-  #we realize iterations on the grain list and compare with the coordinate of the different walls
+  """
+  Detect contact grain in the neighborhood of the wall and  the wall.
 
+  The neighborhood is updated with Update_wall_Neighborhoods().
+  An iteration over the grain list and a comparison with the coordinate of the different walls are done.
+
+    Input :
+        a material dictionnary (a dict)
+        a sample dict (a dict)
+    Output :
+        Nothing, but the sample dict is updated with the different grain - wall in contact
+  """
   for grain in dict_sample['wall_neighborhood']:
 
       p_x_min = min(grain.l_border_x)
@@ -281,10 +306,12 @@ def Grains_Polyhedral_Wall_contact_Neighborhood(dict_material,dict_sample):
 #-------------------------------------------------------------------------------
 
 def Update_wall_Neighborhoods(dict_algorithm, dict_sample):
-    #determine a neighbouroods for wall. This function is called every x time step
-    #grain_wall contact is determined by Grains_Polyhedral_Wall_contact_Neighbourood
-    #factor determines the size of the neighbourood window
+    """
+    Determine a neighborhoods for wall.
 
+    This function is called every x time step. A contact grain - wall is determined by Grains_Polyhedral_Wall_contact_Neighborhood().
+    A factor determines the size of the neighborhood window.
+    """
     wall_neighborhood = []
     for grain in dict_sample['L_g']:
 
