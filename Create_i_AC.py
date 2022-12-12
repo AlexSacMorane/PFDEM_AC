@@ -17,8 +17,21 @@ import Grain
 #Function Definition
 #-------------------------------------------------------------------------------
 
-def Create_i_AC_local(grain,dict_algorithm, dict_material, dict_sample,dict_sollicitations):
+def Create_i_AC_local(grain,dict_algorithm, dict_material, dict_sample, dict_sollicitations):
+    """
+    The goal of this file is to write a new .i file from PF_base_AC.i.
 
+    There is a input file for each grain dissolvable by iteration.
+
+        Input :
+            a grain (a grain)
+            an algorithm dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+        Output :
+            a file is generated (a .i file)
+    """
     # create spatial discretisation
     grain.Compute_etaiM_local(dict_algorithm,dict_material)
 
