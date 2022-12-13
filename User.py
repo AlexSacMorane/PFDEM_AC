@@ -164,6 +164,9 @@ def All_parameters():
     main_folder_name = 'Data_Santamarina' #where data are saved
     template_simulation_name = 'frac_'+str(int(frac_dissolved*100))+'_run_' #template of the simulation name
 
+    #clean
+    clean_memory = True #delete Data, Input, Output at the end of the simulation
+
     #write dict
     dict_algorithm = {
     'dt_PF' : dt_PF,
@@ -190,7 +193,8 @@ def All_parameters():
     'template_simulation_name' : template_simulation_name,
     'i_print_plot' : i_print_plot,
     'factor_neighborhood' : factor_neighborhood,
-    'factor_distribution_etai' : factor_distribution_etai
+    'factor_distribution_etai' : factor_distribution_etai,
+    'clean_memory' : clean_memory
     }
 
     #---------------------------------------------------------------------------

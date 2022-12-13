@@ -291,6 +291,12 @@ def close_simulation(dict_algorithm, dict_tracker, simulation_report):
     #Saving data
     if dict_algorithm['SaveData'] :
 
+        #clean memory
+        if dict_algorithm['clean_memory']:
+            shutil.rmtree('Data')
+            shutil.rmtree('Input')
+            shutil.rmtree('Output')
+
         name_actual_folder = os.path.dirname(os.path.realpath(__file__))
         shutil.copytree(name_actual_folder, '../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['name_folder'])
         os.remove('../'+dict_algorithm['main_folder_name']+'/User_'+dict_algorithm['name_folder']+'_tempo.txt')
