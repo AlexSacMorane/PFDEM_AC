@@ -306,6 +306,8 @@ def close_simulation(dict_algorithm, dict_tracker, simulation_report):
 
         Owntools.save_final(dict_algorithm,dict_tracker)
 
+#-------------------------------------------------------------------------------
+
 if '__main__' == __name__:
     #-------------------------------------------------------------------------------
     #Plan simulation
