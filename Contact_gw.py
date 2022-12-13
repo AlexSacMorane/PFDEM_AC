@@ -163,16 +163,16 @@ class Contact_gw:
 #-------------------------------------------------------------------------------
 
   def DEM_gw_Polyhedral_tangential(self, dt_DEM):
-    """
-    Compute the tangential reaction of a contact grain-wall.
+   """
+   Compute the tangential reaction of a contact grain-wall.
 
-    Here a pontual spring is considered.
+   Here a pontual spring is considered.
 
         Input :
             itself (a contact grain - wall)
         Output :
             Nothing, but the interaction between grain and wall is computed. Differents attributes are updated.
-    """
+   """
    #conditions "if" are defined and same for each wall nature
    if self.nature == 'gwy_min':
        #unlinear stiffness

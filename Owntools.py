@@ -210,15 +210,15 @@ def Debug_DEM_f(dict_algorithm, dict_sample):
 #-------------------------------------------------------------------------------
 
 def Debug_configuration(dict_algorithm,dict_sample):
-    """
-    Plot the configuration of the grains before / after the DEM step.
+  """
+  Plot the configuration of the grains before / after the DEM step.
 
         Input:
             an algorithm dictionnary (a dict)
             a sample dictionnary (a dict)
         Output :
             Nothing, but a .png file is generated (a file)
-    """
+  """
   #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
   #load data needed
   x_min = dict_sample['x_box_min']
