@@ -403,11 +403,11 @@ if '__main__' == __name__:
     #Tracker and create an new dict
     dict_tracker = {
         't_L' : [0],
-        'S_grains_L' : [S_grains],
-        'S_grains_dissolvable_L' : [S_grains_dissolvable],
-        'S_dissolved_L' : [0],
-        'S_dissolved_perc_L' : [0],
-        'S_dissolved_perc_dissolvable_L' : [0],
+        'S_grains_L' : [],
+        'S_grains_dissolvable_L' : [],
+        'S_dissolved_L' : [],
+        'S_dissolved_perc_L' : [],
+        'S_dissolved_perc_dissolvable_L' : [],
         'n_grains_L' : [len(dict_sample['L_g'])],
         'k0_xmin_L' : [],
         'k0_xmax_L' : []

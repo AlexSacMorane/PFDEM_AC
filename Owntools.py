@@ -261,24 +261,16 @@ def Debug_Trackers(dict_tracker):
     """
     #Trackers
     fig = plt.figure(1,figsize=(16,9.12))
-    plt.plot(dict_tracker['t_L'],dict_tracker['S_grains_L'])
-    plt.title('Evolution of the grains surface')
-    fig.savefig('Debug/Evolution_Surface.png')
+    plt.plot(dict_tracker['t_L'],dict_tracker['S_grains_dissolvable_L'])
+    plt.title('Evolution of the dissolvable grains surface')
+    fig.savefig('Debug/Evolution_Dissolvable_Surface.png')
     plt.close(1)
 
     fig = plt.figure(1,figsize=(16,9.12))
-    plt.plot(dict_tracker['S_dissolved_L'][:-1],dict_tracker['k0_xmin_L'],label='k0 with xmin')
-    plt.plot(dict_tracker['S_dissolved_L'][:-1],dict_tracker['k0_xmax_L'],label='k0 with xmax')
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'][:-1],dict_tracker['k0_xmin_L'],label='k0 with xmin')
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'][:-1],dict_tracker['k0_xmax_L'],label='k0 with xmax')
     plt.title('Evolution of the k0')
-    plt.xlabel('Grains surface dissolved (µm2)')
-    fig.savefig('Debug/Evolution_k0_with_TotalSurface.png')
-    plt.close(1)
-
-    fig = plt.figure(1,figsize=(16,9.12))
-    plt.plot(dict_tracker['S_dissolved_perc_L'][:-1],dict_tracker['k0_xmin_L'],label='k0 with xmin')
-    plt.plot(dict_tracker['S_dissolved_perc_L'][:-1],dict_tracker['k0_xmax_L'],label='k0 with xmax')
-    plt.title('Evolution of the k0')
-    plt.xlabel('Percentage of grains surface dissolved (%)')
+    plt.xlabel('Percentage of dissolvable grains surface dissolved (%)')
     fig.savefig('Debug/Evolution_k0_with_percentage_dissolved.png')
     plt.close(1)
 
