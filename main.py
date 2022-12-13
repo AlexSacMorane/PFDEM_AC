@@ -52,6 +52,8 @@ def main_iteration(dict_algorithm, dict_geometry, dict_material, dict_sollicitat
     simulation_report.write_and_print('\nIteration '+str(dict_algorithm['i_PF'])+' / '+str(dict_algorithm['n_t_PFDEM'])+'\n','\nITERATION PF '+str(dict_algorithm['i_PF'])+' / '+str(dict_algorithm['n_t_PFDEM'])+'\n')
 
     #prepare iteration
+    if Path('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])).exists():
+        shutil.rmtree('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF']))
     os.mkdir('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF']))
     os.mkdir('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/txt')
     os.mkdir('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/png')

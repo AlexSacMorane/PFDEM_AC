@@ -337,6 +337,8 @@ def Sort_Files(name_template,dict_algorithm):
      #master simulation
      os.rename(name_template+'_out.e','Output/'+name_template+'_out.e')
      os.rename(name_template+'.i','Input/'+name_template+'.i')
+     if Path('Output/'+name_template).exists():
+         shutil.rmtree('Output/'+name_template)
      os.mkdir('Output/'+name_template)
      j = 0
      j_str = index_to_str(j)
