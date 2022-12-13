@@ -638,8 +638,7 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
             a sollicitations dictionnary (a dict)
             a simulation report (a report)
         Output :
-            a list of tempo grains (a list)
-            the coordinate of the upper wall (a float)
+            Nothing, but dictionnaries are updated
     """
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
@@ -770,14 +769,15 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
 
     DEM_loading(dict_ic, dict_material, dict_sample, dict_sollicitations, True, simulation_report)
 
+    #update element in dict
+    dict_sample['y_box_max'] = dict_ic['y_box_max']
+
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     L_g_tempo = dict_ic['L_g_tempo']
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
     simulation_report.write_and_print(str(len(L_g_tempo))+' / '+str(N_grain)+' grains have been created\n','\n'+str(len(L_g_tempo))+' / '+str(N_grain)+' grains have been created\n')
-
-    return L_g_tempo, y_max
 
 #-------------------------------------------------------------------------------
 
