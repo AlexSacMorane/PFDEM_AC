@@ -298,130 +298,131 @@ def close_simulation(dict_algorithm, dict_tracker, simulation_report):
 
         Owntools.save_final(dict_algorithm,dict_tracker)
 
-#-------------------------------------------------------------------------------
-#Plan simulation
-#-------------------------------------------------------------------------------
+if '__main__' == __name__:
+    #-------------------------------------------------------------------------------
+    #Plan simulation
+    #-------------------------------------------------------------------------------
 
-if Path('Debug').exists():
-    shutil.rmtree('Debug')
-if Path('Input').exists():
-    shutil.rmtree('Input')
-if Path('Output').exists():
-    shutil.rmtree('Output')
-if Path('Data').exists():
-    shutil.rmtree('Data')
+    if Path('Debug').exists():
+        shutil.rmtree('Debug')
+    if Path('Input').exists():
+        shutil.rmtree('Input')
+    if Path('Output').exists():
+        shutil.rmtree('Output')
+    if Path('Data').exists():
+        shutil.rmtree('Data')
 
-os.mkdir('Debug')
-os.mkdir('Debug/DEM_ite')
-os.mkdir('Debug/DEM_ite/Init')
-os.mkdir('Input')
-os.mkdir('Output')
-os.mkdir('Data')
+    os.mkdir('Debug')
+    os.mkdir('Debug/DEM_ite')
+    os.mkdir('Debug/DEM_ite/Init')
+    os.mkdir('Input')
+    os.mkdir('Output')
+    os.mkdir('Data')
 
-#-------------------------------------------------------------------------------
-# tic
-#-------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------
+    # tic
+    #-------------------------------------------------------------------------------
 
-simulation_report = Report.Report('Debug/Report',datetime.now())
+    simulation_report = Report.Report('Debug/Report',datetime.now())
 
-#-------------------------------------------------------------------------------
-#Initial conditions
-#-------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------
+    #Initial conditions
+    #-------------------------------------------------------------------------------
 
-simulation_report.tic_tempo(datetime.now())
+    simulation_report.tic_tempo(datetime.now())
 
-dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations = User.All_parameters()
+    dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations = User.All_parameters()
 
-if dict_algorithm['Debug'] or dict_algorithm['Debug_DEM'] :
-    simulation_report.write('This simulation can be debugged\n')
-if dict_algorithm['SaveData'] :
-    if not Path('../'+dict_algorithm['main_folder_name']).exists():
-        os.mkdir('../'+dict_algorithm['main_folder_name'])
-    simulation_report.write('This simulation is saved\n')
-    i_run = 1
-    folderpath = Path('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['template_simulation_name']+str(i_run))
-    while folderpath.exists():
-        i_run = i_run + 1
+    if dict_algorithm['Debug'] or dict_algorithm['Debug_DEM'] :
+        simulation_report.write('This simulation can be debugged\n')
+    if dict_algorithm['SaveData'] :
+        if not Path('../'+dict_algorithm['main_folder_name']).exists():
+            os.mkdir('../'+dict_algorithm['main_folder_name'])
+        simulation_report.write('This simulation is saved\n')
+        i_run = 1
         folderpath = Path('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['template_simulation_name']+str(i_run))
+        while folderpath.exists():
+            i_run = i_run + 1
+            folderpath = Path('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['template_simulation_name']+str(i_run))
 
-    #add element in dict
-    dict_algorithm['name_folder'] = dict_algorithm['template_simulation_name']+str(i_run)
+        #add element in dict
+        dict_algorithm['name_folder'] = dict_algorithm['template_simulation_name']+str(i_run)
 
-    #tempo save of the user file
-    shutil.copy('User.py','../'+dict_algorithm['main_folder_name']+'/User_'+dict_algorithm['name_folder']+'_tempo.txt')
+        #tempo save of the user file
+        shutil.copy('User.py','../'+dict_algorithm['main_folder_name']+'/User_'+dict_algorithm['name_folder']+'_tempo.txt')
 
-if dict_algorithm['SaveData'] or dict_algorithm['Debug'] or dict_algorithm['Debug_DEM']:
-    simulation_report.write('\n')
+    if dict_algorithm['SaveData'] or dict_algorithm['Debug'] or dict_algorithm['Debug_DEM']:
+        simulation_report.write('\n')
 
-#Creation of the grain (without PF)
-simulation_report.write_and_print('Creation of the grains\n','\nCREATION OF THE GRAINS\n')
-LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    #Creation of the grain (without PF)
+    simulation_report.write_and_print('Creation of the grains\n','\nCREATION OF THE GRAINS\n')
+    LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
-simulation_report.tac_tempo(datetime.now(),'Initialisation')
+    simulation_report.tac_tempo(datetime.now(),'Initialisation')
 
-#-------------------------------------------------------------------------------
-#Creation of polygonal particles
-#-------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------
+    #Creation of polygonal particles
+    #-------------------------------------------------------------------------------
 
-simulation_report.tic_tempo(datetime.now())
+    simulation_report.tic_tempo(datetime.now())
 
-# Creation of the real list of grains
-From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample)#creation pf the dissolution .txt
+    # Creation of the real list of grains
+    From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample)#creation pf the dissolution .txt
 
-simulation_report.tac_tempo(datetime.now(),'Creation of polygonal particles')
+    simulation_report.tac_tempo(datetime.now(),'Creation of polygonal particles')
 
-#-------------------------------------------------------------------------------
-#Distribution etai
-#-------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------
+    #Distribution etai
+    #-------------------------------------------------------------------------------
 
-simulation_report.tic_tempo(datetime.now())
+    simulation_report.tic_tempo(datetime.now())
 
-#Saving the grain surface
-S_grains_dissolvable = 0
-S_grains = 0
-for grain in dict_sample['L_g']:
-    S_grains = S_grains + grain.surface
-    if grain.dissolved :
-        S_grains_dissolvable = S_grains_dissolvable + grain.surface
-simulation_report.write('Total Surface '+str(round(S_grains,0))+' µm2\n')
-simulation_report.write('Total Surface dissolvable '+str(round(S_grains_dissolvable,0))+' µm2\n')
-simulation_report.tac_tempo(datetime.now(),'Dissolution distribution')
+    #Saving the grain surface
+    S_grains_dissolvable = 0
+    S_grains = 0
+    for grain in dict_sample['L_g']:
+        S_grains = S_grains + grain.surface
+        if grain.dissolved :
+            S_grains_dissolvable = S_grains_dissolvable + grain.surface
+    simulation_report.write('Total Surface '+str(round(S_grains,0))+' µm2\n')
+    simulation_report.write('Total Surface dissolvable '+str(round(S_grains_dissolvable,0))+' µm2\n')
+    simulation_report.tac_tempo(datetime.now(),'Dissolution distribution')
 
-#-------------------------------------------------------------------------------
-#Main
-#-------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------
+    #Main
+    #-------------------------------------------------------------------------------
 
-#Tracker and create an new dict
-dict_tracker = {
-    't_L' : [0],
-    'S_grains_L' : [S_grains],
-    'S_grains_dissolvable_L' : [S_grains_dissolvable],
-    'S_dissolved_L' : [0],
-    'S_dissolved_perc_L' : [0],
-    'S_dissolved_perc_dissolvable_L' : [0],
-    'n_grains_L' : [len(dict_sample['L_g'])],
-    'k0_xmin_L' : [],
-    'k0_xmax_L' : []
-}
+    #Tracker and create an new dict
+    dict_tracker = {
+        't_L' : [0],
+        'S_grains_L' : [S_grains],
+        'S_grains_dissolvable_L' : [S_grains_dissolvable],
+        'S_dissolved_L' : [0],
+        'S_dissolved_perc_L' : [0],
+        'S_dissolved_perc_dissolvable_L' : [0],
+        'n_grains_L' : [len(dict_sample['L_g'])],
+        'k0_xmin_L' : [],
+        'k0_xmax_L' : []
+    }
 
-# Preparation and add elements in dicts
-dict_algorithm['i_PF'] = 0
-dict_sample['L_contact_gw'] = []
-dict_sample['L_ij_contact_gw'] = []
-dict_sample['id_contact_gw'] = 0
-dict_sample['L_contact'] = []
-dict_sample['L_ij_contact'] = []
-dict_sample['id_contact'] = 0
+    # Preparation and add elements in dicts
+    dict_algorithm['i_PF'] = 0
+    dict_sample['L_contact_gw'] = []
+    dict_sample['L_ij_contact_gw'] = []
+    dict_sample['id_contact_gw'] = 0
+    dict_sample['L_contact'] = []
+    dict_sample['L_ij_contact'] = []
+    dict_sample['id_contact'] = 0
 
-if dict_algorithm['Debug'] :
-    Owntools.Debug_configuration(dict_algorithm,dict_sample)
+    if dict_algorithm['Debug'] :
+        Owntools.Debug_configuration(dict_algorithm,dict_sample)
 
-while not User.Criteria_StopSimulation(dict_algorithm):
+    while not User.Criteria_StopSimulation(dict_algorithm):
 
-    main_iteration(dict_algorithm, dict_geometry, dict_material, dict_sollicitations, dict_sample, dict_tracker, simulation_report)
+        main_iteration(dict_algorithm, dict_geometry, dict_material, dict_sollicitations, dict_sample, dict_tracker, simulation_report)
 
-#-------------------------------------------------------------------------------
-# close simulation
-#-------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------
+    # close simulation
+    #-------------------------------------------------------------------------------
 
-close_simulation(dict_algorithm, dict_tracker, simulation_report)
+    close_simulation(dict_algorithm, dict_tracker, simulation_report)
