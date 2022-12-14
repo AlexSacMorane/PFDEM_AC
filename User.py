@@ -125,7 +125,7 @@ def All_parameters():
     #Algorithm parameters
 
     #Phase field
-    dt_PF = 0.02 #s time step during MOOSE simulation
+    dt_PF = 0.01 #s time step during MOOSE simulation
     n_t_PF = 10 #number of iterations PF-DEM
     factor_distribution_etai = 1.5 #margin to distribute etai
     MovePF_selector = 'DeconstructRebuild' #Move PF
@@ -162,12 +162,10 @@ def All_parameters():
     Debug = True #plot configuration before and after DEM simulation
     Debug_DEM = False #plot configuration inside DEM
     i_print_plot = 200 #frenquency of the print and plot (if Debug_DEM) in DEM step
+    clean_memory = True #delete Data, Input, Output at the end of the simulation
     SaveData = True #save simulation
     main_folder_name = 'Data_Santamarina' #where data are saved
     template_simulation_name = 'frac_'+str(int(frac_dissolved*100))+'_run_' #template of the simulation name
-
-    #clean
-    clean_memory = True #delete Data, Input, Output at the end of the simulation
 
     #write dict
     dict_algorithm = {
