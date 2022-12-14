@@ -893,7 +893,8 @@ def DEM_loading(dict_ic, dict_material, dict_sample, dict_sollicitations, multi_
                 print('i_DEM',i_DEM,'and Ecin',int(100*Ecin/Ecin_stop),'% and Force',int(100*F/Force_stop),'% and Confinement',int(100*Fv/Forcev_target),'%')
             else :
                 print('i_DEM',i_DEM,'and Ecin',int(100*Ecin/Ecin_stop),'% and Confinement',int(100*Fv/Forcev_target),'%')
-            Plot_Config_Loaded(dict_ic['L_g_tempo'],x_min,x_max,y_min,y_max,i_DEM)
+            if dict_ic['Debug_DEM']:
+                Plot_Config_Loaded(dict_ic['L_g_tempo'],x_min,x_max,y_min,y_max,i_DEM)
 
         #Check stop conditions for DEM
         if i_DEM >= i_DEM_stop + i_DEM_0:
