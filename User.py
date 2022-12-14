@@ -38,10 +38,9 @@ def All_parameters():
     grain_discretisation = 20 # = grain_discretisation_square
 
     N_grain = 300 #total number of grains
-    frac_dissolved = 0.15
+    frac_dissolved = 0.15 #V_soluble/V_total
 
     #Disk
-    N_grain_disk = int(N_grain*(1-frac_dissolved)) #number of grains
     R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
     L_R = [1.2*R_mean,1.1*R_mean,0.9*R_mean,0.8*R_mean] #from larger to smaller
     L_percentage_R = [1/6,1/3,1/3,1/6] #distribution of the different radius
@@ -50,7 +49,6 @@ def All_parameters():
     for i in range(len(L_R)):
         R_mean = R_mean + L_R[i]*L_percentage_R[i]
     #Square
-    N_grain_square = int(N_grain*frac_dissolved) #number of grains
     Dimension_mean = 300 #µm radius
     L_Dimension = [1.2*Dimension_mean,1.1*Dimension_mean,0.9*Dimension_mean,0.8*Dimension_mean] #from larger to smaller
     L_percentage_Dimension = [1/6,1/3,1/3,1/6] #distribution of the different radius
@@ -58,6 +56,10 @@ def All_parameters():
     Dimension_mean = 0
     for i in range(len(L_Dimension)):
         Dimension_mean = Dimension_mean + L_Dimension[i]*L_percentage_Dimension[i]
+
+    #Compute number of grain (square or disk)
+    N_grain_square = int(N_grain*frac_dissolved*math.pi*R_mean**2/(frac_dissolved*math.pi*R_mean**2 + Dimension_mean*Dimension_mean*(1-frac_dissolved)))
+    N_grain_disk = N_grain - N_grain_square
 
     #write dict
     dict_geometry = {
