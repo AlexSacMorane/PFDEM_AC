@@ -35,7 +35,7 @@ def All_parameters():
     #Geometric parameters
 
     #approximatively the number of vertices for one grain during DEM simulation
-    grain_discretisation = 20 # = grain_discretisation_square
+    grain_discretisation = 60 # = grain_discretisation_square
 
     N_grain = 300 #total number of grains
     frac_dissolved = 0.15 #V_soluble/V_total
@@ -204,7 +204,7 @@ def All_parameters():
     #/!\ Work only for 2 /!\
     factor_ymax_box = 2.5 #margin to generate grains
     N_test_max = 5000 # maximum number of tries to generate a grain without overlap
-    i_DEM_stop_IC = 2000 #stop criteria for DEM during IC
+    i_DEM_stop_IC = 3000 #stop criteria for DEM during IC
     Debug_DEM_IC = False #plot configuration inside DEM during IC
     i_print_plot_IC = 200 #frenquency of the print and plot (if Debug_DEM_IC) for IC
     dt_DEM_IC = dt_DEM_crit/5 #s time step during IC
