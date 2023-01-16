@@ -4,13 +4,21 @@ Phase-Field Discrete Element Modelisation applied to granular material.
 
 ## Simulation presentation
 The goal is to reproduce result from <i>Shin, H., Santamarina, J.C. (2009) Mineral Dissolution and the Evolution of k0, Journal of Geotechnical and Geoenvironmental Engineering, 135, 1141-1147</i>.
-This simulation is about a 2D test under oedometrical conditions with an acid injection to dissolve square particles.
-The chain force and the k0 (= &sigma;<sub>1</sub>/&sigma;<sub>2</sub>) evolves with the material dissolution.
+This simulation is about a 2D test under oedometrical conditions with an acid injection to dissolve a fraction of the particles.
+
+![scheme of grain-grain interaction](image/Oedometric_test_WB.png)
+
+The chain force and the k0 (= &sigma;<sub>1</sub>/&sigma;<sub>2</sub>) evolves with the material dissolution. The influence of the shape of the dissolvable particles is discussed.
 
 ## Technical description
-A back and forth is done between phase-field (PF) simulation and discrete element modelisation (DEM). The following scheme illustrated the algorithm.
+The PFDEM is a discussion between phase-field (PF) simulation and discrete element modelization (DEM). Even if those formulations are different, they can collaborate with data exchange.
+![scheme of grain-grain interaction](image/PFDEM_Exchange_Scheme_WB.png)
 
-![scheme of grain-grain interaction](image/General_plan.png)
+
+A back and forth is done between phase-field (PF) simulation and discrete element modelisation (DEM). The following schemes illustrate the algorithm.
+
+
+![scheme of grain-grain interaction](image/General_plan_WB.png)
 
  PF approach is computed with [MOOSE](https://github.com/idaholab/moose) and DEM is computed with an own script based on python 3.9.6. The launch of this project is done by executing the python script <i>main.py</i>. The user can change variables inside the python script <i>User.py</i>. A documentation explains what is the role of the different variable.
 
