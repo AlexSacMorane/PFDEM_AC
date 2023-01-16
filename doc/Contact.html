@@ -1,0 +1,2227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>Contact API documentation</title>
+<meta name="description" content="@author: Alexandre Sac--Morane
+alexandre.sac-morane@uclouvain.be …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>Contact</code></h1>
+</header>
+<section id="section-intro">
+<p>@author: Alexandre Sac&ndash;Morane
+alexandre.sac-morane@uclouvain.be</p>
+<p>The goal of this file is to define a new class.
+The new class is about the contact between two grains</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python"># -*- coding: utf-8 -*-
+&#34;&#34;&#34;
+@author: Alexandre Sac--Morane
+alexandre.sac-morane@uclouvain.be
+
+The goal of this file is to define a new class.
+The new class is about the contact between two grains
+&#34;&#34;&#34;
+
+#-------------------------------------------------------------------------------
+#Librairies
+#-------------------------------------------------------------------------------
+
+import numpy as np
+import math
+import random
+import Grain
+
+#-------------------------------------------------------------------------------
+#Class
+#-------------------------------------------------------------------------------
+
+class Contact:
+
+#-------------------------------------------------------------------------------
+
+  def __init__(self, ID, G1, G2, dict_material):
+    &#34;&#34;&#34;
+    Defining the contact grain-grain.
+
+        Input :
+            itself (a contact grain - grain)
+            an id (a int)
+            two grains (two grains)
+            a material dictionnary (a dict)
+        Output :
+            Nothing, but the contact grain - grain is generated
+    &#34;&#34;&#34;
+    self.id = ID
+    self.g1 = G1
+    self.g2 = G2
+    self.ft = 0
+    self.mu = dict_material[&#39;mu_friction_gg&#39;]
+    self.coeff_restitution = dict_material[&#39;coeff_restitution&#39;]
+    self.tangential_old_statut = False
+    self.overlap_tangential = 0
+
+#-------------------------------------------------------------------------------
+
+  def init_contact(self,L_g):
+    &#34;&#34;&#34;
+    Initialize the contact.
+
+    The grains are updated, the tangetial reaction is set to 0 and a boolean attribute is set to False (new contact grain - grain).
+
+        Input :
+            itself (a contact grain - grain)
+            a list of grains (a list)
+        Output :
+            Nothing, but attributes are updated (two grains, two floats and a boolean)
+    &#34;&#34;&#34;
+    self.g1 = L_g[self.g1.id]
+    self.g2 = L_g[self.g2.id]
+    self.ft = 0
+    self.tangential_old_statut = False
+    self.overlap_tangential = 0
+
+#-------------------------------------------------------------------------------
+
+  def DEM_2grains_Polyhedral_normal(self):
+    &#34;&#34;&#34;
+    Compute the normal reaction of a contact grain-grain
+
+    Here a pontual spring is considered
+
+        Input :
+            itself (a contact grain - grain)
+        Output :
+            Nothing, but attributes are updated
+    &#34;&#34;&#34;
+    #compute angle between grains
+    g1_to_g2 = self.g2.center - self.g1.center
+    if g1_to_g2[1] &gt;= 0 :
+        angle_g1_to_g2 = math.acos(g1_to_g2[0]/np.linalg.norm(g1_to_g2))
+        angle_g2_to_g1 = angle_g1_to_g2 + math.pi
+    else :
+        angle_g1_to_g2 = math.pi + math.acos(-g1_to_g2[0]/np.linalg.norm(g1_to_g2))
+        angle_g2_to_g1 = angle_g1_to_g2 - math.pi
+
+    #extract
+    L_i_vertices_1 = extract_vertices(self.g1, angle_g1_to_g2)
+    L_i_vertices_2 = extract_vertices(self.g2, angle_g2_to_g1)
+
+    #looking for the nearest nodes
+    d_virtual = max(self.g1.r_max,self.g2.r_max)
+    ij_min = [0,0]
+    d_ij_min = 100*d_virtual #Large
+    for i in L_i_vertices_1:
+        for j in L_i_vertices_2:
+            d_ij = np.linalg.norm(self.g2.l_border[:-1][j]-self.g1.l_border[:-1][i]+d_virtual*(self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center))
+            if d_ij &lt; d_ij_min :
+                d_ij_min = d_ij
+                ij_min = [i,j]
+    self.ij_min = ij_min
+
+    #-----------------------------------------------------------------------------
+    #Computing CP
+    #-----------------------------------------------------------------------------
+
+    M = (self.g1.l_border[:-1][ij_min[0]]+self.g2.l_border[:-1][ij_min[1]])/2
+    # 5 candidates for CP
+    N = np.array([self.g1.l_border[:-1][ij_min[0]][0] - self.g2.l_border[:-1][ij_min[1]][0],
+                  self.g1.l_border[:-1][ij_min[0]][1] - self.g2.l_border[:-1][ij_min[1]][1]])
+    N = N/np.linalg.norm(N)
+    PB = np.array([-N[1] ,N[0]])
+    PB = PB/np.linalg.norm(PB)
+
+    #candidats from grain 1
+    if ij_min[0] &lt;len(self.g1.l_border[:-1]) - 1:
+        M1 = self.g1.l_border[:-1][ij_min[0]+1]-self.g1.l_border[:-1][ij_min[0]]
+    else :
+        M1 = self.g1.l_border[:-1][0]-self.g1.l_border[:-1][ij_min[0]]
+    M1 = M1/np.linalg.norm(M1)
+    M3 = self.g1.l_border[:-1][ij_min[0]-1]-self.g1.l_border[:-1][ij_min[0]]
+    M3 = M3/np.linalg.norm(M3)
+    #reorganize the candidats
+    if np.dot(M1,PB) &lt; 0:
+        Mtempo = M1.copy()
+        M1 = M3.copy()
+        M3 = Mtempo.copy()
+
+    #candidats from grain 2
+    if ij_min[1] &lt;len(self.g2.l_border[:-1]) - 1:
+        M2 = self.g2.l_border[:-1][ij_min[1]+1]-self.g2.l_border[:-1][ij_min[1]]
+    else :
+        M2 = self.g2.l_border[:-1][0]-self.g2.l_border[:-1][ij_min[1]]
+    M2 = M2/np.linalg.norm(M2)
+    M4 = self.g2.l_border[:-1][ij_min[1]-1]-self.g2.l_border[:-1][ij_min[1]]
+    M4 = M4/np.linalg.norm(M4)
+    #reorganize the candidats
+    if np.dot(M2,PB) &lt; 0:
+      Mtempo = M2.copy()
+      M2 = M4.copy()
+      M4 = Mtempo.copy()
+
+    #compute the different angles
+    theta_PB = math.pi/2
+    theta_M1 =  math.acos(np.dot(M1,N))
+    theta_M2 =  math.acos(np.dot(M2,N))
+    theta_M3 = -math.acos(np.dot(M3,N))
+    theta_M4 = -math.acos(np.dot(M4,N))
+
+    #find the PC
+    if theta_M2 &lt; theta_PB and theta_PB &lt; theta_M1\
+       and theta_M3 &lt; -theta_PB and -theta_PB &lt; theta_M4:
+       PC = PB
+    else:
+      L_Mi = [M1,M2,M3,M4]
+      L_theta_Mi_PB=[theta_M1-theta_PB, theta_PB-theta_M2, -theta_M3-theta_PB, theta_PB+theta_M4]
+      PC = L_Mi[L_theta_Mi_PB.index(min(L_theta_Mi_PB))]
+
+    #-----------------------------------------------------------------------------
+    # Compute the normal and tangential planes
+    #-----------------------------------------------------------------------------
+
+    PC_normal = np.array([PC[1],-PC[0]])
+    if np.dot(PC_normal,(self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center))&lt;0 :
+        PC_normal = np.array([-PC[1],PC[0]])
+    self.pc_normal = PC_normal #n12
+    self.pc_tangential = np.array([-PC_normal[1],PC_normal[0]])
+
+    #-----------------------------------------------------------------------------
+    # Compute the overlap
+    #-----------------------------------------------------------------------------
+
+    d_b = np.dot(M-self.g2.l_border[:-1][ij_min[1]],PC_normal)
+    d_a = np.dot(M-self.g1.l_border[:-1][ij_min[0]],PC_normal)
+    overlap = d_b - d_a
+    self.overlap_normal = overlap
+
+    if overlap &gt; 0:
+    #-----------------------------------------------------------------------------
+    # Compute the reaction
+    #-----------------------------------------------------------------------------
+
+        #Spring term
+        Y_eq = 1/((1-self.g1.nu*self.g1.nu)/self.g1.y+(1-self.g2.nu*self.g2.nu)/self.g2.y)
+        R_eq = 1/(1/self.g1.r_mean+1/self.g2.r_mean)
+        k = 4/3*Y_eq*math.sqrt(R_eq)
+        F_2_1_n = -k * overlap**(3/2)  #unlinear spring
+        F_2_1 = F_2_1_n * PC_normal
+        self.F_2_1_n = F_2_1_n
+        self.Ep_n = 2/5 * k * overlap**(5/2) #-dEp/dx = F_2_1_n
+        self.g1.update_f( F_2_1[0],  F_2_1[1], self.g1.l_border[:-1][ij_min[0]])
+        self.g2.update_f(-F_2_1[0], -F_2_1[1], self.g2.l_border[:-1][ij_min[1]])
+
+        #Damping term
+        gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
+        mass_eq = self.g1.m*self.g2.m/(self.g1.m+self.g2.m)
+        eta = 2 * gamma * math.sqrt(mass_eq*k)
+        F_2_1_damp_n = np.dot(self.g2.v - self.g1.v,PC_normal)*eta
+        F_2_1_damp = F_2_1_damp_n *PC_normal
+        self.F_2_1_damp = F_2_1_damp_n
+        self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1], self.g1.l_border[:-1][ij_min[0]])
+        self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1], self.g2.l_border[:-1][ij_min[1]])
+
+    #no contact finally
+    else :
+        self.F_2_1_n = 0
+        self.F_2_1_damp = 0
+        self.Ep_n = 0
+
+#-------------------------------------------------------------------------------
+
+  def DEM_2grains_Polyhedral_tangential(self,dt_DEM):
+    &#34;&#34;&#34;
+    Compute the tangential reaction of a contact grain-grain.
+
+    Here a pontual spring is considered.
+
+        Input :
+            itself (a contact grain - grain)
+            a time step (a float)
+        Output :
+            Nothing, but attributes are updated
+    &#34;&#34;&#34;
+    if self.overlap_normal &gt; 0:
+
+        if self.tangential_old_statut:
+          #if a reaction has been already computed
+          #need to project the tangential reaction on the new tangential plane
+          self.ft = self.ft*np.dot(self.tangential_old,self.pc_tangential)
+        else:
+          self.tangential_old_statut = True
+
+        G_eq = 1/((1-self.g1.nu)/self.g1.g+(1-self.g2.nu)/self.g2.g)
+        R_eq = 1/(1/self.g1.r_mean+1/self.g2.r_mean)
+        kt0 = 8 * G_eq *math.sqrt(R_eq*abs(self.overlap_normal))
+        kt = kt0*math.sqrt(max(1-2/3*kt0*abs(self.overlap_tangential)/self.mu/abs(self.F_2_1_n),0)) #not linear spring
+
+        r1 = np.linalg.norm(self.g1.l_border[:-1][self.ij_min[0]] - self.g1.center) - self.overlap_normal/2
+        r2 = np.linalg.norm(self.g2.l_border[:-1][self.ij_min[1]] - self.g2.center) - self.overlap_normal/2
+        Delta_Us = (np.dot(self.g1.v-self.g2.v,self.pc_tangential) + r1*self.g1.w + r2*self.g2.w)*dt_DEM
+        self.overlap_tangential = self.overlap_tangential + Delta_Us
+        self.ft = self.ft - kt*Delta_Us
+        self.tangential_old = self.pc_tangential
+        if abs(self.ft) &gt; abs(self.mu*self.F_2_1_n) or kt == 0: #Coulomb criteria
+            self.ft = self.mu * abs(self.F_2_1_n) * np.sign(self.ft)
+
+        self.g1.update_f( self.ft*self.pc_tangential[0],  self.ft*self.pc_tangential[1], self.g1.l_border[:-1][self.ij_min[0]])
+        self.g2.update_f(-self.ft*self.pc_tangential[0], -self.ft*self.pc_tangential[1], self.g2.l_border[:-1][self.ij_min[1]])
+
+        #Damping term
+        gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
+        mass_eq = self.g1.m*self.g2.m/(self.g1.m+self.g2.m)
+        eta = 2 * gamma * math.sqrt(mass_eq*kt)
+        F_2_1_damp_t = -Delta_Us/dt_DEM*eta/2
+        F_2_1_damp = F_2_1_damp_t *self.pc_tangential
+        self.ft_damp = F_2_1_damp_t
+        self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1], self.g1.l_border[:-1][self.ij_min[0]])
+        self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1], self.g2.l_border[:-1][self.ij_min[1]])
+
+    #no contact finally
+    else :
+        tangential_old_statut = False
+        self.overlap_tangential = 0
+        self.ft = 0
+        self.ft_damp = 0
+
+#-------------------------------------------------------------------------------
+
+  def DEM_2grains_Polyhedral_normal_surface(self):
+    &#34;&#34;&#34;
+    Compute the normal reaction of a contact grain-grain.
+
+    Here a surface spring is considered.
+
+        Input :
+            itself (a contact grain - grain)
+        Output :
+            Nothing, but attributes are updated
+    &#34;&#34;&#34;
+    #looking for the nearest nodes
+    d_virtual = max(self.g1.r_max,self.g2.r_max) #virtual distance
+    ij_min = [0,0]
+    d_ij_min = 100*d_virtual #Large
+    for i in range(len(self.g1.l_border[:-1])):
+      for j in range(len(self.g2.l_border[:-1])):
+          d_ij = np.linalg.norm(self.g2.l_border[:-1][j]-self.g1.l_border[:-1][i]+d_virtual*(self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center))
+          if d_ij &lt; d_ij_min :
+              d_ij_min = d_ij
+              ij_min = [i,j]
+    self.ij_min = ij_min
+
+    #-----------------------------------------------------------------------------
+    #Computing CP
+    #-----------------------------------------------------------------------------
+
+    M = (self.g1.l_border[:-1][ij_min[0]]+self.g2.l_border[:-1][ij_min[1]])/2
+    # 5 candidates for CP
+    N = np.array([self.g1.l_border[:-1][ij_min[0]][0] - self.g2.l_border[:-1][ij_min[1]][0],
+                  self.g1.l_border[:-1][ij_min[0]][1] - self.g2.l_border[:-1][ij_min[1]][1]])
+    N = N/np.linalg.norm(N)
+    PB = np.array([-N[1] ,N[0]])
+    PB = PB/np.linalg.norm(PB)
+
+    #candidats from grain 1
+    M1 = self.g1.l_border[:-1][ij_min[0]+1]-self.g1.l_border[:-1][ij_min[0]]
+    M1 = M1/np.linalg.norm(M1)
+    M3 = self.g1.l_border[:-1][ij_min[0]-1]-self.g1.l_border[:-1][ij_min[0]]
+    M3 = M3/np.linalg.norm(M3)
+    #reorganize the candidats
+    if np.dot(M1,PB) &lt; 0:
+        Mtempo = M1.copy()
+        M1 = M3.copy()
+        M3 = Mtempo.copy()
+
+    #candidats from grain 2
+    M2 = self.g2.l_border[:-1][ij_min[1]+1]-self.g2.l_border[:-1][ij_min[1]]
+    M2 = M2/np.linalg.norm(M2)
+    M4 = self.g2.l_border[:-1][ij_min[1]-1]-self.g2.l_border[:-1][ij_min[1]]
+    M4 = M4/np.linalg.norm(M4)
+    #reorganize the candidats
+    if np.dot(M2,PB) &lt; 0:
+      Mtempo = M2.copy()
+      M2 = M4.copy()
+      M4 = Mtempo.copy()
+
+    #compute the different agnles
+    theta_PB = math.pi/2
+    theta_M1 =  math.acos(np.dot(M1,N))
+    theta_M2 =  math.acos(np.dot(M2,N))
+    theta_M3 = -math.acos(np.dot(M3,N))
+    theta_M4 = -math.acos(np.dot(M4,N))
+
+    #find the PV
+    if theta_M2 &lt; theta_PB and theta_PB &lt; theta_M1\
+       and theta_M3 &lt; -theta_PB and -theta_PB &lt; theta_M4:
+       PC = PB
+    else:
+      L_Mi = [M1,M2,M3,M4]
+      L_theta_Mi_PB=[theta_M1-theta_PB, theta_PB-theta_M2, -theta_M3-theta_PB, theta_PB+theta_M4]
+      PC = L_Mi[L_theta_Mi_PB.index(min(L_theta_Mi_PB))]
+
+    #-----------------------------------------------------------------------------
+    # Compute the normal and tangential planes
+    #-----------------------------------------------------------------------------
+
+    PC_normal = np.array([PC[1],-PC[0]])
+    if np.dot(PC_normal,(self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center))&lt;0 :
+        PC_normal = np.array([-PC[1],PC[0]])
+    self.pc_normal = PC_normal
+    self.pc_tangential = np.array([-PC_normal[1],PC_normal[0]])
+
+    #-----------------------------------------------------------------------------
+    # Compute the overlap
+    #-----------------------------------------------------------------------------
+
+    d_b = np.dot(M-self.g2.l_border[:-1][ij_min[1]],PC_normal)
+    d_a = np.dot(M-self.g1.l_border[:-1][ij_min[0]],PC_normal)
+    overlap = d_b - d_a
+    self.overlap_normal = overlap
+
+    if overlap &gt; 0:
+    #-----------------------------------------------------------------------------
+    # Compute the reaction
+    #-----------------------------------------------------------------------------
+
+        #determine the caracteristics of the contact area
+        self.S_inter()
+        D_inter = self.d_max
+        L_inter = sself.l_eq
+
+        #Surface spring term
+        Y_eq = (self.g1.y+self.g2.y)/2
+        k_surf = Y_eq / L_inter
+        F_2_1_n = -k_surf * D_inter * overlap #surface linear spring
+        F_2_1 = F_2_1_n * PC_normal
+        self.F_2_1_n = F_2_1_n
+        self.g1.update_f( F_2_1[0],  F_2_1[1], self.g1.l_border[:-1][ij_min[0]])
+        self.g2.update_f(-F_2_1[0], -F_2_1[1], self.g2.l_border[:-1][ij_min[1]])
+
+        #Damping term
+        gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
+        mass_eq = self.g1.m*self.g2.m/(self.g1.m+self.g2.m)
+        eta = 2 * gamma * math.sqrt(mass_eq*k)
+        F_2_1_damp_n = np.dot(self.g2.v - self.g1.v,PC_normal)*eta
+        F_2_1_damp = F_2_1_damp_n *PC_normal
+        self.F_2_1_damp = F_2_1_damp_n
+        self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1], self.g1.l_border[:-1][ij_min[0]])
+        self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1], self.g2.l_border[:-1][ij_min[1]])
+
+    #no contact finally
+    else :
+        self.F_2_1_n = 0
+        self.F_2_1_damp = 0
+
+#-------------------------------------------------------------------------------
+
+  def DEM_2grains_Polyhedral_tangential_surface(self,dt_DEM):
+    &#34;&#34;&#34;
+    Compute the tangential reaction of a contact grain-grain.
+
+    Here a surface spring is considered.
+
+        Input :
+            itself (a contact grain - grain)
+            a time step (a float)
+        Output :
+            Nothing, but attributes are updated
+    &#34;&#34;&#34;
+    if self.overlap_normal &gt; 0:
+
+        if self.tangential_old_statut:
+          #if a reaction has been already computed
+          #need to project the tangential reaction on the new tangential plane
+          self.ft = self.ft*np.dot(self.tangential_old,self.pc_tangential)
+        else:
+          self.tangential_old_statut = True
+
+        #determine the caracteristics of the contact area
+        self.S_inter()
+        D_inter = self.d_max
+        L_inter = sself.l_eq
+
+        #Surface spring term
+        Y_eq = (self.g1.y+self.g2.y)/2
+        kn_surf = Y_eq / L_inter #inspired by the bond formulation
+        kt_surf = kn_surf
+
+        r1 = np.linalg.norm(self.g1.l_border[:-1][self.ij_min[0]] - self.g1.center) - self.overlap_normal/2
+        r2 = np.linalg.norm(self.g2.l_border[:-1][self.ij_min[1]] - self.g2.center) - self.overlap_normal/2
+        Delta_Us = (np.dot(self.g1.v-self.g2.v,self.pc_tangential) + r1*self.g1.w + r2*self.g2.w)* dt_DEM
+        self.overlap_tangential = self.overlap_tangential + Delta_Us
+        self.ft = self.ft - kt_surf*D_inter*Delta_Us #inspired by the bond formulation
+        self.tangential_old = self.pc_tangential
+        if abs(self.ft) &gt; abs(self.mu*self.F_2_1_n) : #Coulomb criteria
+            self.ft = self.mu * abs(self.F_2_1_n) * np.sign(self.ft)
+        self.g1.update_f( self.ft*self.pc_tangential[0],  self.ft*self.pc_tangential[1], self.g1.l_border[:-1][self.ij_min[0]])
+        self.g2.update_f(-self.ft*self.pc_tangential[0], -self.ft*self.pc_tangential[1], self.g2.l_border[:-1][self.ij_min[1]])
+
+        #Damping term
+        gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
+        mass_eq = self.g1.m*self.g2.m/(self.g1.m+self.g2.m)
+        eta = 2 * gamma * math.sqrt(mass_eq*kt*D_inter)
+        F_2_1_damp_t = -Delta_Us/dt_DEM*eta/2
+        self.ft_damp = F_2_1_damp_t
+        F_2_1_damp = F_2_1_damp_t *self.pc_tangential
+        self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1], self.g1.l_border[:-1][self.ij_min[0]])
+        self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1], self.g2.l_border[:-1][self.ij_min[1]])
+
+    #no contact finally
+    else :
+        tangential_old_statut = False
+        self.overlap_tangential = 0
+        self.ft = 0
+        self.ft_damp = 0
+
+#-------------------------------------------------------------------------------
+
+  def S_inter(self):
+      &#34;&#34;&#34;
+      Compute the intersection surface of the contact grain - grain.
+
+        Input :
+            itself (a contact grain - grain)
+        Output :
+            Nothing, but attributes are updated (three floats)
+      &#34;&#34;&#34;
+      L_border = []
+      #looking for vertices from grain 2 if they are inside of the grain 1
+      for p in self.g2.l_border[:-1] :
+          d = np.linalg.norm(np.array(p)-self.g1.center)
+          if p[1]&gt;self.g1.center[1]:
+              theta = math.acos((p[0]-self.g1.center[0])/np.linalg.norm(self.g1.center-p))
+          else :
+              theta = 2*math.pi - math.acos((p[0]-self.g1.center[0])/np.linalg.norm(self.g1.center-p))
+          #looking for the grain 1 radius in the same direction
+          L_theta_R_i = list(abs(np.array(self.g1.l_theta_r)-theta))
+          R = self.g1.l_r[L_theta_R_i.index(min(L_theta_R_i))]
+          if d &lt; R :
+              L_border.append(p)
+      #looking for vertices from grain 1 if they are inside of the grain 2
+      for p in self.g1.l_border[:-1] :
+          d = np.linalg.norm(np.array(p)-self.g2.center)
+          if p[1]&gt;self.g2.center[1]:
+              theta = math.acos((p[0]-self.g2.center[0])/np.linalg.norm(self.g2.center-p))
+          else :
+              theta = 2*math.pi - math.acos((p[0]-self.g2.center[0])/np.linalg.norm(self.g2.center-p))
+          #looking for the grain 2 radius in the same direction
+          L_theta_R_i = list(abs(np.array(self.g2.l_theta_r)-theta))
+          R = self.g2.l_r[L_theta_R_i.index(min(L_theta_R_i))]
+          if d &lt; R :
+              L_border.append(p)
+
+      #adaptation
+      if L_border != []:
+          L_id_used = [0]
+          L_border_adapted = [L_border[0]]
+          L_border_x_adapted = [L_border[0][0]]
+          L_border_y_adapted = [L_border[0][1]]
+          HighValue = 100000000 #Large
+
+          current_node = L_border[0]
+          for j in range(1,len(L_border)):
+              L_d = list(np.zeros(len(L_border)))
+              for i in range(0,len(L_border)):
+                  node = L_border[i]
+                  if  i not in L_id_used:
+                      d = np.linalg.norm(np.array(node) - np.array(current_node))
+                      L_d[i] = d
+                  else :
+                      L_d[i] = HighValue #Value need to be larger than potential distance between node
+
+              index_nearest_node = L_d.index(min(L_d))
+              nearest_node = L_border[index_nearest_node]
+              current_node = nearest_node
+              L_border_adapted.append(nearest_node)
+              L_border_x_adapted.append(nearest_node[0])
+              L_border_y_adapted.append(nearest_node[1])
+              L_id_used.append(index_nearest_node)
+
+      #compute the characteristic values of the contact
+      vect_tangential = self.pc_tangential
+      d_max = 0
+      ij_p = (0,0)
+      for i_p1 in range(len(L_border_adapted)-1):
+          for i_p2 in range(i_p1+1,len(L_border_adapted)):
+              d = abs(np.dot(L_border_adapted[i_p1]-L_border_adapted[i_p2],vect_tangential))
+              if d &gt; d_max :
+                  d_max = d
+                  ij_p = (i_p1, i_p2)
+      S = DetermineSurfacePolyhedral(L_border_adapted)
+      self.surface = S
+      self.d_max = d_max
+      self.l_eq = S/d_max
+
+#-------------------------------------------------------------------------------
+# Functions
+#-------------------------------------------------------------------------------
+
+def extract_vertices(g, angle_g_to_other_g) :
+    &#34;&#34;&#34;
+    Extract a list of indices of vertices inside a angular window.
+
+        Input :
+            a grain (a grain)
+            an angle (a float)
+        Output :
+            a list of indices (a list)
+    &#34;&#34;&#34;
+    dtheta = 3*2*math.pi/len(g.l_border)
+    angle_minus = angle_g_to_other_g - dtheta/2
+    if angle_minus &lt; 0 :
+        angle_minus = angle_minus + 2*math.pi
+    angle_plus  = angle_g_to_other_g + dtheta/2
+    if 2*math.pi &lt;= angle_plus :
+        angle_plus = angle_plus - 2*math.pi
+    i_minus = find_value_in_list(g.l_theta_r.copy(), angle_minus)
+    i_plus = i_minus + find_value_in_list(g.l_theta_r[i_minus:].copy() + g.l_theta_r[:i_minus].copy(), angle_plus)
+
+    L_i_vertices = []
+    for i in range(i_minus, i_plus+1):
+        if i &lt; len(g.l_theta_r):
+            L_i_vertices.append(i)
+        else :
+            L_i_vertices.append(i-len(g.l_theta_r))
+    return L_i_vertices
+
+#-------------------------------------------------------------------------------
+
+def find_value_in_list(List_to_search, value_to_find) :
+    &#34;&#34;&#34;
+    Extract the index of the nearest value from a target in a list.
+
+        Input :
+            a list of float (a list)
+            a target (a float)
+        Output :
+            an index (an int)
+    &#34;&#34;&#34;
+    L_search = list(abs(np.array(List_to_search)-value_to_find))
+    return L_search.index(min(L_search))
+
+#-------------------------------------------------------------------------------
+
+def DetermineSurfacePolyhedral(L_border):
+      &#34;&#34;&#34;
+      Use the Monte-Carlo method to compute the surface of a grain.
+
+      Used in S_inter() to compute the surface of the intersection.
+
+        Input :
+            a list of coordinates (a list)
+        Output :
+            a surface (a float)
+      &#34;&#34;&#34;
+      #Determine the study box
+      min_max_defined = False
+      for p in L_border :
+          if not min_max_defined:
+              box_min_x = p[0]
+              box_max_x = p[0]
+              box_min_y = p[1]
+              box_max_y = p[1]
+              min_max_defined = True
+          else:
+              if p[0] &lt; box_min_x:
+                  box_min_x = p[0]
+              elif p[0] &gt; box_max_x:
+                  box_max_x = p[0]
+              if p[1] &lt; box_min_y:
+                  box_min_y = p[1]
+              elif p[1] &gt; box_max_y:
+                  box_max_y = p[1]
+
+      #Monte Carlo method inside the box to  determine the surface
+      N_MonteCarlo = 3000
+      sigma = 1 #kg/µm2
+      M_Mass = 0
+      for i in range(N_MonteCarlo):
+          P = np.array([random.uniform(box_min_x,box_max_x),random.uniform(box_min_y,box_max_y)])
+          if P_is_inside(P,L_border):
+              M_Mass = M_Mass + sigma
+      Mass = (box_max_x-box_min_x)*(box_max_y-box_min_y)/N_MonteCarlo*M_Mass
+
+      return Mass/sigma
+
+#-------------------------------------------------------------------------------
+
+def P_is_inside(P,L_border):
+  &#34;&#34;&#34;
+  Determine if a point P is inside of a grain.
+
+  See Franklin 1994, see Alonso-Marroquin 2009
+
+    Input :
+        a point (a 1 x 2 numpy array)
+        a list of coordinates (a list)
+    Output :
+        a Boolean (True if the point is inside the grain)
+  &#34;&#34;&#34;
+  #slide on y constant
+  counter = 0
+  for i_p_border in range(len(L_border)-1):
+      #consider only points if the coordinates frame the y-coordinate of the point
+      if (L_border[i_p_border][1]-P[1])*(L_border[i_p_border+1][1]-P[1]) &lt; 0 :
+        x_border = L_border[i_p_border][0] + (L_border[i_p_border+1][0]-L_border[i_p_border][0])*(P[1]-L_border[i_p_border][1])/(L_border[i_p_border+1][1]-L_border[i_p_border][1])
+        if x_border &gt; P[0] :
+            counter = counter + 1
+  if counter % 2 == 0:
+    return False
+  else :
+    return True
+
+#-------------------------------------------------------------------------------
+
+def Update_Neighborhoods(dict_algorithm,dict_sample):
+    &#34;&#34;&#34;
+    Determine a neighborhood for each grain.
+
+    This function is called every x time step. The contact is determined by Grains_Polyhedral_contact_Neighborhoods().
+
+    Notice that if there is a potential contact between grain_i and grain_j, grain_i is not in the neighborhood of grain_j.
+    Whereas grain_j is in the neighbourood of grain_i, with i_grain &lt; j_grain
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a sample dictionnary (a dict)
+        Output :
+            Nothing, but attribut is updated for each grains (a list)
+    &#34;&#34;&#34;
+    for i_grain in range(len(dict_sample[&#39;L_g&#39;])-1) :
+        neighborhood = []
+        for j_grain in range(i_grain+1,len(dict_sample[&#39;L_g&#39;])):
+            if np.linalg.norm(dict_sample[&#39;L_g&#39;][i_grain].center-dict_sample[&#39;L_g&#39;][j_grain].center) &lt; dict_algorithm[&#39;factor_neighborhood&#39;]*(dict_sample[&#39;L_g&#39;][i_grain].r_max+dict_sample[&#39;L_g&#39;][j_grain].r_max):
+                neighborhood.append(dict_sample[&#39;L_g&#39;][j_grain])
+        dict_sample[&#39;L_g&#39;][i_grain].neighbourood = neighborhood
+
+#-------------------------------------------------------------------------------
+
+def Grains_Polyhedral_contact_Neighborhoods_bool(g1,g2):
+  &#34;&#34;&#34;
+  Detect contact grain-grain.
+
+    Input :
+        two grains (two grains)
+    Output :
+        a Boolean (True if there is a contact)
+  &#34;&#34;&#34;
+  #looking for the nearest nodes
+  d_virtual = max(g1.r_max,g2.r_max)
+  ij_min = [0,0]
+  d_ij_min = 100*d_virtual #Large
+  for i in range(len(g1.l_border[:-1])):
+    for j in range(len(g2.l_border[:-1])):
+        d_ij = np.linalg.norm(g2.l_border[:-1][j]-g1.l_border[:-1][i]+d_virtual*(g2.center-g1.center)/np.linalg.norm(g2.center-g1.center))
+        if d_ij &lt; d_ij_min :
+            d_ij_min = d_ij
+            ij_min = [i,j]
+
+  d_ij_min = np.dot(g2.l_border[:-1][ij_min[1]]-g1.l_border[:-1][ij_min[0]],-(g2.center-g1.center)/np.linalg.norm(g2.center-g1.center))
+  return d_ij_min &gt; 0
+
+#-------------------------------------------------------------------------------
+
+def Grains_Polyhedral_contact_Neighborhoods(dict_material,dict_sample):
+    &#34;&#34;&#34;
+    Detect contact between a grain and grains from its neighborhood.
+
+    The neighbourood is updated with Update_Neighborhoods_f()
+
+        Input :
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+        Output :
+            Nothing, but the sample dictionnary is updated with a list of contacts grain - grain
+    &#34;&#34;&#34;
+    for i_grain in range(len(dict_sample[&#39;L_g&#39;])-1) :
+        for neighbour in dict_sample[&#39;L_g&#39;][i_grain].neighbourood:
+            j_grain = neighbour.id
+            if Grains_Polyhedral_contact_Neighborhoods_bool(dict_sample[&#39;L_g&#39;][i_grain],dict_sample[&#39;L_g&#39;][j_grain]):
+                if (i_grain,j_grain) not in dict_sample[&#39;L_ij_contact&#39;]:  #contact not detected previously
+                   #creation of contact
+                   dict_sample[&#39;L_ij_contact&#39;].append((i_grain,j_grain))
+                   dict_sample[&#39;L_contact&#39;].append(Contact(dict_sample[&#39;id_contact&#39;], dict_sample[&#39;L_g&#39;][i_grain], dict_sample[&#39;L_g&#39;][j_grain], dict_material))
+                   dict_sample[&#39;id_contact&#39;] = dict_sample[&#39;id_contact&#39;] + 1
+
+            else :
+                if (i_grain,j_grain) in dict_sample[&#39;L_ij_contact&#39;] : #contact detected previously is not anymore
+                       dict_sample[&#39;L_contact&#39;].pop(dict_sample[&#39;L_ij_contact&#39;].index((i_grain,j_grain)))
+                       dict_sample[&#39;L_ij_contact&#39;].remove((i_grain,j_grain))</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="Contact.DetermineSurfacePolyhedral"><code class="name flex">
+<span>def <span class="ident">DetermineSurfacePolyhedral</span></span>(<span>L_border)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Use the Monte-Carlo method to compute the surface of a grain.</p>
+<p>Used in S_inter() to compute the surface of the intersection.</p>
+<p>Input :
+a list of coordinates (a list)
+Output :
+a surface (a float)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def DetermineSurfacePolyhedral(L_border):
+      &#34;&#34;&#34;
+      Use the Monte-Carlo method to compute the surface of a grain.
+
+      Used in S_inter() to compute the surface of the intersection.
+
+        Input :
+            a list of coordinates (a list)
+        Output :
+            a surface (a float)
+      &#34;&#34;&#34;
+      #Determine the study box
+      min_max_defined = False
+      for p in L_border :
+          if not min_max_defined:
+              box_min_x = p[0]
+              box_max_x = p[0]
+              box_min_y = p[1]
+              box_max_y = p[1]
+              min_max_defined = True
+          else:
+              if p[0] &lt; box_min_x:
+                  box_min_x = p[0]
+              elif p[0] &gt; box_max_x:
+                  box_max_x = p[0]
+              if p[1] &lt; box_min_y:
+                  box_min_y = p[1]
+              elif p[1] &gt; box_max_y:
+                  box_max_y = p[1]
+
+      #Monte Carlo method inside the box to  determine the surface
+      N_MonteCarlo = 3000
+      sigma = 1 #kg/µm2
+      M_Mass = 0
+      for i in range(N_MonteCarlo):
+          P = np.array([random.uniform(box_min_x,box_max_x),random.uniform(box_min_y,box_max_y)])
+          if P_is_inside(P,L_border):
+              M_Mass = M_Mass + sigma
+      Mass = (box_max_x-box_min_x)*(box_max_y-box_min_y)/N_MonteCarlo*M_Mass
+
+      return Mass/sigma</code></pre>
+</details>
+</dd>
+<dt id="Contact.Grains_Polyhedral_contact_Neighborhoods"><code class="name flex">
+<span>def <span class="ident">Grains_Polyhedral_contact_Neighborhoods</span></span>(<span>dict_material, dict_sample)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Detect contact between a grain and grains from its neighborhood.</p>
+<p>The neighbourood is updated with Update_Neighborhoods_f()</p>
+<pre><code>Input :
+    a material dictionnary (a dict)
+    a sample dictionnary (a dict)
+Output :
+    Nothing, but the sample dictionnary is updated with a list of contacts grain - grain
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def Grains_Polyhedral_contact_Neighborhoods(dict_material,dict_sample):
+    &#34;&#34;&#34;
+    Detect contact between a grain and grains from its neighborhood.
+
+    The neighbourood is updated with Update_Neighborhoods_f()
+
+        Input :
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+        Output :
+            Nothing, but the sample dictionnary is updated with a list of contacts grain - grain
+    &#34;&#34;&#34;
+    for i_grain in range(len(dict_sample[&#39;L_g&#39;])-1) :
+        for neighbour in dict_sample[&#39;L_g&#39;][i_grain].neighbourood:
+            j_grain = neighbour.id
+            if Grains_Polyhedral_contact_Neighborhoods_bool(dict_sample[&#39;L_g&#39;][i_grain],dict_sample[&#39;L_g&#39;][j_grain]):
+                if (i_grain,j_grain) not in dict_sample[&#39;L_ij_contact&#39;]:  #contact not detected previously
+                   #creation of contact
+                   dict_sample[&#39;L_ij_contact&#39;].append((i_grain,j_grain))
+                   dict_sample[&#39;L_contact&#39;].append(Contact(dict_sample[&#39;id_contact&#39;], dict_sample[&#39;L_g&#39;][i_grain], dict_sample[&#39;L_g&#39;][j_grain], dict_material))
+                   dict_sample[&#39;id_contact&#39;] = dict_sample[&#39;id_contact&#39;] + 1
+
+            else :
+                if (i_grain,j_grain) in dict_sample[&#39;L_ij_contact&#39;] : #contact detected previously is not anymore
+                       dict_sample[&#39;L_contact&#39;].pop(dict_sample[&#39;L_ij_contact&#39;].index((i_grain,j_grain)))
+                       dict_sample[&#39;L_ij_contact&#39;].remove((i_grain,j_grain))</code></pre>
+</details>
+</dd>
+<dt id="Contact.Grains_Polyhedral_contact_Neighborhoods_bool"><code class="name flex">
+<span>def <span class="ident">Grains_Polyhedral_contact_Neighborhoods_bool</span></span>(<span>g1, g2)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Detect contact grain-grain.</p>
+<p>Input :
+two grains (two grains)
+Output :
+a Boolean (True if there is a contact)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def Grains_Polyhedral_contact_Neighborhoods_bool(g1,g2):
+  &#34;&#34;&#34;
+  Detect contact grain-grain.
+
+    Input :
+        two grains (two grains)
+    Output :
+        a Boolean (True if there is a contact)
+  &#34;&#34;&#34;
+  #looking for the nearest nodes
+  d_virtual = max(g1.r_max,g2.r_max)
+  ij_min = [0,0]
+  d_ij_min = 100*d_virtual #Large
+  for i in range(len(g1.l_border[:-1])):
+    for j in range(len(g2.l_border[:-1])):
+        d_ij = np.linalg.norm(g2.l_border[:-1][j]-g1.l_border[:-1][i]+d_virtual*(g2.center-g1.center)/np.linalg.norm(g2.center-g1.center))
+        if d_ij &lt; d_ij_min :
+            d_ij_min = d_ij
+            ij_min = [i,j]
+
+  d_ij_min = np.dot(g2.l_border[:-1][ij_min[1]]-g1.l_border[:-1][ij_min[0]],-(g2.center-g1.center)/np.linalg.norm(g2.center-g1.center))
+  return d_ij_min &gt; 0</code></pre>
+</details>
+</dd>
+<dt id="Contact.P_is_inside"><code class="name flex">
+<span>def <span class="ident">P_is_inside</span></span>(<span>P, L_border)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Determine if a point P is inside of a grain.</p>
+<p>See Franklin 1994, see Alonso-Marroquin 2009</p>
+<p>Input :
+a point (a 1 x 2 numpy array)
+a list of coordinates (a list)
+Output :
+a Boolean (True if the point is inside the grain)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def P_is_inside(P,L_border):
+  &#34;&#34;&#34;
+  Determine if a point P is inside of a grain.
+
+  See Franklin 1994, see Alonso-Marroquin 2009
+
+    Input :
+        a point (a 1 x 2 numpy array)
+        a list of coordinates (a list)
+    Output :
+        a Boolean (True if the point is inside the grain)
+  &#34;&#34;&#34;
+  #slide on y constant
+  counter = 0
+  for i_p_border in range(len(L_border)-1):
+      #consider only points if the coordinates frame the y-coordinate of the point
+      if (L_border[i_p_border][1]-P[1])*(L_border[i_p_border+1][1]-P[1]) &lt; 0 :
+        x_border = L_border[i_p_border][0] + (L_border[i_p_border+1][0]-L_border[i_p_border][0])*(P[1]-L_border[i_p_border][1])/(L_border[i_p_border+1][1]-L_border[i_p_border][1])
+        if x_border &gt; P[0] :
+            counter = counter + 1
+  if counter % 2 == 0:
+    return False
+  else :
+    return True</code></pre>
+</details>
+</dd>
+<dt id="Contact.Update_Neighborhoods"><code class="name flex">
+<span>def <span class="ident">Update_Neighborhoods</span></span>(<span>dict_algorithm, dict_sample)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Determine a neighborhood for each grain.</p>
+<p>This function is called every x time step. The contact is determined by Grains_Polyhedral_contact_Neighborhoods().</p>
+<p>Notice that if there is a potential contact between grain_i and grain_j, grain_i is not in the neighborhood of grain_j.
+Whereas grain_j is in the neighbourood of grain_i, with i_grain &lt; j_grain</p>
+<pre><code>Input :
+    an algorithm dictionnary (a dict)
+    a sample dictionnary (a dict)
+Output :
+    Nothing, but attribut is updated for each grains (a list)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def Update_Neighborhoods(dict_algorithm,dict_sample):
+    &#34;&#34;&#34;
+    Determine a neighborhood for each grain.
+
+    This function is called every x time step. The contact is determined by Grains_Polyhedral_contact_Neighborhoods().
+
+    Notice that if there is a potential contact between grain_i and grain_j, grain_i is not in the neighborhood of grain_j.
+    Whereas grain_j is in the neighbourood of grain_i, with i_grain &lt; j_grain
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a sample dictionnary (a dict)
+        Output :
+            Nothing, but attribut is updated for each grains (a list)
+    &#34;&#34;&#34;
+    for i_grain in range(len(dict_sample[&#39;L_g&#39;])-1) :
+        neighborhood = []
+        for j_grain in range(i_grain+1,len(dict_sample[&#39;L_g&#39;])):
+            if np.linalg.norm(dict_sample[&#39;L_g&#39;][i_grain].center-dict_sample[&#39;L_g&#39;][j_grain].center) &lt; dict_algorithm[&#39;factor_neighborhood&#39;]*(dict_sample[&#39;L_g&#39;][i_grain].r_max+dict_sample[&#39;L_g&#39;][j_grain].r_max):
+                neighborhood.append(dict_sample[&#39;L_g&#39;][j_grain])
+        dict_sample[&#39;L_g&#39;][i_grain].neighbourood = neighborhood</code></pre>
+</details>
+</dd>
+<dt id="Contact.extract_vertices"><code class="name flex">
+<span>def <span class="ident">extract_vertices</span></span>(<span>g, angle_g_to_other_g)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Extract a list of indices of vertices inside a angular window.</p>
+<pre><code>Input :
+    a grain (a grain)
+    an angle (a float)
+Output :
+    a list of indices (a list)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_vertices(g, angle_g_to_other_g) :
+    &#34;&#34;&#34;
+    Extract a list of indices of vertices inside a angular window.
+
+        Input :
+            a grain (a grain)
+            an angle (a float)
+        Output :
+            a list of indices (a list)
+    &#34;&#34;&#34;
+    dtheta = 3*2*math.pi/len(g.l_border)
+    angle_minus = angle_g_to_other_g - dtheta/2
+    if angle_minus &lt; 0 :
+        angle_minus = angle_minus + 2*math.pi
+    angle_plus  = angle_g_to_other_g + dtheta/2
+    if 2*math.pi &lt;= angle_plus :
+        angle_plus = angle_plus - 2*math.pi
+    i_minus = find_value_in_list(g.l_theta_r.copy(), angle_minus)
+    i_plus = i_minus + find_value_in_list(g.l_theta_r[i_minus:].copy() + g.l_theta_r[:i_minus].copy(), angle_plus)
+
+    L_i_vertices = []
+    for i in range(i_minus, i_plus+1):
+        if i &lt; len(g.l_theta_r):
+            L_i_vertices.append(i)
+        else :
+            L_i_vertices.append(i-len(g.l_theta_r))
+    return L_i_vertices</code></pre>
+</details>
+</dd>
+<dt id="Contact.find_value_in_list"><code class="name flex">
+<span>def <span class="ident">find_value_in_list</span></span>(<span>List_to_search, value_to_find)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Extract the index of the nearest value from a target in a list.</p>
+<pre><code>Input :
+    a list of float (a list)
+    a target (a float)
+Output :
+    an index (an int)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_value_in_list(List_to_search, value_to_find) :
+    &#34;&#34;&#34;
+    Extract the index of the nearest value from a target in a list.
+
+        Input :
+            a list of float (a list)
+            a target (a float)
+        Output :
+            an index (an int)
+    &#34;&#34;&#34;
+    L_search = list(abs(np.array(List_to_search)-value_to_find))
+    return L_search.index(min(L_search))</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="Contact.Contact"><code class="flex name class">
+<span>class <span class="ident">Contact</span></span>
+<span>(</span><span>ID, G1, G2, dict_material)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Defining the contact grain-grain.</p>
+<pre><code>Input :
+    itself (a contact grain - grain)
+    an id (a int)
+    two grains (two grains)
+    a material dictionnary (a dict)
+Output :
+    Nothing, but the contact grain - grain is generated
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Contact:
+
+#-------------------------------------------------------------------------------
+
+  def __init__(self, ID, G1, G2, dict_material):
+    &#34;&#34;&#34;
+    Defining the contact grain-grain.
+
+        Input :
+            itself (a contact grain - grain)
+            an id (a int)
+            two grains (two grains)
+            a material dictionnary (a dict)
+        Output :
+            Nothing, but the contact grain - grain is generated
+    &#34;&#34;&#34;
+    self.id = ID
+    self.g1 = G1
+    self.g2 = G2
+    self.ft = 0
+    self.mu = dict_material[&#39;mu_friction_gg&#39;]
+    self.coeff_restitution = dict_material[&#39;coeff_restitution&#39;]
+    self.tangential_old_statut = False
+    self.overlap_tangential = 0
+
+#-------------------------------------------------------------------------------
+
+  def init_contact(self,L_g):
+    &#34;&#34;&#34;
+    Initialize the contact.
+
+    The grains are updated, the tangetial reaction is set to 0 and a boolean attribute is set to False (new contact grain - grain).
+
+        Input :
+            itself (a contact grain - grain)
+            a list of grains (a list)
+        Output :
+            Nothing, but attributes are updated (two grains, two floats and a boolean)
+    &#34;&#34;&#34;
+    self.g1 = L_g[self.g1.id]
+    self.g2 = L_g[self.g2.id]
+    self.ft = 0
+    self.tangential_old_statut = False
+    self.overlap_tangential = 0
+
+#-------------------------------------------------------------------------------
+
+  def DEM_2grains_Polyhedral_normal(self):
+    &#34;&#34;&#34;
+    Compute the normal reaction of a contact grain-grain
+
+    Here a pontual spring is considered
+
+        Input :
+            itself (a contact grain - grain)
+        Output :
+            Nothing, but attributes are updated
+    &#34;&#34;&#34;
+    #compute angle between grains
+    g1_to_g2 = self.g2.center - self.g1.center
+    if g1_to_g2[1] &gt;= 0 :
+        angle_g1_to_g2 = math.acos(g1_to_g2[0]/np.linalg.norm(g1_to_g2))
+        angle_g2_to_g1 = angle_g1_to_g2 + math.pi
+    else :
+        angle_g1_to_g2 = math.pi + math.acos(-g1_to_g2[0]/np.linalg.norm(g1_to_g2))
+        angle_g2_to_g1 = angle_g1_to_g2 - math.pi
+
+    #extract
+    L_i_vertices_1 = extract_vertices(self.g1, angle_g1_to_g2)
+    L_i_vertices_2 = extract_vertices(self.g2, angle_g2_to_g1)
+
+    #looking for the nearest nodes
+    d_virtual = max(self.g1.r_max,self.g2.r_max)
+    ij_min = [0,0]
+    d_ij_min = 100*d_virtual #Large
+    for i in L_i_vertices_1:
+        for j in L_i_vertices_2:
+            d_ij = np.linalg.norm(self.g2.l_border[:-1][j]-self.g1.l_border[:-1][i]+d_virtual*(self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center))
+            if d_ij &lt; d_ij_min :
+                d_ij_min = d_ij
+                ij_min = [i,j]
+    self.ij_min = ij_min
+
+    #-----------------------------------------------------------------------------
+    #Computing CP
+    #-----------------------------------------------------------------------------
+
+    M = (self.g1.l_border[:-1][ij_min[0]]+self.g2.l_border[:-1][ij_min[1]])/2
+    # 5 candidates for CP
+    N = np.array([self.g1.l_border[:-1][ij_min[0]][0] - self.g2.l_border[:-1][ij_min[1]][0],
+                  self.g1.l_border[:-1][ij_min[0]][1] - self.g2.l_border[:-1][ij_min[1]][1]])
+    N = N/np.linalg.norm(N)
+    PB = np.array([-N[1] ,N[0]])
+    PB = PB/np.linalg.norm(PB)
+
+    #candidats from grain 1
+    if ij_min[0] &lt;len(self.g1.l_border[:-1]) - 1:
+        M1 = self.g1.l_border[:-1][ij_min[0]+1]-self.g1.l_border[:-1][ij_min[0]]
+    else :
+        M1 = self.g1.l_border[:-1][0]-self.g1.l_border[:-1][ij_min[0]]
+    M1 = M1/np.linalg.norm(M1)
+    M3 = self.g1.l_border[:-1][ij_min[0]-1]-self.g1.l_border[:-1][ij_min[0]]
+    M3 = M3/np.linalg.norm(M3)
+    #reorganize the candidats
+    if np.dot(M1,PB) &lt; 0:
+        Mtempo = M1.copy()
+        M1 = M3.copy()
+        M3 = Mtempo.copy()
+
+    #candidats from grain 2
+    if ij_min[1] &lt;len(self.g2.l_border[:-1]) - 1:
+        M2 = self.g2.l_border[:-1][ij_min[1]+1]-self.g2.l_border[:-1][ij_min[1]]
+    else :
+        M2 = self.g2.l_border[:-1][0]-self.g2.l_border[:-1][ij_min[1]]
+    M2 = M2/np.linalg.norm(M2)
+    M4 = self.g2.l_border[:-1][ij_min[1]-1]-self.g2.l_border[:-1][ij_min[1]]
+    M4 = M4/np.linalg.norm(M4)
+    #reorganize the candidats
+    if np.dot(M2,PB) &lt; 0:
+      Mtempo = M2.copy()
+      M2 = M4.copy()
+      M4 = Mtempo.copy()
+
+    #compute the different angles
+    theta_PB = math.pi/2
+    theta_M1 =  math.acos(np.dot(M1,N))
+    theta_M2 =  math.acos(np.dot(M2,N))
+    theta_M3 = -math.acos(np.dot(M3,N))
+    theta_M4 = -math.acos(np.dot(M4,N))
+
+    #find the PC
+    if theta_M2 &lt; theta_PB and theta_PB &lt; theta_M1\
+       and theta_M3 &lt; -theta_PB and -theta_PB &lt; theta_M4:
+       PC = PB
+    else:
+      L_Mi = [M1,M2,M3,M4]
+      L_theta_Mi_PB=[theta_M1-theta_PB, theta_PB-theta_M2, -theta_M3-theta_PB, theta_PB+theta_M4]
+      PC = L_Mi[L_theta_Mi_PB.index(min(L_theta_Mi_PB))]
+
+    #-----------------------------------------------------------------------------
+    # Compute the normal and tangential planes
+    #-----------------------------------------------------------------------------
+
+    PC_normal = np.array([PC[1],-PC[0]])
+    if np.dot(PC_normal,(self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center))&lt;0 :
+        PC_normal = np.array([-PC[1],PC[0]])
+    self.pc_normal = PC_normal #n12
+    self.pc_tangential = np.array([-PC_normal[1],PC_normal[0]])
+
+    #-----------------------------------------------------------------------------
+    # Compute the overlap
+    #-----------------------------------------------------------------------------
+
+    d_b = np.dot(M-self.g2.l_border[:-1][ij_min[1]],PC_normal)
+    d_a = np.dot(M-self.g1.l_border[:-1][ij_min[0]],PC_normal)
+    overlap = d_b - d_a
+    self.overlap_normal = overlap
+
+    if overlap &gt; 0:
+    #-----------------------------------------------------------------------------
+    # Compute the reaction
+    #-----------------------------------------------------------------------------
+
+        #Spring term
+        Y_eq = 1/((1-self.g1.nu*self.g1.nu)/self.g1.y+(1-self.g2.nu*self.g2.nu)/self.g2.y)
+        R_eq = 1/(1/self.g1.r_mean+1/self.g2.r_mean)
+        k = 4/3*Y_eq*math.sqrt(R_eq)
+        F_2_1_n = -k * overlap**(3/2)  #unlinear spring
+        F_2_1 = F_2_1_n * PC_normal
+        self.F_2_1_n = F_2_1_n
+        self.Ep_n = 2/5 * k * overlap**(5/2) #-dEp/dx = F_2_1_n
+        self.g1.update_f( F_2_1[0],  F_2_1[1], self.g1.l_border[:-1][ij_min[0]])
+        self.g2.update_f(-F_2_1[0], -F_2_1[1], self.g2.l_border[:-1][ij_min[1]])
+
+        #Damping term
+        gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
+        mass_eq = self.g1.m*self.g2.m/(self.g1.m+self.g2.m)
+        eta = 2 * gamma * math.sqrt(mass_eq*k)
+        F_2_1_damp_n = np.dot(self.g2.v - self.g1.v,PC_normal)*eta
+        F_2_1_damp = F_2_1_damp_n *PC_normal
+        self.F_2_1_damp = F_2_1_damp_n
+        self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1], self.g1.l_border[:-1][ij_min[0]])
+        self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1], self.g2.l_border[:-1][ij_min[1]])
+
+    #no contact finally
+    else :
+        self.F_2_1_n = 0
+        self.F_2_1_damp = 0
+        self.Ep_n = 0
+
+#-------------------------------------------------------------------------------
+
+  def DEM_2grains_Polyhedral_tangential(self,dt_DEM):
+    &#34;&#34;&#34;
+    Compute the tangential reaction of a contact grain-grain.
+
+    Here a pontual spring is considered.
+
+        Input :
+            itself (a contact grain - grain)
+            a time step (a float)
+        Output :
+            Nothing, but attributes are updated
+    &#34;&#34;&#34;
+    if self.overlap_normal &gt; 0:
+
+        if self.tangential_old_statut:
+          #if a reaction has been already computed
+          #need to project the tangential reaction on the new tangential plane
+          self.ft = self.ft*np.dot(self.tangential_old,self.pc_tangential)
+        else:
+          self.tangential_old_statut = True
+
+        G_eq = 1/((1-self.g1.nu)/self.g1.g+(1-self.g2.nu)/self.g2.g)
+        R_eq = 1/(1/self.g1.r_mean+1/self.g2.r_mean)
+        kt0 = 8 * G_eq *math.sqrt(R_eq*abs(self.overlap_normal))
+        kt = kt0*math.sqrt(max(1-2/3*kt0*abs(self.overlap_tangential)/self.mu/abs(self.F_2_1_n),0)) #not linear spring
+
+        r1 = np.linalg.norm(self.g1.l_border[:-1][self.ij_min[0]] - self.g1.center) - self.overlap_normal/2
+        r2 = np.linalg.norm(self.g2.l_border[:-1][self.ij_min[1]] - self.g2.center) - self.overlap_normal/2
+        Delta_Us = (np.dot(self.g1.v-self.g2.v,self.pc_tangential) + r1*self.g1.w + r2*self.g2.w)*dt_DEM
+        self.overlap_tangential = self.overlap_tangential + Delta_Us
+        self.ft = self.ft - kt*Delta_Us
+        self.tangential_old = self.pc_tangential
+        if abs(self.ft) &gt; abs(self.mu*self.F_2_1_n) or kt == 0: #Coulomb criteria
+            self.ft = self.mu * abs(self.F_2_1_n) * np.sign(self.ft)
+
+        self.g1.update_f( self.ft*self.pc_tangential[0],  self.ft*self.pc_tangential[1], self.g1.l_border[:-1][self.ij_min[0]])
+        self.g2.update_f(-self.ft*self.pc_tangential[0], -self.ft*self.pc_tangential[1], self.g2.l_border[:-1][self.ij_min[1]])
+
+        #Damping term
+        gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
+        mass_eq = self.g1.m*self.g2.m/(self.g1.m+self.g2.m)
+        eta = 2 * gamma * math.sqrt(mass_eq*kt)
+        F_2_1_damp_t = -Delta_Us/dt_DEM*eta/2
+        F_2_1_damp = F_2_1_damp_t *self.pc_tangential
+        self.ft_damp = F_2_1_damp_t
+        self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1], self.g1.l_border[:-1][self.ij_min[0]])
+        self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1], self.g2.l_border[:-1][self.ij_min[1]])
+
+    #no contact finally
+    else :
+        tangential_old_statut = False
+        self.overlap_tangential = 0
+        self.ft = 0
+        self.ft_damp = 0
+
+#-------------------------------------------------------------------------------
+
+  def DEM_2grains_Polyhedral_normal_surface(self):
+    &#34;&#34;&#34;
+    Compute the normal reaction of a contact grain-grain.
+
+    Here a surface spring is considered.
+
+        Input :
+            itself (a contact grain - grain)
+        Output :
+            Nothing, but attributes are updated
+    &#34;&#34;&#34;
+    #looking for the nearest nodes
+    d_virtual = max(self.g1.r_max,self.g2.r_max) #virtual distance
+    ij_min = [0,0]
+    d_ij_min = 100*d_virtual #Large
+    for i in range(len(self.g1.l_border[:-1])):
+      for j in range(len(self.g2.l_border[:-1])):
+          d_ij = np.linalg.norm(self.g2.l_border[:-1][j]-self.g1.l_border[:-1][i]+d_virtual*(self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center))
+          if d_ij &lt; d_ij_min :
+              d_ij_min = d_ij
+              ij_min = [i,j]
+    self.ij_min = ij_min
+
+    #-----------------------------------------------------------------------------
+    #Computing CP
+    #-----------------------------------------------------------------------------
+
+    M = (self.g1.l_border[:-1][ij_min[0]]+self.g2.l_border[:-1][ij_min[1]])/2
+    # 5 candidates for CP
+    N = np.array([self.g1.l_border[:-1][ij_min[0]][0] - self.g2.l_border[:-1][ij_min[1]][0],
+                  self.g1.l_border[:-1][ij_min[0]][1] - self.g2.l_border[:-1][ij_min[1]][1]])
+    N = N/np.linalg.norm(N)
+    PB = np.array([-N[1] ,N[0]])
+    PB = PB/np.linalg.norm(PB)
+
+    #candidats from grain 1
+    M1 = self.g1.l_border[:-1][ij_min[0]+1]-self.g1.l_border[:-1][ij_min[0]]
+    M1 = M1/np.linalg.norm(M1)
+    M3 = self.g1.l_border[:-1][ij_min[0]-1]-self.g1.l_border[:-1][ij_min[0]]
+    M3 = M3/np.linalg.norm(M3)
+    #reorganize the candidats
+    if np.dot(M1,PB) &lt; 0:
+        Mtempo = M1.copy()
+        M1 = M3.copy()
+        M3 = Mtempo.copy()
+
+    #candidats from grain 2
+    M2 = self.g2.l_border[:-1][ij_min[1]+1]-self.g2.l_border[:-1][ij_min[1]]
+    M2 = M2/np.linalg.norm(M2)
+    M4 = self.g2.l_border[:-1][ij_min[1]-1]-self.g2.l_border[:-1][ij_min[1]]
+    M4 = M4/np.linalg.norm(M4)
+    #reorganize the candidats
+    if np.dot(M2,PB) &lt; 0:
+      Mtempo = M2.copy()
+      M2 = M4.copy()
+      M4 = Mtempo.copy()
+
+    #compute the different agnles
+    theta_PB = math.pi/2
+    theta_M1 =  math.acos(np.dot(M1,N))
+    theta_M2 =  math.acos(np.dot(M2,N))
+    theta_M3 = -math.acos(np.dot(M3,N))
+    theta_M4 = -math.acos(np.dot(M4,N))
+
+    #find the PV
+    if theta_M2 &lt; theta_PB and theta_PB &lt; theta_M1\
+       and theta_M3 &lt; -theta_PB and -theta_PB &lt; theta_M4:
+       PC = PB
+    else:
+      L_Mi = [M1,M2,M3,M4]
+      L_theta_Mi_PB=[theta_M1-theta_PB, theta_PB-theta_M2, -theta_M3-theta_PB, theta_PB+theta_M4]
+      PC = L_Mi[L_theta_Mi_PB.index(min(L_theta_Mi_PB))]
+
+    #-----------------------------------------------------------------------------
+    # Compute the normal and tangential planes
+    #-----------------------------------------------------------------------------
+
+    PC_normal = np.array([PC[1],-PC[0]])
+    if np.dot(PC_normal,(self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center))&lt;0 :
+        PC_normal = np.array([-PC[1],PC[0]])
+    self.pc_normal = PC_normal
+    self.pc_tangential = np.array([-PC_normal[1],PC_normal[0]])
+
+    #-----------------------------------------------------------------------------
+    # Compute the overlap
+    #-----------------------------------------------------------------------------
+
+    d_b = np.dot(M-self.g2.l_border[:-1][ij_min[1]],PC_normal)
+    d_a = np.dot(M-self.g1.l_border[:-1][ij_min[0]],PC_normal)
+    overlap = d_b - d_a
+    self.overlap_normal = overlap
+
+    if overlap &gt; 0:
+    #-----------------------------------------------------------------------------
+    # Compute the reaction
+    #-----------------------------------------------------------------------------
+
+        #determine the caracteristics of the contact area
+        self.S_inter()
+        D_inter = self.d_max
+        L_inter = sself.l_eq
+
+        #Surface spring term
+        Y_eq = (self.g1.y+self.g2.y)/2
+        k_surf = Y_eq / L_inter
+        F_2_1_n = -k_surf * D_inter * overlap #surface linear spring
+        F_2_1 = F_2_1_n * PC_normal
+        self.F_2_1_n = F_2_1_n
+        self.g1.update_f( F_2_1[0],  F_2_1[1], self.g1.l_border[:-1][ij_min[0]])
+        self.g2.update_f(-F_2_1[0], -F_2_1[1], self.g2.l_border[:-1][ij_min[1]])
+
+        #Damping term
+        gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
+        mass_eq = self.g1.m*self.g2.m/(self.g1.m+self.g2.m)
+        eta = 2 * gamma * math.sqrt(mass_eq*k)
+        F_2_1_damp_n = np.dot(self.g2.v - self.g1.v,PC_normal)*eta
+        F_2_1_damp = F_2_1_damp_n *PC_normal
+        self.F_2_1_damp = F_2_1_damp_n
+        self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1], self.g1.l_border[:-1][ij_min[0]])
+        self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1], self.g2.l_border[:-1][ij_min[1]])
+
+    #no contact finally
+    else :
+        self.F_2_1_n = 0
+        self.F_2_1_damp = 0
+
+#-------------------------------------------------------------------------------
+
+  def DEM_2grains_Polyhedral_tangential_surface(self,dt_DEM):
+    &#34;&#34;&#34;
+    Compute the tangential reaction of a contact grain-grain.
+
+    Here a surface spring is considered.
+
+        Input :
+            itself (a contact grain - grain)
+            a time step (a float)
+        Output :
+            Nothing, but attributes are updated
+    &#34;&#34;&#34;
+    if self.overlap_normal &gt; 0:
+
+        if self.tangential_old_statut:
+          #if a reaction has been already computed
+          #need to project the tangential reaction on the new tangential plane
+          self.ft = self.ft*np.dot(self.tangential_old,self.pc_tangential)
+        else:
+          self.tangential_old_statut = True
+
+        #determine the caracteristics of the contact area
+        self.S_inter()
+        D_inter = self.d_max
+        L_inter = sself.l_eq
+
+        #Surface spring term
+        Y_eq = (self.g1.y+self.g2.y)/2
+        kn_surf = Y_eq / L_inter #inspired by the bond formulation
+        kt_surf = kn_surf
+
+        r1 = np.linalg.norm(self.g1.l_border[:-1][self.ij_min[0]] - self.g1.center) - self.overlap_normal/2
+        r2 = np.linalg.norm(self.g2.l_border[:-1][self.ij_min[1]] - self.g2.center) - self.overlap_normal/2
+        Delta_Us = (np.dot(self.g1.v-self.g2.v,self.pc_tangential) + r1*self.g1.w + r2*self.g2.w)* dt_DEM
+        self.overlap_tangential = self.overlap_tangential + Delta_Us
+        self.ft = self.ft - kt_surf*D_inter*Delta_Us #inspired by the bond formulation
+        self.tangential_old = self.pc_tangential
+        if abs(self.ft) &gt; abs(self.mu*self.F_2_1_n) : #Coulomb criteria
+            self.ft = self.mu * abs(self.F_2_1_n) * np.sign(self.ft)
+        self.g1.update_f( self.ft*self.pc_tangential[0],  self.ft*self.pc_tangential[1], self.g1.l_border[:-1][self.ij_min[0]])
+        self.g2.update_f(-self.ft*self.pc_tangential[0], -self.ft*self.pc_tangential[1], self.g2.l_border[:-1][self.ij_min[1]])
+
+        #Damping term
+        gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
+        mass_eq = self.g1.m*self.g2.m/(self.g1.m+self.g2.m)
+        eta = 2 * gamma * math.sqrt(mass_eq*kt*D_inter)
+        F_2_1_damp_t = -Delta_Us/dt_DEM*eta/2
+        self.ft_damp = F_2_1_damp_t
+        F_2_1_damp = F_2_1_damp_t *self.pc_tangential
+        self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1], self.g1.l_border[:-1][self.ij_min[0]])
+        self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1], self.g2.l_border[:-1][self.ij_min[1]])
+
+    #no contact finally
+    else :
+        tangential_old_statut = False
+        self.overlap_tangential = 0
+        self.ft = 0
+        self.ft_damp = 0
+
+#-------------------------------------------------------------------------------
+
+  def S_inter(self):
+      &#34;&#34;&#34;
+      Compute the intersection surface of the contact grain - grain.
+
+        Input :
+            itself (a contact grain - grain)
+        Output :
+            Nothing, but attributes are updated (three floats)
+      &#34;&#34;&#34;
+      L_border = []
+      #looking for vertices from grain 2 if they are inside of the grain 1
+      for p in self.g2.l_border[:-1] :
+          d = np.linalg.norm(np.array(p)-self.g1.center)
+          if p[1]&gt;self.g1.center[1]:
+              theta = math.acos((p[0]-self.g1.center[0])/np.linalg.norm(self.g1.center-p))
+          else :
+              theta = 2*math.pi - math.acos((p[0]-self.g1.center[0])/np.linalg.norm(self.g1.center-p))
+          #looking for the grain 1 radius in the same direction
+          L_theta_R_i = list(abs(np.array(self.g1.l_theta_r)-theta))
+          R = self.g1.l_r[L_theta_R_i.index(min(L_theta_R_i))]
+          if d &lt; R :
+              L_border.append(p)
+      #looking for vertices from grain 1 if they are inside of the grain 2
+      for p in self.g1.l_border[:-1] :
+          d = np.linalg.norm(np.array(p)-self.g2.center)
+          if p[1]&gt;self.g2.center[1]:
+              theta = math.acos((p[0]-self.g2.center[0])/np.linalg.norm(self.g2.center-p))
+          else :
+              theta = 2*math.pi - math.acos((p[0]-self.g2.center[0])/np.linalg.norm(self.g2.center-p))
+          #looking for the grain 2 radius in the same direction
+          L_theta_R_i = list(abs(np.array(self.g2.l_theta_r)-theta))
+          R = self.g2.l_r[L_theta_R_i.index(min(L_theta_R_i))]
+          if d &lt; R :
+              L_border.append(p)
+
+      #adaptation
+      if L_border != []:
+          L_id_used = [0]
+          L_border_adapted = [L_border[0]]
+          L_border_x_adapted = [L_border[0][0]]
+          L_border_y_adapted = [L_border[0][1]]
+          HighValue = 100000000 #Large
+
+          current_node = L_border[0]
+          for j in range(1,len(L_border)):
+              L_d = list(np.zeros(len(L_border)))
+              for i in range(0,len(L_border)):
+                  node = L_border[i]
+                  if  i not in L_id_used:
+                      d = np.linalg.norm(np.array(node) - np.array(current_node))
+                      L_d[i] = d
+                  else :
+                      L_d[i] = HighValue #Value need to be larger than potential distance between node
+
+              index_nearest_node = L_d.index(min(L_d))
+              nearest_node = L_border[index_nearest_node]
+              current_node = nearest_node
+              L_border_adapted.append(nearest_node)
+              L_border_x_adapted.append(nearest_node[0])
+              L_border_y_adapted.append(nearest_node[1])
+              L_id_used.append(index_nearest_node)
+
+      #compute the characteristic values of the contact
+      vect_tangential = self.pc_tangential
+      d_max = 0
+      ij_p = (0,0)
+      for i_p1 in range(len(L_border_adapted)-1):
+          for i_p2 in range(i_p1+1,len(L_border_adapted)):
+              d = abs(np.dot(L_border_adapted[i_p1]-L_border_adapted[i_p2],vect_tangential))
+              if d &gt; d_max :
+                  d_max = d
+                  ij_p = (i_p1, i_p2)
+      S = DetermineSurfacePolyhedral(L_border_adapted)
+      self.surface = S
+      self.d_max = d_max
+      self.l_eq = S/d_max</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="Contact.Contact.DEM_2grains_Polyhedral_normal"><code class="name flex">
+<span>def <span class="ident">DEM_2grains_Polyhedral_normal</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the normal reaction of a contact grain-grain</p>
+<p>Here a pontual spring is considered</p>
+<pre><code>Input :
+    itself (a contact grain - grain)
+Output :
+    Nothing, but attributes are updated
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def DEM_2grains_Polyhedral_normal(self):
+  &#34;&#34;&#34;
+  Compute the normal reaction of a contact grain-grain
+
+  Here a pontual spring is considered
+
+      Input :
+          itself (a contact grain - grain)
+      Output :
+          Nothing, but attributes are updated
+  &#34;&#34;&#34;
+  #compute angle between grains
+  g1_to_g2 = self.g2.center - self.g1.center
+  if g1_to_g2[1] &gt;= 0 :
+      angle_g1_to_g2 = math.acos(g1_to_g2[0]/np.linalg.norm(g1_to_g2))
+      angle_g2_to_g1 = angle_g1_to_g2 + math.pi
+  else :
+      angle_g1_to_g2 = math.pi + math.acos(-g1_to_g2[0]/np.linalg.norm(g1_to_g2))
+      angle_g2_to_g1 = angle_g1_to_g2 - math.pi
+
+  #extract
+  L_i_vertices_1 = extract_vertices(self.g1, angle_g1_to_g2)
+  L_i_vertices_2 = extract_vertices(self.g2, angle_g2_to_g1)
+
+  #looking for the nearest nodes
+  d_virtual = max(self.g1.r_max,self.g2.r_max)
+  ij_min = [0,0]
+  d_ij_min = 100*d_virtual #Large
+  for i in L_i_vertices_1:
+      for j in L_i_vertices_2:
+          d_ij = np.linalg.norm(self.g2.l_border[:-1][j]-self.g1.l_border[:-1][i]+d_virtual*(self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center))
+          if d_ij &lt; d_ij_min :
+              d_ij_min = d_ij
+              ij_min = [i,j]
+  self.ij_min = ij_min
+
+  #-----------------------------------------------------------------------------
+  #Computing CP
+  #-----------------------------------------------------------------------------
+
+  M = (self.g1.l_border[:-1][ij_min[0]]+self.g2.l_border[:-1][ij_min[1]])/2
+  # 5 candidates for CP
+  N = np.array([self.g1.l_border[:-1][ij_min[0]][0] - self.g2.l_border[:-1][ij_min[1]][0],
+                self.g1.l_border[:-1][ij_min[0]][1] - self.g2.l_border[:-1][ij_min[1]][1]])
+  N = N/np.linalg.norm(N)
+  PB = np.array([-N[1] ,N[0]])
+  PB = PB/np.linalg.norm(PB)
+
+  #candidats from grain 1
+  if ij_min[0] &lt;len(self.g1.l_border[:-1]) - 1:
+      M1 = self.g1.l_border[:-1][ij_min[0]+1]-self.g1.l_border[:-1][ij_min[0]]
+  else :
+      M1 = self.g1.l_border[:-1][0]-self.g1.l_border[:-1][ij_min[0]]
+  M1 = M1/np.linalg.norm(M1)
+  M3 = self.g1.l_border[:-1][ij_min[0]-1]-self.g1.l_border[:-1][ij_min[0]]
+  M3 = M3/np.linalg.norm(M3)
+  #reorganize the candidats
+  if np.dot(M1,PB) &lt; 0:
+      Mtempo = M1.copy()
+      M1 = M3.copy()
+      M3 = Mtempo.copy()
+
+  #candidats from grain 2
+  if ij_min[1] &lt;len(self.g2.l_border[:-1]) - 1:
+      M2 = self.g2.l_border[:-1][ij_min[1]+1]-self.g2.l_border[:-1][ij_min[1]]
+  else :
+      M2 = self.g2.l_border[:-1][0]-self.g2.l_border[:-1][ij_min[1]]
+  M2 = M2/np.linalg.norm(M2)
+  M4 = self.g2.l_border[:-1][ij_min[1]-1]-self.g2.l_border[:-1][ij_min[1]]
+  M4 = M4/np.linalg.norm(M4)
+  #reorganize the candidats
+  if np.dot(M2,PB) &lt; 0:
+    Mtempo = M2.copy()
+    M2 = M4.copy()
+    M4 = Mtempo.copy()
+
+  #compute the different angles
+  theta_PB = math.pi/2
+  theta_M1 =  math.acos(np.dot(M1,N))
+  theta_M2 =  math.acos(np.dot(M2,N))
+  theta_M3 = -math.acos(np.dot(M3,N))
+  theta_M4 = -math.acos(np.dot(M4,N))
+
+  #find the PC
+  if theta_M2 &lt; theta_PB and theta_PB &lt; theta_M1\
+     and theta_M3 &lt; -theta_PB and -theta_PB &lt; theta_M4:
+     PC = PB
+  else:
+    L_Mi = [M1,M2,M3,M4]
+    L_theta_Mi_PB=[theta_M1-theta_PB, theta_PB-theta_M2, -theta_M3-theta_PB, theta_PB+theta_M4]
+    PC = L_Mi[L_theta_Mi_PB.index(min(L_theta_Mi_PB))]
+
+  #-----------------------------------------------------------------------------
+  # Compute the normal and tangential planes
+  #-----------------------------------------------------------------------------
+
+  PC_normal = np.array([PC[1],-PC[0]])
+  if np.dot(PC_normal,(self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center))&lt;0 :
+      PC_normal = np.array([-PC[1],PC[0]])
+  self.pc_normal = PC_normal #n12
+  self.pc_tangential = np.array([-PC_normal[1],PC_normal[0]])
+
+  #-----------------------------------------------------------------------------
+  # Compute the overlap
+  #-----------------------------------------------------------------------------
+
+  d_b = np.dot(M-self.g2.l_border[:-1][ij_min[1]],PC_normal)
+  d_a = np.dot(M-self.g1.l_border[:-1][ij_min[0]],PC_normal)
+  overlap = d_b - d_a
+  self.overlap_normal = overlap
+
+  if overlap &gt; 0:
+  #-----------------------------------------------------------------------------
+  # Compute the reaction
+  #-----------------------------------------------------------------------------
+
+      #Spring term
+      Y_eq = 1/((1-self.g1.nu*self.g1.nu)/self.g1.y+(1-self.g2.nu*self.g2.nu)/self.g2.y)
+      R_eq = 1/(1/self.g1.r_mean+1/self.g2.r_mean)
+      k = 4/3*Y_eq*math.sqrt(R_eq)
+      F_2_1_n = -k * overlap**(3/2)  #unlinear spring
+      F_2_1 = F_2_1_n * PC_normal
+      self.F_2_1_n = F_2_1_n
+      self.Ep_n = 2/5 * k * overlap**(5/2) #-dEp/dx = F_2_1_n
+      self.g1.update_f( F_2_1[0],  F_2_1[1], self.g1.l_border[:-1][ij_min[0]])
+      self.g2.update_f(-F_2_1[0], -F_2_1[1], self.g2.l_border[:-1][ij_min[1]])
+
+      #Damping term
+      gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
+      mass_eq = self.g1.m*self.g2.m/(self.g1.m+self.g2.m)
+      eta = 2 * gamma * math.sqrt(mass_eq*k)
+      F_2_1_damp_n = np.dot(self.g2.v - self.g1.v,PC_normal)*eta
+      F_2_1_damp = F_2_1_damp_n *PC_normal
+      self.F_2_1_damp = F_2_1_damp_n
+      self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1], self.g1.l_border[:-1][ij_min[0]])
+      self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1], self.g2.l_border[:-1][ij_min[1]])
+
+  #no contact finally
+  else :
+      self.F_2_1_n = 0
+      self.F_2_1_damp = 0
+      self.Ep_n = 0</code></pre>
+</details>
+</dd>
+<dt id="Contact.Contact.DEM_2grains_Polyhedral_normal_surface"><code class="name flex">
+<span>def <span class="ident">DEM_2grains_Polyhedral_normal_surface</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the normal reaction of a contact grain-grain.</p>
+<p>Here a surface spring is considered.</p>
+<pre><code>Input :
+    itself (a contact grain - grain)
+Output :
+    Nothing, but attributes are updated
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def DEM_2grains_Polyhedral_normal_surface(self):
+  &#34;&#34;&#34;
+  Compute the normal reaction of a contact grain-grain.
+
+  Here a surface spring is considered.
+
+      Input :
+          itself (a contact grain - grain)
+      Output :
+          Nothing, but attributes are updated
+  &#34;&#34;&#34;
+  #looking for the nearest nodes
+  d_virtual = max(self.g1.r_max,self.g2.r_max) #virtual distance
+  ij_min = [0,0]
+  d_ij_min = 100*d_virtual #Large
+  for i in range(len(self.g1.l_border[:-1])):
+    for j in range(len(self.g2.l_border[:-1])):
+        d_ij = np.linalg.norm(self.g2.l_border[:-1][j]-self.g1.l_border[:-1][i]+d_virtual*(self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center))
+        if d_ij &lt; d_ij_min :
+            d_ij_min = d_ij
+            ij_min = [i,j]
+  self.ij_min = ij_min
+
+  #-----------------------------------------------------------------------------
+  #Computing CP
+  #-----------------------------------------------------------------------------
+
+  M = (self.g1.l_border[:-1][ij_min[0]]+self.g2.l_border[:-1][ij_min[1]])/2
+  # 5 candidates for CP
+  N = np.array([self.g1.l_border[:-1][ij_min[0]][0] - self.g2.l_border[:-1][ij_min[1]][0],
+                self.g1.l_border[:-1][ij_min[0]][1] - self.g2.l_border[:-1][ij_min[1]][1]])
+  N = N/np.linalg.norm(N)
+  PB = np.array([-N[1] ,N[0]])
+  PB = PB/np.linalg.norm(PB)
+
+  #candidats from grain 1
+  M1 = self.g1.l_border[:-1][ij_min[0]+1]-self.g1.l_border[:-1][ij_min[0]]
+  M1 = M1/np.linalg.norm(M1)
+  M3 = self.g1.l_border[:-1][ij_min[0]-1]-self.g1.l_border[:-1][ij_min[0]]
+  M3 = M3/np.linalg.norm(M3)
+  #reorganize the candidats
+  if np.dot(M1,PB) &lt; 0:
+      Mtempo = M1.copy()
+      M1 = M3.copy()
+      M3 = Mtempo.copy()
+
+  #candidats from grain 2
+  M2 = self.g2.l_border[:-1][ij_min[1]+1]-self.g2.l_border[:-1][ij_min[1]]
+  M2 = M2/np.linalg.norm(M2)
+  M4 = self.g2.l_border[:-1][ij_min[1]-1]-self.g2.l_border[:-1][ij_min[1]]
+  M4 = M4/np.linalg.norm(M4)
+  #reorganize the candidats
+  if np.dot(M2,PB) &lt; 0:
+    Mtempo = M2.copy()
+    M2 = M4.copy()
+    M4 = Mtempo.copy()
+
+  #compute the different agnles
+  theta_PB = math.pi/2
+  theta_M1 =  math.acos(np.dot(M1,N))
+  theta_M2 =  math.acos(np.dot(M2,N))
+  theta_M3 = -math.acos(np.dot(M3,N))
+  theta_M4 = -math.acos(np.dot(M4,N))
+
+  #find the PV
+  if theta_M2 &lt; theta_PB and theta_PB &lt; theta_M1\
+     and theta_M3 &lt; -theta_PB and -theta_PB &lt; theta_M4:
+     PC = PB
+  else:
+    L_Mi = [M1,M2,M3,M4]
+    L_theta_Mi_PB=[theta_M1-theta_PB, theta_PB-theta_M2, -theta_M3-theta_PB, theta_PB+theta_M4]
+    PC = L_Mi[L_theta_Mi_PB.index(min(L_theta_Mi_PB))]
+
+  #-----------------------------------------------------------------------------
+  # Compute the normal and tangential planes
+  #-----------------------------------------------------------------------------
+
+  PC_normal = np.array([PC[1],-PC[0]])
+  if np.dot(PC_normal,(self.g2.center-self.g1.center)/np.linalg.norm(self.g2.center-self.g1.center))&lt;0 :
+      PC_normal = np.array([-PC[1],PC[0]])
+  self.pc_normal = PC_normal
+  self.pc_tangential = np.array([-PC_normal[1],PC_normal[0]])
+
+  #-----------------------------------------------------------------------------
+  # Compute the overlap
+  #-----------------------------------------------------------------------------
+
+  d_b = np.dot(M-self.g2.l_border[:-1][ij_min[1]],PC_normal)
+  d_a = np.dot(M-self.g1.l_border[:-1][ij_min[0]],PC_normal)
+  overlap = d_b - d_a
+  self.overlap_normal = overlap
+
+  if overlap &gt; 0:
+  #-----------------------------------------------------------------------------
+  # Compute the reaction
+  #-----------------------------------------------------------------------------
+
+      #determine the caracteristics of the contact area
+      self.S_inter()
+      D_inter = self.d_max
+      L_inter = sself.l_eq
+
+      #Surface spring term
+      Y_eq = (self.g1.y+self.g2.y)/2
+      k_surf = Y_eq / L_inter
+      F_2_1_n = -k_surf * D_inter * overlap #surface linear spring
+      F_2_1 = F_2_1_n * PC_normal
+      self.F_2_1_n = F_2_1_n
+      self.g1.update_f( F_2_1[0],  F_2_1[1], self.g1.l_border[:-1][ij_min[0]])
+      self.g2.update_f(-F_2_1[0], -F_2_1[1], self.g2.l_border[:-1][ij_min[1]])
+
+      #Damping term
+      gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
+      mass_eq = self.g1.m*self.g2.m/(self.g1.m+self.g2.m)
+      eta = 2 * gamma * math.sqrt(mass_eq*k)
+      F_2_1_damp_n = np.dot(self.g2.v - self.g1.v,PC_normal)*eta
+      F_2_1_damp = F_2_1_damp_n *PC_normal
+      self.F_2_1_damp = F_2_1_damp_n
+      self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1], self.g1.l_border[:-1][ij_min[0]])
+      self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1], self.g2.l_border[:-1][ij_min[1]])
+
+  #no contact finally
+  else :
+      self.F_2_1_n = 0
+      self.F_2_1_damp = 0</code></pre>
+</details>
+</dd>
+<dt id="Contact.Contact.DEM_2grains_Polyhedral_tangential"><code class="name flex">
+<span>def <span class="ident">DEM_2grains_Polyhedral_tangential</span></span>(<span>self, dt_DEM)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the tangential reaction of a contact grain-grain.</p>
+<p>Here a pontual spring is considered.</p>
+<pre><code>Input :
+    itself (a contact grain - grain)
+    a time step (a float)
+Output :
+    Nothing, but attributes are updated
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def DEM_2grains_Polyhedral_tangential(self,dt_DEM):
+  &#34;&#34;&#34;
+  Compute the tangential reaction of a contact grain-grain.
+
+  Here a pontual spring is considered.
+
+      Input :
+          itself (a contact grain - grain)
+          a time step (a float)
+      Output :
+          Nothing, but attributes are updated
+  &#34;&#34;&#34;
+  if self.overlap_normal &gt; 0:
+
+      if self.tangential_old_statut:
+        #if a reaction has been already computed
+        #need to project the tangential reaction on the new tangential plane
+        self.ft = self.ft*np.dot(self.tangential_old,self.pc_tangential)
+      else:
+        self.tangential_old_statut = True
+
+      G_eq = 1/((1-self.g1.nu)/self.g1.g+(1-self.g2.nu)/self.g2.g)
+      R_eq = 1/(1/self.g1.r_mean+1/self.g2.r_mean)
+      kt0 = 8 * G_eq *math.sqrt(R_eq*abs(self.overlap_normal))
+      kt = kt0*math.sqrt(max(1-2/3*kt0*abs(self.overlap_tangential)/self.mu/abs(self.F_2_1_n),0)) #not linear spring
+
+      r1 = np.linalg.norm(self.g1.l_border[:-1][self.ij_min[0]] - self.g1.center) - self.overlap_normal/2
+      r2 = np.linalg.norm(self.g2.l_border[:-1][self.ij_min[1]] - self.g2.center) - self.overlap_normal/2
+      Delta_Us = (np.dot(self.g1.v-self.g2.v,self.pc_tangential) + r1*self.g1.w + r2*self.g2.w)*dt_DEM
+      self.overlap_tangential = self.overlap_tangential + Delta_Us
+      self.ft = self.ft - kt*Delta_Us
+      self.tangential_old = self.pc_tangential
+      if abs(self.ft) &gt; abs(self.mu*self.F_2_1_n) or kt == 0: #Coulomb criteria
+          self.ft = self.mu * abs(self.F_2_1_n) * np.sign(self.ft)
+
+      self.g1.update_f( self.ft*self.pc_tangential[0],  self.ft*self.pc_tangential[1], self.g1.l_border[:-1][self.ij_min[0]])
+      self.g2.update_f(-self.ft*self.pc_tangential[0], -self.ft*self.pc_tangential[1], self.g2.l_border[:-1][self.ij_min[1]])
+
+      #Damping term
+      gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
+      mass_eq = self.g1.m*self.g2.m/(self.g1.m+self.g2.m)
+      eta = 2 * gamma * math.sqrt(mass_eq*kt)
+      F_2_1_damp_t = -Delta_Us/dt_DEM*eta/2
+      F_2_1_damp = F_2_1_damp_t *self.pc_tangential
+      self.ft_damp = F_2_1_damp_t
+      self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1], self.g1.l_border[:-1][self.ij_min[0]])
+      self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1], self.g2.l_border[:-1][self.ij_min[1]])
+
+  #no contact finally
+  else :
+      tangential_old_statut = False
+      self.overlap_tangential = 0
+      self.ft = 0
+      self.ft_damp = 0</code></pre>
+</details>
+</dd>
+<dt id="Contact.Contact.DEM_2grains_Polyhedral_tangential_surface"><code class="name flex">
+<span>def <span class="ident">DEM_2grains_Polyhedral_tangential_surface</span></span>(<span>self, dt_DEM)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the tangential reaction of a contact grain-grain.</p>
+<p>Here a surface spring is considered.</p>
+<pre><code>Input :
+    itself (a contact grain - grain)
+    a time step (a float)
+Output :
+    Nothing, but attributes are updated
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def DEM_2grains_Polyhedral_tangential_surface(self,dt_DEM):
+  &#34;&#34;&#34;
+  Compute the tangential reaction of a contact grain-grain.
+
+  Here a surface spring is considered.
+
+      Input :
+          itself (a contact grain - grain)
+          a time step (a float)
+      Output :
+          Nothing, but attributes are updated
+  &#34;&#34;&#34;
+  if self.overlap_normal &gt; 0:
+
+      if self.tangential_old_statut:
+        #if a reaction has been already computed
+        #need to project the tangential reaction on the new tangential plane
+        self.ft = self.ft*np.dot(self.tangential_old,self.pc_tangential)
+      else:
+        self.tangential_old_statut = True
+
+      #determine the caracteristics of the contact area
+      self.S_inter()
+      D_inter = self.d_max
+      L_inter = sself.l_eq
+
+      #Surface spring term
+      Y_eq = (self.g1.y+self.g2.y)/2
+      kn_surf = Y_eq / L_inter #inspired by the bond formulation
+      kt_surf = kn_surf
+
+      r1 = np.linalg.norm(self.g1.l_border[:-1][self.ij_min[0]] - self.g1.center) - self.overlap_normal/2
+      r2 = np.linalg.norm(self.g2.l_border[:-1][self.ij_min[1]] - self.g2.center) - self.overlap_normal/2
+      Delta_Us = (np.dot(self.g1.v-self.g2.v,self.pc_tangential) + r1*self.g1.w + r2*self.g2.w)* dt_DEM
+      self.overlap_tangential = self.overlap_tangential + Delta_Us
+      self.ft = self.ft - kt_surf*D_inter*Delta_Us #inspired by the bond formulation
+      self.tangential_old = self.pc_tangential
+      if abs(self.ft) &gt; abs(self.mu*self.F_2_1_n) : #Coulomb criteria
+          self.ft = self.mu * abs(self.F_2_1_n) * np.sign(self.ft)
+      self.g1.update_f( self.ft*self.pc_tangential[0],  self.ft*self.pc_tangential[1], self.g1.l_border[:-1][self.ij_min[0]])
+      self.g2.update_f(-self.ft*self.pc_tangential[0], -self.ft*self.pc_tangential[1], self.g2.l_border[:-1][self.ij_min[1]])
+
+      #Damping term
+      gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
+      mass_eq = self.g1.m*self.g2.m/(self.g1.m+self.g2.m)
+      eta = 2 * gamma * math.sqrt(mass_eq*kt*D_inter)
+      F_2_1_damp_t = -Delta_Us/dt_DEM*eta/2
+      self.ft_damp = F_2_1_damp_t
+      F_2_1_damp = F_2_1_damp_t *self.pc_tangential
+      self.g1.update_f( F_2_1_damp[0],  F_2_1_damp[1], self.g1.l_border[:-1][self.ij_min[0]])
+      self.g2.update_f(-F_2_1_damp[0], -F_2_1_damp[1], self.g2.l_border[:-1][self.ij_min[1]])
+
+  #no contact finally
+  else :
+      tangential_old_statut = False
+      self.overlap_tangential = 0
+      self.ft = 0
+      self.ft_damp = 0</code></pre>
+</details>
+</dd>
+<dt id="Contact.Contact.S_inter"><code class="name flex">
+<span>def <span class="ident">S_inter</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the intersection surface of the contact grain - grain.</p>
+<p>Input :
+itself (a contact grain - grain)
+Output :
+Nothing, but attributes are updated (three floats)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def S_inter(self):
+    &#34;&#34;&#34;
+    Compute the intersection surface of the contact grain - grain.
+
+      Input :
+          itself (a contact grain - grain)
+      Output :
+          Nothing, but attributes are updated (three floats)
+    &#34;&#34;&#34;
+    L_border = []
+    #looking for vertices from grain 2 if they are inside of the grain 1
+    for p in self.g2.l_border[:-1] :
+        d = np.linalg.norm(np.array(p)-self.g1.center)
+        if p[1]&gt;self.g1.center[1]:
+            theta = math.acos((p[0]-self.g1.center[0])/np.linalg.norm(self.g1.center-p))
+        else :
+            theta = 2*math.pi - math.acos((p[0]-self.g1.center[0])/np.linalg.norm(self.g1.center-p))
+        #looking for the grain 1 radius in the same direction
+        L_theta_R_i = list(abs(np.array(self.g1.l_theta_r)-theta))
+        R = self.g1.l_r[L_theta_R_i.index(min(L_theta_R_i))]
+        if d &lt; R :
+            L_border.append(p)
+    #looking for vertices from grain 1 if they are inside of the grain 2
+    for p in self.g1.l_border[:-1] :
+        d = np.linalg.norm(np.array(p)-self.g2.center)
+        if p[1]&gt;self.g2.center[1]:
+            theta = math.acos((p[0]-self.g2.center[0])/np.linalg.norm(self.g2.center-p))
+        else :
+            theta = 2*math.pi - math.acos((p[0]-self.g2.center[0])/np.linalg.norm(self.g2.center-p))
+        #looking for the grain 2 radius in the same direction
+        L_theta_R_i = list(abs(np.array(self.g2.l_theta_r)-theta))
+        R = self.g2.l_r[L_theta_R_i.index(min(L_theta_R_i))]
+        if d &lt; R :
+            L_border.append(p)
+
+    #adaptation
+    if L_border != []:
+        L_id_used = [0]
+        L_border_adapted = [L_border[0]]
+        L_border_x_adapted = [L_border[0][0]]
+        L_border_y_adapted = [L_border[0][1]]
+        HighValue = 100000000 #Large
+
+        current_node = L_border[0]
+        for j in range(1,len(L_border)):
+            L_d = list(np.zeros(len(L_border)))
+            for i in range(0,len(L_border)):
+                node = L_border[i]
+                if  i not in L_id_used:
+                    d = np.linalg.norm(np.array(node) - np.array(current_node))
+                    L_d[i] = d
+                else :
+                    L_d[i] = HighValue #Value need to be larger than potential distance between node
+
+            index_nearest_node = L_d.index(min(L_d))
+            nearest_node = L_border[index_nearest_node]
+            current_node = nearest_node
+            L_border_adapted.append(nearest_node)
+            L_border_x_adapted.append(nearest_node[0])
+            L_border_y_adapted.append(nearest_node[1])
+            L_id_used.append(index_nearest_node)
+
+    #compute the characteristic values of the contact
+    vect_tangential = self.pc_tangential
+    d_max = 0
+    ij_p = (0,0)
+    for i_p1 in range(len(L_border_adapted)-1):
+        for i_p2 in range(i_p1+1,len(L_border_adapted)):
+            d = abs(np.dot(L_border_adapted[i_p1]-L_border_adapted[i_p2],vect_tangential))
+            if d &gt; d_max :
+                d_max = d
+                ij_p = (i_p1, i_p2)
+    S = DetermineSurfacePolyhedral(L_border_adapted)
+    self.surface = S
+    self.d_max = d_max
+    self.l_eq = S/d_max</code></pre>
+</details>
+</dd>
+<dt id="Contact.Contact.init_contact"><code class="name flex">
+<span>def <span class="ident">init_contact</span></span>(<span>self, L_g)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Initialize the contact.</p>
+<p>The grains are updated, the tangetial reaction is set to 0 and a boolean attribute is set to False (new contact grain - grain).</p>
+<pre><code>Input :
+    itself (a contact grain - grain)
+    a list of grains (a list)
+Output :
+    Nothing, but attributes are updated (two grains, two floats and a boolean)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def init_contact(self,L_g):
+  &#34;&#34;&#34;
+  Initialize the contact.
+
+  The grains are updated, the tangetial reaction is set to 0 and a boolean attribute is set to False (new contact grain - grain).
+
+      Input :
+          itself (a contact grain - grain)
+          a list of grains (a list)
+      Output :
+          Nothing, but attributes are updated (two grains, two floats and a boolean)
+  &#34;&#34;&#34;
+  self.g1 = L_g[self.g1.id]
+  self.g2 = L_g[self.g2.id]
+  self.ft = 0
+  self.tangential_old_statut = False
+  self.overlap_tangential = 0</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="Contact.DetermineSurfacePolyhedral" href="#Contact.DetermineSurfacePolyhedral">DetermineSurfacePolyhedral</a></code></li>
+<li><code><a title="Contact.Grains_Polyhedral_contact_Neighborhoods" href="#Contact.Grains_Polyhedral_contact_Neighborhoods">Grains_Polyhedral_contact_Neighborhoods</a></code></li>
+<li><code><a title="Contact.Grains_Polyhedral_contact_Neighborhoods_bool" href="#Contact.Grains_Polyhedral_contact_Neighborhoods_bool">Grains_Polyhedral_contact_Neighborhoods_bool</a></code></li>
+<li><code><a title="Contact.P_is_inside" href="#Contact.P_is_inside">P_is_inside</a></code></li>
+<li><code><a title="Contact.Update_Neighborhoods" href="#Contact.Update_Neighborhoods">Update_Neighborhoods</a></code></li>
+<li><code><a title="Contact.extract_vertices" href="#Contact.extract_vertices">extract_vertices</a></code></li>
+<li><code><a title="Contact.find_value_in_list" href="#Contact.find_value_in_list">find_value_in_list</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="Contact.Contact" href="#Contact.Contact">Contact</a></code></h4>
+<ul class="">
+<li><code><a title="Contact.Contact.DEM_2grains_Polyhedral_normal" href="#Contact.Contact.DEM_2grains_Polyhedral_normal">DEM_2grains_Polyhedral_normal</a></code></li>
+<li><code><a title="Contact.Contact.DEM_2grains_Polyhedral_normal_surface" href="#Contact.Contact.DEM_2grains_Polyhedral_normal_surface">DEM_2grains_Polyhedral_normal_surface</a></code></li>
+<li><code><a title="Contact.Contact.DEM_2grains_Polyhedral_tangential" href="#Contact.Contact.DEM_2grains_Polyhedral_tangential">DEM_2grains_Polyhedral_tangential</a></code></li>
+<li><code><a title="Contact.Contact.DEM_2grains_Polyhedral_tangential_surface" href="#Contact.Contact.DEM_2grains_Polyhedral_tangential_surface">DEM_2grains_Polyhedral_tangential_surface</a></code></li>
+<li><code><a title="Contact.Contact.S_inter" href="#Contact.Contact.S_inter">S_inter</a></code></li>
+<li><code><a title="Contact.Contact.init_contact" href="#Contact.Contact.init_contact">init_contact</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

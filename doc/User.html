@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>User API documentation</title>
+<meta name="description" content="@author: Alexandre Sac--Morane
+alexandre.sac-morane@uclouvain.be …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>User</code></h1>
+</header>
+<section id="section-intro">
+<p>@author: Alexandre Sac&ndash;Morane
+alexandre.sac-morane@uclouvain.be</p>
+<p>This is the file where the user can change the different parameters for the simulation.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python"># -*- coding: utf-8 -*-
+&#34;&#34;&#34;
+@author: Alexandre Sac--Morane
+alexandre.sac-morane@uclouvain.be
+
+This is the file where the user can change the different parameters for the simulation.
+&#34;&#34;&#34;
+
+#-------------------------------------------------------------------------------
+#Librairy
+#-------------------------------------------------------------------------------
+
+import math
+import numpy as np
+
+#-------------------------------------------------------------------------------
+#User
+#-------------------------------------------------------------------------------
+
+def All_parameters():
+    &#34;&#34;&#34;
+    This function is called in main() to have all the parameters needed in the simulation
+
+        Input :
+            Nothing
+        Output :
+            an algorithm dictionnary (a dict)
+            a geometry dictionnary (a dict)
+            an initial condition dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+    &#34;&#34;&#34;
+    #---------------------------------------------------------------------------
+    #Geometric parameters
+
+    #approximatively the number of vertices for one grain during DEM simulation
+    grain_discretisation = 60 # = grain_discretisation_square
+
+    N_grain = 300 #total number of grains
+    frac_dissolved = 0.15 #V_soluble/V_total
+
+    #Disk
+    R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
+    L_R = [1.2*R_mean,1.1*R_mean,0.9*R_mean,0.8*R_mean] #from larger to smaller
+    L_percentage_R = [1/6,1/3,1/3,1/6] #distribution of the different radius
+    #Recompute the mean radius
+    R_mean = 0
+    for i in range(len(L_R)):
+        R_mean = R_mean + L_R[i]*L_percentage_R[i]
+    #Square
+    Dimension_mean = 300 #µm radius
+    L_Dimension = [1.2*Dimension_mean,1.1*Dimension_mean,0.9*Dimension_mean,0.8*Dimension_mean] #from larger to smaller
+    L_percentage_Dimension = [1/6,1/3,1/3,1/6] #distribution of the different radius
+    #Recompute the mean dimension
+    Dimension_mean = 0
+    for i in range(len(L_Dimension)):
+        Dimension_mean = Dimension_mean + L_Dimension[i]*L_percentage_Dimension[i]
+
+    #Compute number of grain (square or disk)
+    N_grain_square = int(N_grain*frac_dissolved*math.pi*R_mean**2/(frac_dissolved*math.pi*R_mean**2 + Dimension_mean*Dimension_mean*(1-frac_dissolved)))
+    N_grain_disk = N_grain - N_grain_square
+
+    #write dict
+    dict_geometry = {
+    &#39;N_grain_disk&#39; : N_grain_disk,
+    &#39;R_mean&#39; : R_mean,
+    &#39;L_R&#39; : L_R,
+    &#39;L_percentage_R&#39; : L_percentage_R,
+    &#39;grain_discretisation&#39; : grain_discretisation,
+    &#39;N_grain_square&#39; : N_grain_square,
+    &#39;Dimension_mean&#39; : Dimension_mean,
+    &#39;L_Dimension&#39; : L_Dimension,
+    &#39;L_percentage_Dimension&#39; : L_percentage_Dimension,
+    &#39;grain_discretisation_square&#39; : grain_discretisation,
+    }
+
+    #---------------------------------------------------------------------------
+    #Material parameters
+
+    Y = 70*(10**9)*(10**6)*(10**(-12)) #Young Modulus µN/µm2
+    nu = 0.3 #Poisson&#39;s ratio
+    rho = 2500*10**(-6*3) #density kg/µm3
+    rho_surf_disk = 4/3*rho*R_mean #kg/µm2
+    rho_surf_square = rho*Dimension_mean #kg/µm2
+    mu_friction_gg = 0.5 #grain-grain
+    mu_friction_gw = 0 #grain-wall
+    coeff_restitution = 0.2 #1 is perfect elastic
+    # PF parameters
+    M_pf = 1 # mobility
+    kc_pf = 3 #graident coefficient
+
+    #write dict
+    dict_material = {
+    &#39;Y&#39; : Y,
+    &#39;nu&#39; : nu,
+    &#39;rho&#39; : rho,
+    &#39;rho_surf_disk&#39; : rho_surf_disk,
+    &#39;rho_surf_square&#39; : rho_surf_square,
+    &#39;mu_friction_gg&#39; : mu_friction_gg,
+    &#39;mu_friction_gw&#39; : mu_friction_gw,
+    &#39;coeff_restitution&#39; : coeff_restitution,
+    &#39;M_pf&#39; : M_pf,
+    &#39;kc_pf&#39; : kc_pf
+    }
+
+    #---------------------------------------------------------------------------
+    #Sample definition
+
+    Lenght_mean = (R_mean*N_grain_disk + Dimension_mean/2*N_grain_square)/N_grain #mean characteristic lenght
+
+    #Box définition
+    x_box_min = 0 #µm
+    x_box_max = 2*Lenght_mean*math.sqrt(N_grain/0.6) #µm 0.6 from Santamarina, 2014 to avoid boundaries effect
+    y_box_min = 0 #µm
+
+    #write dict
+    dict_sample = {
+    &#39;x_box_min&#39; : x_box_min,
+    &#39;x_box_max&#39; : x_box_max,
+    &#39;y_box_min&#39; : y_box_min
+    }
+
+    #---------------------------------------------------------------------------
+    #Algorithm parameters
+
+    #Phase field
+    dt_PF = 0.01 #s time step during MOOSE simulation
+    n_t_PF = 10 #number of iterations PF-DEM
+    MovePF_selector = &#39;DeconstructRebuild&#39; #Move PF
+    n_local = 40 #number of node inside local PF simulation
+    dx_local = min(2*min(dict_geometry[&#39;L_R&#39;]),min(dict_geometry[&#39;L_Dimension&#39;]))/(n_local-1)
+    dy_local = min(2*min(dict_geometry[&#39;L_R&#39;]),min(dict_geometry[&#39;L_Dimension&#39;]))/(n_local-1)
+    #add into material dict from this data
+    w = 4*math.sqrt(dx_local**2+dy_local**2)
+    double_well_height = 10*dict_material[&#39;kc_pf&#39;]/w/w
+    dict_material[&#39;w&#39;] = w
+    dict_material[&#39;double_well_height&#39;] = double_well_height
+
+    #DEM parameters
+    dt_DEM_crit = math.pi*min(min(L_Dimension)/2,min(L_R))/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O&#39;Sullivan 2011
+
+    dt_DEM = dt_DEM_crit/8 #s time step during DEM simulation
+    factor_neighborhood = 1.5 #margin to detect a grain into a neighborhood
+    i_update_neighborhoods = 500 #the frequency of the update of the neighborhood of the grains and the walls
+    Spring_type = &#39;Ponctual&#39; #Kind of contact
+    #Stop criteria of the DEM
+    i_DEM_stop = 3000 #maximum iteration for one DEM simulation
+    Ecin_ratio = 0.0002
+    n_window_stop = 50
+    dk0_stop = 0.05
+    dy_box_max_stop = 0.5
+
+    #PF-DEM
+    n_t_PFDEM = 30 #number of cycle PF-DEM
+
+    #Number of processor
+    np_proc = 4
+
+    #Debugging
+    Debug = True #plot configuration before and after DEM simulation
+    Debug_DEM = False #plot configuration inside DEM
+    i_print_plot = 200 #frenquency of the print and plot (if Debug_DEM) in DEM step
+    clean_memory = True #delete Data, Input, Output at the end of the simulation
+    SaveData = True #save simulation
+    main_folder_name = &#39;Data_Santamarina&#39; #where data are saved
+    template_simulation_name = &#39;frac_&#39;+str(int(frac_dissolved*100))+&#39;_run_&#39; #template of the simulation name
+
+    #write dict
+    dict_algorithm = {
+    &#39;dt_PF&#39; : dt_PF,
+    &#39;n_t_PF&#39; : n_t_PF,
+    &#39;dt_DEM_crit&#39; : dt_DEM_crit,
+    &#39;n_local&#39; : n_local,
+    &#39;dx_local&#39; : dx_local,
+    &#39;dy_local&#39; : dy_local,
+    &#39;dt_DEM&#39; : dt_DEM,
+    &#39;i_update_neighborhoods&#39;: i_update_neighborhoods,
+    &#39;i_DEM_stop&#39; : i_DEM_stop,
+    &#39;Ecin_ratio&#39; : Ecin_ratio,
+    &#39;n_window_stop&#39; : n_window_stop,
+    &#39;dk0_stop&#39; : dk0_stop,
+    &#39;dy_box_max_stop&#39; : dy_box_max_stop,
+    &#39;n_t_PFDEM&#39; : n_t_PFDEM,
+    &#39;MovePF_selector&#39; : MovePF_selector,
+    &#39;Spring_type&#39; : Spring_type,
+    &#39;np_proc&#39; : np_proc,
+    &#39;Debug&#39; : Debug,
+    &#39;Debug_DEM&#39; : Debug_DEM,
+    &#39;SaveData&#39; : SaveData,
+    &#39;main_folder_name&#39; : main_folder_name,
+    &#39;template_simulation_name&#39; : template_simulation_name,
+    &#39;i_print_plot&#39; : i_print_plot,
+    &#39;factor_neighborhood&#39; : factor_neighborhood,
+    &#39;clean_memory&#39; : clean_memory
+    }
+
+    #---------------------------------------------------------------------------
+    #Initial condition parameters
+
+    n_generation = 2 #number of grains generation
+    #/!\ Work only for 2 /!\
+    factor_ymax_box = 2.5 #margin to generate grains
+    N_test_max = 5000 # maximum number of tries to generate a grain without overlap
+    i_DEM_stop_IC = 3000 #stop criteria for DEM during IC
+    Debug_DEM_IC = False #plot configuration inside DEM during IC
+    i_print_plot_IC = 200 #frenquency of the print and plot (if Debug_DEM_IC) for IC
+    dt_DEM_IC = dt_DEM_crit/5 #s time step during IC
+    Ecin_ratio_IC = 0.0005
+    factor_neighborhood_IC = 1.5 #margin to detect a grain into a neighborhood
+    i_update_neighborhoods_gen = 20 #the frequency of the update of the neighborhood of the grains and the walls during IC generations
+    i_update_neighborhoods_com = 100 #the frequency of the update of the neighborhood of the grains and the walls during IC combination
+
+    #write dict
+    dict_ic = {
+    &#39;n_generation&#39; : n_generation,
+    &#39;i_update_neighborhoods_gen&#39;: i_update_neighborhoods_gen,
+    &#39;i_update_neighborhoods_com&#39;: i_update_neighborhoods_com,
+    &#39;factor_ymax_box&#39; : factor_ymax_box,
+    &#39;i_DEM_stop_IC&#39; : i_DEM_stop_IC,
+    &#39;Debug_DEM&#39; : Debug_DEM_IC,
+    &#39;dt_DEM_IC&#39; : dt_DEM_IC,
+    &#39;Ecin_ratio_IC&#39; : Ecin_ratio_IC,
+    &#39;i_print_plot_IC&#39; : i_print_plot_IC,
+    &#39;factor_neighborhood_IC&#39; : factor_neighborhood_IC,
+    &#39;N_test_max&#39; : N_test_max
+    }
+
+    #---------------------------------------------------------------------------
+    #External sollicitations
+
+    Vertical_Confinement_Linear_Force = Y*2*R_mean/1000 #µN/µm used to compute the Vertical_Confinement_Force
+    Vertical_Confinement_Force = Vertical_Confinement_Linear_Force*(x_box_max-x_box_min) #µN
+    gravity = 0 #µm/s2
+
+    #Add energy to dissolved grain
+    Dissolution_Energy = 0.2
+
+    #write dict
+    dict_sollicitations = {
+    &#39;Dissolution_Energy&#39; : Dissolution_Energy,
+    &#39;Vertical_Confinement_Force&#39; : Vertical_Confinement_Force,
+    &#39;gravity&#39; : gravity
+    }
+
+    #---------------------------------------------------------------------------
+
+    return dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations
+
+#-------------------------------------------------------------------------------
+
+def Criteria_StopSimulation(dict_algorithm):
+    &#34;&#34;&#34;
+    Criteria to stop simulation (PF and DEM).
+
+        Input :
+            an algorithm dictionnary (a dict)
+        Output :
+            a Booean (True if the simulation must be stopped)
+    &#34;&#34;&#34;
+    Criteria_Verified = False
+    if dict_algorithm[&#39;i_PF&#39;] &gt;= dict_algorithm[&#39;n_t_PFDEM&#39;]:
+        Criteria_Verified = True
+    return Criteria_Verified</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="User.All_parameters"><code class="name flex">
+<span>def <span class="ident">All_parameters</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function is called in main() to have all the parameters needed in the simulation</p>
+<pre><code>Input :
+    Nothing
+Output :
+    an algorithm dictionnary (a dict)
+    a geometry dictionnary (a dict)
+    an initial condition dictionnary (a dict)
+    a material dictionnary (a dict)
+    a sample dictionnary (a dict)
+    a sollicitations dictionnary (a dict)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def All_parameters():
+    &#34;&#34;&#34;
+    This function is called in main() to have all the parameters needed in the simulation
+
+        Input :
+            Nothing
+        Output :
+            an algorithm dictionnary (a dict)
+            a geometry dictionnary (a dict)
+            an initial condition dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+    &#34;&#34;&#34;
+    #---------------------------------------------------------------------------
+    #Geometric parameters
+
+    #approximatively the number of vertices for one grain during DEM simulation
+    grain_discretisation = 60 # = grain_discretisation_square
+
+    N_grain = 300 #total number of grains
+    frac_dissolved = 0.15 #V_soluble/V_total
+
+    #Disk
+    R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
+    L_R = [1.2*R_mean,1.1*R_mean,0.9*R_mean,0.8*R_mean] #from larger to smaller
+    L_percentage_R = [1/6,1/3,1/3,1/6] #distribution of the different radius
+    #Recompute the mean radius
+    R_mean = 0
+    for i in range(len(L_R)):
+        R_mean = R_mean + L_R[i]*L_percentage_R[i]
+    #Square
+    Dimension_mean = 300 #µm radius
+    L_Dimension = [1.2*Dimension_mean,1.1*Dimension_mean,0.9*Dimension_mean,0.8*Dimension_mean] #from larger to smaller
+    L_percentage_Dimension = [1/6,1/3,1/3,1/6] #distribution of the different radius
+    #Recompute the mean dimension
+    Dimension_mean = 0
+    for i in range(len(L_Dimension)):
+        Dimension_mean = Dimension_mean + L_Dimension[i]*L_percentage_Dimension[i]
+
+    #Compute number of grain (square or disk)
+    N_grain_square = int(N_grain*frac_dissolved*math.pi*R_mean**2/(frac_dissolved*math.pi*R_mean**2 + Dimension_mean*Dimension_mean*(1-frac_dissolved)))
+    N_grain_disk = N_grain - N_grain_square
+
+    #write dict
+    dict_geometry = {
+    &#39;N_grain_disk&#39; : N_grain_disk,
+    &#39;R_mean&#39; : R_mean,
+    &#39;L_R&#39; : L_R,
+    &#39;L_percentage_R&#39; : L_percentage_R,
+    &#39;grain_discretisation&#39; : grain_discretisation,
+    &#39;N_grain_square&#39; : N_grain_square,
+    &#39;Dimension_mean&#39; : Dimension_mean,
+    &#39;L_Dimension&#39; : L_Dimension,
+    &#39;L_percentage_Dimension&#39; : L_percentage_Dimension,
+    &#39;grain_discretisation_square&#39; : grain_discretisation,
+    }
+
+    #---------------------------------------------------------------------------
+    #Material parameters
+
+    Y = 70*(10**9)*(10**6)*(10**(-12)) #Young Modulus µN/µm2
+    nu = 0.3 #Poisson&#39;s ratio
+    rho = 2500*10**(-6*3) #density kg/µm3
+    rho_surf_disk = 4/3*rho*R_mean #kg/µm2
+    rho_surf_square = rho*Dimension_mean #kg/µm2
+    mu_friction_gg = 0.5 #grain-grain
+    mu_friction_gw = 0 #grain-wall
+    coeff_restitution = 0.2 #1 is perfect elastic
+    # PF parameters
+    M_pf = 1 # mobility
+    kc_pf = 3 #graident coefficient
+
+    #write dict
+    dict_material = {
+    &#39;Y&#39; : Y,
+    &#39;nu&#39; : nu,
+    &#39;rho&#39; : rho,
+    &#39;rho_surf_disk&#39; : rho_surf_disk,
+    &#39;rho_surf_square&#39; : rho_surf_square,
+    &#39;mu_friction_gg&#39; : mu_friction_gg,
+    &#39;mu_friction_gw&#39; : mu_friction_gw,
+    &#39;coeff_restitution&#39; : coeff_restitution,
+    &#39;M_pf&#39; : M_pf,
+    &#39;kc_pf&#39; : kc_pf
+    }
+
+    #---------------------------------------------------------------------------
+    #Sample definition
+
+    Lenght_mean = (R_mean*N_grain_disk + Dimension_mean/2*N_grain_square)/N_grain #mean characteristic lenght
+
+    #Box définition
+    x_box_min = 0 #µm
+    x_box_max = 2*Lenght_mean*math.sqrt(N_grain/0.6) #µm 0.6 from Santamarina, 2014 to avoid boundaries effect
+    y_box_min = 0 #µm
+
+    #write dict
+    dict_sample = {
+    &#39;x_box_min&#39; : x_box_min,
+    &#39;x_box_max&#39; : x_box_max,
+    &#39;y_box_min&#39; : y_box_min
+    }
+
+    #---------------------------------------------------------------------------
+    #Algorithm parameters
+
+    #Phase field
+    dt_PF = 0.01 #s time step during MOOSE simulation
+    n_t_PF = 10 #number of iterations PF-DEM
+    MovePF_selector = &#39;DeconstructRebuild&#39; #Move PF
+    n_local = 40 #number of node inside local PF simulation
+    dx_local = min(2*min(dict_geometry[&#39;L_R&#39;]),min(dict_geometry[&#39;L_Dimension&#39;]))/(n_local-1)
+    dy_local = min(2*min(dict_geometry[&#39;L_R&#39;]),min(dict_geometry[&#39;L_Dimension&#39;]))/(n_local-1)
+    #add into material dict from this data
+    w = 4*math.sqrt(dx_local**2+dy_local**2)
+    double_well_height = 10*dict_material[&#39;kc_pf&#39;]/w/w
+    dict_material[&#39;w&#39;] = w
+    dict_material[&#39;double_well_height&#39;] = double_well_height
+
+    #DEM parameters
+    dt_DEM_crit = math.pi*min(min(L_Dimension)/2,min(L_R))/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O&#39;Sullivan 2011
+
+    dt_DEM = dt_DEM_crit/8 #s time step during DEM simulation
+    factor_neighborhood = 1.5 #margin to detect a grain into a neighborhood
+    i_update_neighborhoods = 500 #the frequency of the update of the neighborhood of the grains and the walls
+    Spring_type = &#39;Ponctual&#39; #Kind of contact
+    #Stop criteria of the DEM
+    i_DEM_stop = 3000 #maximum iteration for one DEM simulation
+    Ecin_ratio = 0.0002
+    n_window_stop = 50
+    dk0_stop = 0.05
+    dy_box_max_stop = 0.5
+
+    #PF-DEM
+    n_t_PFDEM = 30 #number of cycle PF-DEM
+
+    #Number of processor
+    np_proc = 4
+
+    #Debugging
+    Debug = True #plot configuration before and after DEM simulation
+    Debug_DEM = False #plot configuration inside DEM
+    i_print_plot = 200 #frenquency of the print and plot (if Debug_DEM) in DEM step
+    clean_memory = True #delete Data, Input, Output at the end of the simulation
+    SaveData = True #save simulation
+    main_folder_name = &#39;Data_Santamarina&#39; #where data are saved
+    template_simulation_name = &#39;frac_&#39;+str(int(frac_dissolved*100))+&#39;_run_&#39; #template of the simulation name
+
+    #write dict
+    dict_algorithm = {
+    &#39;dt_PF&#39; : dt_PF,
+    &#39;n_t_PF&#39; : n_t_PF,
+    &#39;dt_DEM_crit&#39; : dt_DEM_crit,
+    &#39;n_local&#39; : n_local,
+    &#39;dx_local&#39; : dx_local,
+    &#39;dy_local&#39; : dy_local,
+    &#39;dt_DEM&#39; : dt_DEM,
+    &#39;i_update_neighborhoods&#39;: i_update_neighborhoods,
+    &#39;i_DEM_stop&#39; : i_DEM_stop,
+    &#39;Ecin_ratio&#39; : Ecin_ratio,
+    &#39;n_window_stop&#39; : n_window_stop,
+    &#39;dk0_stop&#39; : dk0_stop,
+    &#39;dy_box_max_stop&#39; : dy_box_max_stop,
+    &#39;n_t_PFDEM&#39; : n_t_PFDEM,
+    &#39;MovePF_selector&#39; : MovePF_selector,
+    &#39;Spring_type&#39; : Spring_type,
+    &#39;np_proc&#39; : np_proc,
+    &#39;Debug&#39; : Debug,
+    &#39;Debug_DEM&#39; : Debug_DEM,
+    &#39;SaveData&#39; : SaveData,
+    &#39;main_folder_name&#39; : main_folder_name,
+    &#39;template_simulation_name&#39; : template_simulation_name,
+    &#39;i_print_plot&#39; : i_print_plot,
+    &#39;factor_neighborhood&#39; : factor_neighborhood,
+    &#39;clean_memory&#39; : clean_memory
+    }
+
+    #---------------------------------------------------------------------------
+    #Initial condition parameters
+
+    n_generation = 2 #number of grains generation
+    #/!\ Work only for 2 /!\
+    factor_ymax_box = 2.5 #margin to generate grains
+    N_test_max = 5000 # maximum number of tries to generate a grain without overlap
+    i_DEM_stop_IC = 3000 #stop criteria for DEM during IC
+    Debug_DEM_IC = False #plot configuration inside DEM during IC
+    i_print_plot_IC = 200 #frenquency of the print and plot (if Debug_DEM_IC) for IC
+    dt_DEM_IC = dt_DEM_crit/5 #s time step during IC
+    Ecin_ratio_IC = 0.0005
+    factor_neighborhood_IC = 1.5 #margin to detect a grain into a neighborhood
+    i_update_neighborhoods_gen = 20 #the frequency of the update of the neighborhood of the grains and the walls during IC generations
+    i_update_neighborhoods_com = 100 #the frequency of the update of the neighborhood of the grains and the walls during IC combination
+
+    #write dict
+    dict_ic = {
+    &#39;n_generation&#39; : n_generation,
+    &#39;i_update_neighborhoods_gen&#39;: i_update_neighborhoods_gen,
+    &#39;i_update_neighborhoods_com&#39;: i_update_neighborhoods_com,
+    &#39;factor_ymax_box&#39; : factor_ymax_box,
+    &#39;i_DEM_stop_IC&#39; : i_DEM_stop_IC,
+    &#39;Debug_DEM&#39; : Debug_DEM_IC,
+    &#39;dt_DEM_IC&#39; : dt_DEM_IC,
+    &#39;Ecin_ratio_IC&#39; : Ecin_ratio_IC,
+    &#39;i_print_plot_IC&#39; : i_print_plot_IC,
+    &#39;factor_neighborhood_IC&#39; : factor_neighborhood_IC,
+    &#39;N_test_max&#39; : N_test_max
+    }
+
+    #---------------------------------------------------------------------------
+    #External sollicitations
+
+    Vertical_Confinement_Linear_Force = Y*2*R_mean/1000 #µN/µm used to compute the Vertical_Confinement_Force
+    Vertical_Confinement_Force = Vertical_Confinement_Linear_Force*(x_box_max-x_box_min) #µN
+    gravity = 0 #µm/s2
+
+    #Add energy to dissolved grain
+    Dissolution_Energy = 0.2
+
+    #write dict
+    dict_sollicitations = {
+    &#39;Dissolution_Energy&#39; : Dissolution_Energy,
+    &#39;Vertical_Confinement_Force&#39; : Vertical_Confinement_Force,
+    &#39;gravity&#39; : gravity
+    }
+
+    #---------------------------------------------------------------------------
+
+    return dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations</code></pre>
+</details>
+</dd>
+<dt id="User.Criteria_StopSimulation"><code class="name flex">
+<span>def <span class="ident">Criteria_StopSimulation</span></span>(<span>dict_algorithm)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Criteria to stop simulation (PF and DEM).</p>
+<pre><code>Input :
+    an algorithm dictionnary (a dict)
+Output :
+    a Booean (True if the simulation must be stopped)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def Criteria_StopSimulation(dict_algorithm):
+    &#34;&#34;&#34;
+    Criteria to stop simulation (PF and DEM).
+
+        Input :
+            an algorithm dictionnary (a dict)
+        Output :
+            a Booean (True if the simulation must be stopped)
+    &#34;&#34;&#34;
+    Criteria_Verified = False
+    if dict_algorithm[&#39;i_PF&#39;] &gt;= dict_algorithm[&#39;n_t_PFDEM&#39;]:
+        Criteria_Verified = True
+    return Criteria_Verified</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="User.All_parameters" href="#User.All_parameters">All_parameters</a></code></li>
+<li><code><a title="User.Criteria_StopSimulation" href="#User.Criteria_StopSimulation">Criteria_StopSimulation</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
