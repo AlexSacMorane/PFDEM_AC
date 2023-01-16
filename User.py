@@ -127,7 +127,6 @@ def All_parameters():
     #Phase field
     dt_PF = 0.01 #s time step during MOOSE simulation
     n_t_PF = 10 #number of iterations PF-DEM
-    factor_distribution_etai = 1.5 #margin to distribute etai
     MovePF_selector = 'DeconstructRebuild' #Move PF
     n_local = 40 #number of node inside local PF simulation
     dx_local = min(2*min(dict_geometry['L_R']),min(dict_geometry['L_Dimension']))/(n_local-1)
@@ -193,7 +192,6 @@ def All_parameters():
     'template_simulation_name' : template_simulation_name,
     'i_print_plot' : i_print_plot,
     'factor_neighborhood' : factor_neighborhood,
-    'factor_distribution_etai' : factor_distribution_etai,
     'clean_memory' : clean_memory
     }
 
