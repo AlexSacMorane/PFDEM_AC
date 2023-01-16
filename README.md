@@ -38,6 +38,7 @@ The goal of the DEM step is to compute a steady-state configuration. Grains are 
 ## What is next ?
 Some next releases are presented here.
 
+- find a way to multiproccess the DEM simulation
 - add rolling resistance
 - increase the user experience (homogenize names, correct english)
 - create AI or a guide to select algorithm parameters (as neighborhood update frequency, time step, stop criteria, etc...)
@@ -77,4 +78,22 @@ Inputs are sorted in different dictionnaries.
 
 - <i>x_box_min</i> : the coordinate of the left wall
 - <i>x_box_max</i> : the coordinate of the right wall
-- <i>y_box_min</i> : the coordinate of the lower wall. The position of the upper wall is moving to verify the confinement pressure 
+- <i>y_box_min</i> : the coordinate of the lower wall. The position of the upper wall is moving to verify the confinement pressure
+
+#### Algorithm
+
+- <i>dt_PF</i> : the time step used for the phase-field simulation
+- <i>n_t_PF</i> : approximatively the time step of the phase-field simulation. It defines with <i>dt_PF</i> the total duration of the phase-field simulation
+- <i>dx_local</i> and <i>dy_local</i> : define the mesh of the phase-field simulations.
+- <i>dt_DEM</i> : the time step for the DEM simulation
+- <i>i_DEM_stop</i> : the maximum iterations done during a DEM simulation
+- <i>i_update_neighborhoods</i>: the frequency of neighborhood update
+- <i>factor_neighborhood</i> : defines the size of the neighborhood.
+- <i>Spring_type</i> : model used during DEM simulation
+- <i>Ecin_ratio</i> : defines a stop criteria for the DEM simulation. The steady-state is assumed when the mean displacement during one DEM step is lower than the ratio of the mean radius
+- <i>n_window_stop</i> : defines a steps window to detect the steady state
+- <i>dk0_stop</i> : in the window defined by <i>n_window_stop</i>, the steady-state is detected if the difference between the maximum and the minimum k0 (= &sigma;<sub>1</sub>/&sigma;<sub>2</sub>) is lower than <i>dk0_stop</i>
+- <i>dy_box_max_stop</i> : in the window defined by <i>n_window_stop</i>, the steady-state is detected if the difference between the maximum and the minimum upper wall position is lower than <i>dy_box_max_stop</i>
+- <i>n_t_PFDEM</i> : the total number of PFDEM iteration. A PFDEM iteration is composed by one DEM and one phase-field simulations.
+- <i>MovePF_selector</i> : method to move the phase-field
+- <i>np_proc</i> : number of processor used for the simulation
