@@ -88,7 +88,7 @@ Inputs are sorted in different dictionnaries.
 - <i>dt_DEM</i> : the time step for the DEM simulation
 - <i>i_DEM_stop</i> : the maximum iterations done during a DEM simulation
 - <i>i_update_neighborhoods</i>: the frequency of neighborhood update
-- <i>factor_neighborhood</i> : defines the size of the neighborhood.
+- <i>factor_neighborhood</i> : defines the size of the neighborhood
 - <i>Spring_type</i> : model used during DEM simulation
 - <i>Ecin_ratio</i> : defines a stop criteria for the DEM simulation. The steady-state is assumed when the mean displacement during one DEM step is lower than the ratio of the mean radius
 - <i>n_window_stop</i> : defines a steps window to detect the steady state
@@ -97,3 +97,21 @@ Inputs are sorted in different dictionnaries.
 - <i>n_t_PFDEM</i> : the total number of PFDEM iteration. A PFDEM iteration is composed by one DEM and one phase-field simulations.
 - <i>MovePF_selector</i> : method to move the phase-field
 - <i>np_proc</i> : number of processor used for the simulation
+
+#### Initial condition
+
+- <i>n_generation</i> : number of grain generation
+- <i>N_test_max</i> : the maximum number of try to generate a grain without overlap with grains already created
+- <i>factor_ymax_box</i> : define the upper wall position for the grain generation
+- <i>i_update_neighborhoods_gen</i>: frequency of neighborhood update during one generation step.
+- <i>i_update_neighborhoods_com</i>: frequency of neighborhood update during multi generation step.
+- <i>factor_neighborhood_IC</i> : defines the size of the neighborhood
+- <i>i_DEM_stop_IC</i> : the maximum DEM iterations
+- <i>dt_DEM_IC</i> : the DEM time step
+- <i>Ecin_ratio_IC</i> : defines a stop criteria for the DEM simulation. The steady-state is assumed when the mean displacement during one DEM step is lower than the ratio of the mean radius
+
+#### Sollicitations
+
+- <i>Dissolution_Energy</i> : the dissolution energy introduced in the phase-field simulations
+- <i>Vertical_Confinement_Force</i> : the vertical confinement force applied on the upper wall
+- <i>gravity</i> : value of the gravity
