@@ -26,6 +26,8 @@ The following schemes illustrate the algorithm.
 
 Phase-field approach is computed with [MOOSE](https://github.com/idaholab/moose) (the solver must be correctly installed) and DEM is computed with an own script based on python 3.9.6. The launch of this project is done by executing the python script <i>main.py</i> (multiple run can be asked with <i>multiple_main.py</i>). The user can change variables inside the python script <i>User.py</i>. A section in the following helps to understand the different inputs.
 
+Saves are done before the phase-field simulation and at the end of the DEM. If crash (it seems to happend often during the phase-field simulation with MOOSE) occurs during the simulation, the function <i>main_after_crash.py</i> can be called to come back before the crash.
+
 ### Phase-field
 The goal of the phase-field step is to compute the shape of the grains as it evolves with the dissolution.
 An Allen-Cahn formulation is used. Hence, the conservation of the mass should not be verified as dissolution occurs.
@@ -44,3 +46,19 @@ Some next releases are presented here.
 - publish an article about the simulation and result
 
 ## Understand User.py
+
+Inputs are sorted in different dictionnaries.
+
+#### Geometry
+
+- <i>N_grain_disk</i> : is the number of the undissolvable grains. It is computed from the variables <i>N_grain</i> and <i>frac_dissolved</i>
+- <i>R_mean</i> : is the mean radius of the undissolvable grains. It is computed from the particle size distribution used
+- <i>L_R</i> : is the list of the radius. It defines the particle size distribution of the undissolvable grains with the variable <i>L_percentage_R</i>
+- <i>L_percentage_R</i> : is the percentage of total number of undissolvable grains with a linked radius. It defines the particle size distribution of the undissolvable grains with the variable <i>L_R</i>
+- <i>grain_discretisation</i> : is the discretization of the undissolvable grains
+
+- <i>N_grain_square</i> : is the number of the dissolvable grains. It is computed from the variables <i>N_grain</i> and <i>frac_dissolved</i>
+- <i>Dimension_mean</i> : is the mean dimension of the dissolvable grains. Following the shape of the dissolvable grains, the dimension can be different things (radius, lenght for example). It is computed from the particle size distribution used
+- <i>L_Dimension</i> : is the list of the dimension. It defines the particle size distribution of the dissolvable grains with the variable <i>L_percentage_Dimension</i>
+- <i>L_percentage_Dimension</i> : is the percentage of total number of dissolvable grains with a linked dimension. It defines the particle size distribution of the dissolvable grains with the variable <i>L_Dimension</i>
+- <i>grain_discretisation_square</i> : is the discretization of the dissolvable grains
