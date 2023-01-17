@@ -28,6 +28,8 @@ Phase-field approach is computed with [MOOSE](https://github.com/idaholab/moose)
 
 Saves are done before the phase-field simulation and at the end of the DEM. If crash (it seems to happend often during the phase-field simulation with MOOSE) occurs during the simulation, the function <i>main_after_crash.py</i> can be called to come back before the crash.
 
+A [documentation](https://alexsacmorane.github.io/pfdem) for the python script is available.
+
 ### Phase-field
 The goal of the phase-field step is to compute the shape of the grains as it evolves with the dissolution.
 An Allen-Cahn formulation is used. Hence, the conservation of the mass should not be verified as dissolution occurs.
