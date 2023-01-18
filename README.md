@@ -4,7 +4,7 @@ Phase-Field Discrete Element Modelisation applied to granular material.
 
 ## Simulation presentation
 This simulation is about a 2D test under oedometrical conditions with an acid injection.
-The chain force and the k0 (= &sigma;<sub>1</sub>/&sigma;<sub>2</sub>) evolves with the material dissolution.
+The chain force and the k0 (= &sigma;<sub>2</sub>/&sigma;<sub>1</sub>) evolves with the material dissolution.
 
 ## Technical description
 A back and forth is done between phase-field (PF) simulation and discrete element modelisation (DEM). The following scheme illustrated the algorithm.
