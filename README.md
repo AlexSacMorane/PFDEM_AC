@@ -8,7 +8,7 @@ This simulation is about a 2D test under oedometrical conditions with an acid in
 
 ![scheme of grain-grain interaction](image/Oedometric_test_WB.png)
 
-The chain force and the k0 (= &sigma;<sub>1</sub>/&sigma;<sub>2</sub>) evolves with the material dissolution. The influence of the shape of the dissolvable particles is discussed.
+The chain force and the k0 (= &sigma;<sub>2</sub>/&sigma;<sub>1</sub>) evolves with the material dissolution. The influence of the shape of the dissolvable particles is discussed.
 
 ## Technical description
 The PFDEM is a discussion between phase-field (PF) simulation and discrete element modelization (DEM). Even if those formulations are different, they can collaborate with data exchange.
