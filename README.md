@@ -43,6 +43,7 @@ The goal of the DEM step is to compute a steady-state configuration. Grains are 
 ## What is next ?
 Some next releases are presented here.
 
+- Update this main branch
 - find a way to multiproccess the DEM simulation
 - add rolling resistance
 - increase the user experience (homogenize names, correct english)
