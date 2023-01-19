@@ -2,6 +2,10 @@
 
 Phase-Field Discrete Element Modelisation applied to granular material.
 
+## WARNING !
+
+Please go to the more updated branch LikeSantamarina2009.
+
 ## Simulation presentation
 This simulation is about a 2D test under oedometrical conditions with an acid injection to dissolve a fraction of the particles.
 
