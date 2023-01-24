@@ -229,6 +229,7 @@ def main_iteration(dict_algorithm, dict_geometry, dict_material, dict_sollicitat
         S_grains = S_grains + grain.surface
         if grain.dissolved :
             S_grains_dissolvable = S_grains_dissolvable + grain.surface
+    Owntools.Compute_porosity(dict_sample)
     simulation_report.write('Total Surface '+str(int(S_grains))+' µm2\n')
     simulation_report.write('Total Surface dissolvable '+str(int(S_grains_dissolvable))+' µm2\n')
 
@@ -240,6 +241,7 @@ def main_iteration(dict_algorithm, dict_geometry, dict_material, dict_sollicitat
     dict_tracker['n_grains_L'].append(len(dict_sample['L_g']))
     dict_tracker['S_grains_dissolvable_L'].append(S_grains_dissolvable)
     dict_tracker['S_dissolved_perc_dissolvable_L'].append((dict_tracker['S_grains_dissolvable_L'][0]-S_grains_dissolvable)/(dict_tracker['S_grains_dissolvable_L'][0])*100)
+    dict_tracker['porosity_L'].append(dict_sample['porosity'])
 
     simulation_report.tac_tempo(datetime.now(),'PF iteration '+str(dict_algorithm['i_PF']))
 
@@ -404,6 +406,7 @@ if '__main__' == __name__:
         S_grains = S_grains + grain.surface
         if grain.dissolved :
             S_grains_dissolvable = S_grains_dissolvable + grain.surface
+    Owntools.Compute_porosity(dict_sample)
     simulation_report.write('Total Surface '+str(round(S_grains,0))+' µm2\n')
     simulation_report.write('Total Surface dissolvable '+str(round(S_grains_dissolvable,0))+' µm2\n')
     simulation_report.tac_tempo(datetime.now(),'Dissolution distribution')
@@ -416,13 +419,14 @@ if '__main__' == __name__:
     dict_tracker = {
         't_L' : [0],
         'S_grains_L' : [],
-        'S_grains_dissolvable_L' : [],
+        'S_grains_dissolvable_L' : [S_grains_dissolvable],
         'S_dissolved_L' : [],
         'S_dissolved_perc_L' : [],
         'S_dissolved_perc_dissolvable_L' : [],
         'n_grains_L' : [len(dict_sample['L_g'])],
         'k0_xmin_L' : [],
-        'k0_xmax_L' : []
+        'k0_xmax_L' : [],
+        'porosity_L' : [dict_sample['porosity']]
     }
 
     # Preparation and add elements in dicts
