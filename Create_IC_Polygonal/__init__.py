@@ -22,6 +22,7 @@ import Create_IC.Contact_gw_ic
 from Create_IC_Polygonal.Grain_ic_polygonal import Grain_Tempo_Polygonal
 from Create_IC_Polygonal.Contact_gg_ic_polygonal import Contact_Tempo_Polygonal, Update_Neighborhoods, Grains_contact_Neighborhoods
 from Create_IC_Polygonal.Contact_gw_ic_polygonal import Contact_gw_Tempo_Polygonal, Update_wall_Neighborhoods, Grains_Polyhedral_Wall_contact_Neighborhood
+import Grain
 
 #-------------------------------------------------------------------------------
 #Function

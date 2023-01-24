@@ -98,6 +98,8 @@ class Grain_Tempo_Polygonal:
     #common
     self.id = grain_sphere.id
     self.center = np.array(grain_sphere.center)
+    self.dissolved = grain_sphere.dissolved
+    self.type = grain_sphere.type
     self.l_border = L_border
     self.l_border_x = L_border_x
     self.l_border_y = L_border_y
