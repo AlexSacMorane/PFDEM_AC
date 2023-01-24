@@ -37,7 +37,7 @@ def main_iteration_until_pf(dict_algorithm, dict_geometry, dict_material, dict_s
     '''
     Description of one PDEM iteration.
 
-    The iteration is composed by a DEM step (to obtain a steady state configuration) and a PF step (to obtain dissolution and precipitation).
+    The iteration is composed by a DEM step (to obtain a steady state configuration).
 
         Input :
             an algorithm dictionnary (a dict)
@@ -48,7 +48,7 @@ def main_iteration_until_pf(dict_algorithm, dict_geometry, dict_material, dict_s
             a tracker dictionnary (a dict)
             a simulation report (a Report)
         Output :
-            Nothing but the dictionnaies and the report are updated
+            Nothing but the dictionnaries and the report are updated
     '''
     # update element in dict
     dict_algorithm['i_PF'] = dict_algorithm['i_PF'] + 1
@@ -213,9 +213,9 @@ def main_iteration_until_pf(dict_algorithm, dict_geometry, dict_material, dict_s
 
 def main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_sollicitations, dict_sample, dict_tracker, simulation_report):
     '''
-    Description of one PDEM iteration.
+    Description of one PFDEM iteration.
 
-    The iteration is composed by a DEM step (to obtain a steady state configuration) and a PF step (to obtain dissolution and precipitation).
+    The iteration is composed by a PF step (to obtain dissolution and precipitation).
 
         Input :
             an algorithm dictionnary (a dict)
@@ -226,7 +226,7 @@ def main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_so
             a tracker dictionnary (a dict)
             a simulation report (a Report)
         Output :
-            Nothing but the dictionnaies and the report are updated
+            Nothing but the dictionnaries and the report are updated
     '''
     simulation_report.tic_tempo(datetime.now())
 
