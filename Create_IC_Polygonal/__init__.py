@@ -61,7 +61,6 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
     """
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
-    i_update_neighborhoods = dict_ic['i_update_neighborhoods_com']
     i_DEM_0 = dict_ic['i_DEM_IC']
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 
@@ -92,12 +91,12 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
         dict_ic['i_DEM_IC'] = dict_ic['i_DEM_IC'] + 1
 
         #Contact detection
-        if (dict_ic['i_DEM_IC']-i_DEM_0-1) % i_update_neighborhoods  == 0:
+        if (dict_ic['i_DEM_IC']-i_DEM_0-1) % dict_algorithm['i_update_neighborhoods']  == 0:
             Update_Neighborhoods(dict_ic)
         Grains_contact_Neighborhoods(dict_ic,dict_material)
 
         # Detection of contacts between grain and walls
-        if (dict_ic['i_DEM_IC']-i_DEM_0-1) % i_update_neighborhoods  == 0:
+        if (dict_ic['i_DEM_IC']-i_DEM_0-1) % dict_algorithm['i_update_neighborhoods']  == 0:
             wall_neighborhood = Update_wall_Neighborhoods(dict_ic['L_g_tempo'],dict_ic['factor_neighborhood_IC'],dict_sample['x_box_min'],dict_sample['x_box_max'],dict_sample['y_box_min'],dict_sample['y_box_max'])
         Grains_Polyhedral_Wall_contact_Neighborhood(wall_neighborhood,dict_sample['x_box_min'],dict_sample['x_box_max'],dict_sample['y_box_min'],dict_sample['y_box_max'], dict_ic, dict_material)
 
