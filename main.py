@@ -19,7 +19,11 @@ from pathlib import Path
 #Own function and class
 from Write_txt import Write_txt
 from Create_i_AC import Create_i_AC_local
-from Create_LG_IC import LG_tempo, From_LG_tempo_to_usable
+
+#from Create_LG_IC import LG_tempo, From_LG_tempo_to_usable
+import Create_IC
+import Create_IC_Polygonal
+
 import Owntools
 import Grain
 import Contact
@@ -364,20 +368,23 @@ if '__main__' == __name__:
     if dict_algorithm['SaveData'] or dict_algorithm['Debug'] or dict_algorithm['Debug_DEM']:
         simulation_report.write('\n')
 
+    #-------------------------------------------------------------------------------
     #Creation of the grain (without PF)
+    #-------------------------------------------------------------------------------
+
     simulation_report.write_and_print('Creation of the grains\n','\nCREATION OF THE GRAINS\n')
-    LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    #initial ic
+    Create_IC.LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    #convert into discrete grains
+    dict_ic_discrete = Create_IC_Polygonal.Discretize_Grains(dict_ic, dict_geometry['grain_discretization'])
+    #load discrete grains
+    Create_IC_Polygonal.DEM_loading(dict_algorithm, dict_ic_discrete, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
     simulation_report.tac_tempo(datetime.now(),'Initialisation')
-
-    #-------------------------------------------------------------------------------
-    #Creation of polygonal particles
-    #-------------------------------------------------------------------------------
-
     simulation_report.tic_tempo(datetime.now())
 
     # Creation of the real list of grains
-    From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample)#creation pf the dissolution .txt
+    Create_IC_Polygonal.From_LG_tempo_to_usable(dict_ic_discrete, dict_geometry, dict_material, dict_sample)
 
     simulation_report.tac_tempo(datetime.now(),'Creation of polygonal particles')
 
