@@ -181,7 +181,7 @@ def All_parameters():
     i_print_plot = 200 #frenquency of the print and plot (if Debug_DEM) in DEM step
     clean_memory = True #delete Data, Input, Output at the end of the simulation
     SaveData = True #save simulation
-    main_folder_name = 'Data_Santamarina' #where data are saved
+    main_folder_name = 'Data_Like_Santamarina' #where data are saved
     template_simulation_name = 'frac_'+str(int(frac_dissolved*100))+'_run_' #template of the simulation name
 
     #write dict
