@@ -883,7 +883,7 @@ def save_DEM_final(dict_algorithm, dict_sample, dict_sollicitations, dict_tracke
 
 #-------------------------------------------------------------------------------
 
-def save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker):
+def save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
     """
     Save dictionnaries at the end of PFDEM iteration.
 
@@ -905,6 +905,35 @@ def save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_s
     dict_save['sample'] = dict_sample
     dict_save['sollicitations'] = dict_sollicitations
     dict_save['tracker'] = dict_tracker
+    dict_save['report'] = simulation_report
+    pickle.dump(dict_save,outfile)
+    outfile.close()
+
+#-------------------------------------------------------------------------------
+
+def save_dicts_before_pf(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
+    """
+    Save dictionnaries at the end of PFDEM iteration.
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a geometry dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a save file is generated (a file)
+    """
+    outfile = open(dict_algorithm['name_folder']+'_save_dicts_before_pf','wb')
+    dict_save = {}
+    dict_save['algorithm'] = dict_algorithm
+    dict_save['geometry'] = dict_geometry
+    dict_save['material'] = dict_material
+    dict_save['sample'] = dict_sample
+    dict_save['sollicitations'] = dict_sollicitations
+    dict_save['tracker'] = dict_tracker
+    dict_save['report'] = simulation_report
     pickle.dump(dict_save,outfile)
     outfile.close()
 

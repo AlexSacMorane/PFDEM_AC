@@ -33,7 +33,7 @@ import User
 
 #-------------------------------------------------------------------------------
 
-def main_iteration(dict_algorithm, dict_geometry, dict_material, dict_sollicitations, dict_sample, dict_tracker, simulation_report):
+def main_iteration_until_pf(dict_algorithm, dict_geometry, dict_material, dict_sollicitations, dict_sample, dict_tracker, simulation_report):
     '''
     Description of one PDEM iteration.
 
@@ -206,12 +206,28 @@ def main_iteration(dict_algorithm, dict_geometry, dict_material, dict_sollicitat
     dict_tracker['k0_xmin_L'].append(dict_sample['k0_xmin'])
     dict_tracker['k0_xmax_L'].append(dict_sample['k0_xmax'])
 
+    Owntools.save_dicts_before_pf(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
     simulation_report.tac_tempo(datetime.now(),'DEM loop '+str(dict_algorithm['i_PF']))
 
-    #-----------------------------------------------------------------------------
-    # PF Simulation
-    #-----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
+def main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_sollicitations, dict_sample, dict_tracker, simulation_report):
+    '''
+    Description of one PDEM iteration.
+
+    The iteration is composed by a DEM step (to obtain a steady state configuration) and a PF step (to obtain dissolution and precipitation).
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a geometry dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sollicitation dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a tracker dictionnary (a dict)
+            a simulation report (a Report)
+        Output :
+            Nothing but the dictionnaies and the report are updated
+    '''
     simulation_report.tic_tempo(datetime.now())
 
     for grain in dict_sample['L_g']:
@@ -269,7 +285,7 @@ def main_iteration(dict_algorithm, dict_geometry, dict_material, dict_sollicitat
 
     if dict_algorithm['SaveData'] :
         Owntools.save_tempo(dict_algorithm,dict_tracker)
-        Owntools.save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker)
+        Owntools.save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
         shutil.copy('Debug/Report.txt','../'+dict_algorithm['main_folder_name']+'/Report_'+dict_algorithm['name_folder']+'_tempo.txt')
 
 #-------------------------------------------------------------------------------
@@ -443,7 +459,8 @@ if '__main__' == __name__:
 
     while not User.Criteria_StopSimulation(dict_algorithm):
 
-        main_iteration(dict_algorithm, dict_geometry, dict_material, dict_sollicitations, dict_sample, dict_tracker, simulation_report)
+        main_iteration_until_pf(dict_algorithm, dict_geometry, dict_material, dict_sollicitations, dict_sample, dict_tracker, simulation_report)
+        main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_sollicitations, dict_sample, dict_tracker, simulation_report)
 
     #-------------------------------------------------------------------------------
     # close simulation

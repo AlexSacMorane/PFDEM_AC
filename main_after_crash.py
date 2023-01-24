@@ -35,7 +35,6 @@ import main
 #-------------------------------------------------------------------------------
 
 name_to_load = 'frac_5_run_1_save_dicts'
-name_report = 'Debug/Report_after_crash'
 
 #-------------------------------------------------------------------------------
 #load data
@@ -50,21 +49,19 @@ dict_material = dict_save['material']
 dict_sample = dict_save['sample']
 dict_sollicitations = dict_save['sollicitations']
 dict_tracker = dict_save['tracker']
-
-#-------------------------------------------------------------------------------
-#Plan the simulation
-#-------------------------------------------------------------------------------
-
-#create a simulation report
-simulation_report = Report.Report(name_report,datetime.now())
+simulation_report = dict_save['report']
 
 #-------------------------------------------------------------------------------
 #main
 #-------------------------------------------------------------------------------
 
+if name_to_load[-10:] =='_before_pf':
+    main.main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_sollicitations, dict_sample, dict_tracker, simulation_report)
+
 while not User.Criteria_StopSimulation(dict_algorithm):
 
-    main.main_iteration(dict_algorithm, dict_geometry, dict_material, dict_sollicitations, dict_sample, dict_tracker, simulation_report)
+    main.main_iteration_until_pf(dict_algorithm, dict_geometry, dict_material, dict_sollicitations, dict_sample, dict_tracker, simulation_report)
+    main.main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_sollicitations, dict_sample, dict_tracker, simulation_report)
 
 #-------------------------------------------------------------------------------
 #close simulation
