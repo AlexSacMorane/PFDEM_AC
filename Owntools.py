@@ -268,11 +268,18 @@ def Debug_Trackers(dict_tracker):
     plt.close(1)
 
     fig = plt.figure(1,figsize=(16,9.12))
-    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'][:-1],dict_tracker['k0_xmin_L'],label='k0 with xmin')
-    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'][:-1],dict_tracker['k0_xmax_L'],label='k0 with xmax')
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'],dict_tracker['k0_xmin_L'],label='k0 with xmin')
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'],dict_tracker['k0_xmax_L'],label='k0 with xmax')
     plt.title('Evolution of the k0')
     plt.xlabel('Percentage of dissolvable grains surface dissolved (%)')
     fig.savefig('Debug/Evolution_k0_with_percentage_dissolved.png')
+    plt.close(1)
+
+    fig = plt.figure(1,figsize=(16,9.12))
+    plt.plot(dict_tracker['t_L'], dict_tracker['porosity_L'])
+    plt.title('Evolution of the porosity')
+    plt.xlabel('Time (s)')
+    fig.savefig('Debug/Evolution_porosity.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
@@ -468,6 +475,23 @@ def Reset_y_max(L_g,Force):
     y_max = y_max - (Force/k)**(2/3)
 
     return y_max
+
+#-------------------------------------------------------------------------------
+
+def Compute_porosity(dict_sample):
+    """
+    Compute the porosity = grains surface / box surface.
+
+        Input :
+            a sample dictionnary (a dict)
+        Output :
+            Nothing, but the sample dictionnary gets updated value concerning the porosity
+    """
+    Sg = 0
+    for grain in dict_sample['L_g']:
+        Sg = Sg + grain.surface
+    Sb = (dict_sample['x_box_max']-dict_sample['x_box_min'])*(dict_sample['y_box_max']-dict_sample['y_box_min'])
+    dict_sample['porosity'] = Sg/Sb
 
 #-------------------------------------------------------------------------------
 
@@ -824,7 +848,7 @@ def save_DEM_tempo(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker):
 
 #-------------------------------------------------------------------------------
 
-def save_DEM_final(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker):
+def save_DEM_final(dict_algorithm, dict_sample, dict_sollicitations, dict_tracker):
     """
     Save trackers and configuration at the end of DEM iteration.
 
@@ -898,11 +922,15 @@ def save_tempo(dict_algorithm,dict_tracker):
     """
     outfile = open('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['name_folder']+'_save_tempo','wb')
     dict_save = {}
+    dict_save['t_L'] = dict_tracker['t_L']
     dict_save['k0_xmin_L'] = dict_tracker['k0_xmin_L']
     dict_save['k0_xmax_L'] = dict_tracker['k0_xmax_L']
+    dict_save['S_grains_L'] = dict_tracker['S_grains_L']
     dict_save['S_dissolved_L'] = dict_tracker['S_dissolved_L']
     dict_save['S_dissolved_perc_L'] = dict_tracker['S_dissolved_perc_L']
-    dict_save['S_grains_L'] = dict_tracker['S_grains_L']
+    dict_save['S_grains_dissolvable_L'] = dict_tracker['S_grains_dissolvable_L']
+    dict_save['S_dissolved_perc_dissolvable_L'] = dict_tracker['S_dissolved_perc_dissolvable_L']
+    dict_save['porosity'] = dict_tracker['porosity_L']
     pickle.dump(dict_save,outfile)
     outfile.close()
 
@@ -921,10 +949,14 @@ def save_final(dict_algorithm,dict_tracker):
     os.remove('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['name_folder']+'_save_tempo')
     outfile = open('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['name_folder']+'_save','wb')
     dict_save = {}
+    dict_save['t_L'] = dict_tracker['t_L']
     dict_save['k0_xmin_L'] = dict_tracker['k0_xmin_L']
     dict_save['k0_xmax_L'] = dict_tracker['k0_xmax_L']
+    dict_save['S_grains_L'] = dict_tracker['S_grains_L']
     dict_save['S_dissolved_L'] = dict_tracker['S_dissolved_L']
     dict_save['S_dissolved_perc_L'] = dict_tracker['S_dissolved_perc_L']
-    dict_save['S_grains_L'] = dict_tracker['S_grains_L']
+    dict_save['S_grains_dissolvable_L'] = dict_tracker['S_grains_dissolvable_L']
+    dict_save['S_dissolved_perc_dissolvable_L'] = dict_tracker['S_dissolved_perc_dissolvable_L']
+    dict_save['porosity'] = dict_tracker['porosity_L']
     pickle.dump(dict_save,outfile)
     outfile.close()
