@@ -118,8 +118,6 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
 
     DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitation, simulation_report)
 
-    simulation_report.write_and_print(str(len(dict_ic['L_g_tempo']))+' / '+str(dict_geometry['N_grain'])+' grains have been created\n','\n'+str(len(dict_ic['L_g_tempo']))+' / '+str(dict_geometry['N_grain'])+' grains have been created\n')
-
 #-------------------------------------------------------------------------------
 
 def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitation, simulation_report):

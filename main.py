@@ -376,10 +376,13 @@ if '__main__' == __name__:
     #initial ic
     Create_IC.LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
     #convert into discrete grains
+    simulation_report.write_and_print('Discretization of the grains\n','\nDISCRETIZATION OF THE GRAINS\n')
     dict_ic_discrete = Create_IC_Polygonal.Discretize_Grains(dict_ic, dict_geometry['grain_discretization'])
     #load discrete grains
     Create_IC_Polygonal.DEM_loading(dict_algorithm, dict_ic_discrete, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
+    simulation_report.write_and_print(str(len(dict_ic_discrete['L_g_tempo']))+' / '+str(dict_geometry['N_grain'])+' grains have been created\n',
+                                      '\n'+str(len(dict_ic_discrete['L_g_tempo']))+' / '+str(dict_geometry['N_grain'])+' grains have been created\n')
     simulation_report.tac_tempo(datetime.now(),'Initialisation')
     simulation_report.tic_tempo(datetime.now())
 
