@@ -160,7 +160,7 @@ def All_parameters():
 
     dt_DEM = dt_DEM_crit/8 #s time step during DEM simulation
     factor_neighborhood = 1.5 #margin to detect a grain into a neighborhood
-    i_update_neighborhoods = 500 #the frequency of the update of the neighborhood of the grains and the walls
+    i_update_neighborhoods = 200 #the frequency of the update of the neighborhood of the grains and the walls
     Spring_type = 'Ponctual' #Kind of contact
     #Stop criteria of the DEM
     i_DEM_stop = 3000 #maximum iteration for one DEM simulation
@@ -217,7 +217,7 @@ def All_parameters():
     #Initial condition parameters
 
     n_generation = 2 #number of grains generation
-    factor_ymax_box = 1.4 #margin to generate grains
+    factor_ymax_box = 1.5 #margin to generate grains
     N_test_max = 5000 # maximum number of tries to generate a grain without overlap
     i_DEM_stop_IC = 3000 #stop criteria for DEM during IC
     Debug_DEM_IC = False #plot configuration inside DEM during IC
