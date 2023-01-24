@@ -62,9 +62,9 @@ class Grain_Tempo:
         L_border_y.append(L_border_y[0])
         self.radius = Lenght
         self.theta = 0
-        self.rho_surf = dict_material['rho_surf_disk']
+        self.rho_surf = dict_material['rho_surf_undissolvable']
         self.surface = math.pi*Lenght**2
-        self.mass = math.pi*Lenght**2*dict_material['rho_surf_disk']
+        self.mass = math.pi*Lenght**2*dict_material['rho_surf_undissolvable']
         self.inertia = self.mass*Lenght**2
     if Type == 'Square':
         if False:
@@ -99,9 +99,9 @@ class Grain_Tempo:
             L_border_y.append(L_border_y[0])
             self.dimension = Lenght
             self.theta = Theta
-            self.rho_surf = dict_material['rho_surf_square']
+            self.rho_surf = dict_material['rho_surf_dissolvable']
             self.surface = Lenght**2
-            self.mass = Lenght**2*dict_material['rho_surf_square']
+            self.mass = Lenght**2*dict_material['rho_surf_dissolvable']
             self.inertia = 1/6*self.mass*Lenght**2
         else :
             #Build the border
@@ -118,9 +118,9 @@ class Grain_Tempo:
             L_border_y.append(L_border_y[0])
             self.dimension = Lenght/2
             self.theta = 0
-            self.rho_surf = dict_material['rho_surf_disk']
+            self.rho_surf = dict_material['rho_surf_undissolvable']
             self.surface = math.pi*(Lenght/2)**2
-            self.mass = math.pi*(Lenght/2)**2*dict_material['rho_surf_disk']
+            self.mass = math.pi*(Lenght/2)**2*dict_material['rho_surf_undissolvable']
             self.inertia = self.mass*(Lenght/2)**2
 
     #save
@@ -1496,7 +1496,7 @@ def Plot_Config_Loaded_End(L_g,x_min,x_max,y_min,y_max):
 
 def From_LG_tempo_to_usable(dict_ic, dict_geometry, dict_material, dict_sample):
     """
-    Create a rea lgrain from a temporary grain.
+    Create a real grain from a temporary grain.
 
     The phase variable is built. The distance between the point of the mesh and the particle center determines the value of the variable.
     A cosine profile is applied inside the interface.

@@ -35,12 +35,12 @@ def All_parameters():
     #Geometric parameters
 
     #approximatively the number of vertices for one grain during DEM simulation
-    grain_discretisation = 60 # = grain_discretisation_square
+    grain_discretization = 60
 
     N_grain = 300 #total number of grains
     frac_dissolved = 0.15 #V_soluble/V_total
 
-    #Disk
+    #Undissolvalble - disk
     R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
     L_R = [1.2*R_mean,1.1*R_mean,0.9*R_mean,0.8*R_mean] #from larger to smaller
     L_percentage_R = [1/6,1/3,1/3,1/6] #distribution of the different radius
@@ -48,7 +48,8 @@ def All_parameters():
     R_mean = 0
     for i in range(len(L_R)):
         R_mean = R_mean + L_R[i]*L_percentage_R[i]
-    #Square
+    #Dissolvable
+    Shape = 'Disk'
     Dimension_mean = 300 #µm radius
     L_Dimension = [1.2*Dimension_mean,1.1*Dimension_mean,0.9*Dimension_mean,0.8*Dimension_mean] #from larger to smaller
     L_percentage_Dimension = [1/6,1/3,1/3,1/6] #distribution of the different radius
@@ -58,21 +59,25 @@ def All_parameters():
         Dimension_mean = Dimension_mean + L_Dimension[i]*L_percentage_Dimension[i]
 
     #Compute number of grain (square or disk)
-    N_grain_square = int(N_grain*frac_dissolved*math.pi*R_mean**2/(frac_dissolved*math.pi*R_mean**2 + Dimension_mean*Dimension_mean*(1-frac_dissolved)))
-    N_grain_disk = N_grain - N_grain_square
+    if Shape == 'Square' :
+        N_grain_dissolvable = int(N_grain*frac_dissolved*math.pi*R_mean**2/(frac_dissolved*math.pi*R_mean**2 + Dimension_mean*Dimension_mean*(1-frac_dissolved)))
+    elif Shape == 'Disk':
+        N_grain_dissolvable = int(N_grain*frac_dissolved*math.pi*R_mean**2/(math.pi*R_mean**2*frac_dissolved + math.pi*Dimension_mean**2*(1-frac_dissolved)))
+    N_grain_undissolvable = N_grain - N_grain_dissolvable
 
     #write dict
     dict_geometry = {
-    'N_grain_disk' : N_grain_disk,
+    'N_grain_undissolvable' : N_grain_undissolvable,
     'R_mean' : R_mean,
     'L_R' : L_R,
     'L_percentage_R' : L_percentage_R,
-    'grain_discretisation' : grain_discretisation,
-    'N_grain_square' : N_grain_square,
+    'N_grain_dissolvable' : N_grain_dissolvable,
+    'Shape_dissolvable' : Shape,
     'Dimension_mean' : Dimension_mean,
     'L_Dimension' : L_Dimension,
     'L_percentage_Dimension' : L_percentage_Dimension,
-    'grain_discretisation_square' : grain_discretisation,
+    'N_grain' : N_grain,
+    'grain_discretization' : grain_discretization,
     }
 
     #---------------------------------------------------------------------------
@@ -81,8 +86,11 @@ def All_parameters():
     Y = 70*(10**9)*(10**6)*(10**(-12)) #Young Modulus µN/µm2
     nu = 0.3 #Poisson's ratio
     rho = 2500*10**(-6*3) #density kg/µm3
-    rho_surf_disk = 4/3*rho*R_mean #kg/µm2
-    rho_surf_square = rho*Dimension_mean #kg/µm2
+    rho_surf_undissolvable = 4/3*rho*R_mean #kg/µm2
+    if Shape == 'Disk' :
+        rho_surf_dissolvable = 4/3*rho*Dimension_mean #kg/µm2
+    elif Shape == 'Square' :
+        rho_surf_dissolvable = rho*Dimension_mean #kg/µm2
     mu_friction_gg = 0.5 #grain-grain
     mu_friction_gw = 0 #grain-wall
     coeff_restitution = 0.2 #1 is perfect elastic
@@ -95,8 +103,8 @@ def All_parameters():
     'Y' : Y,
     'nu' : nu,
     'rho' : rho,
-    'rho_surf_disk' : rho_surf_disk,
-    'rho_surf_square' : rho_surf_square,
+    'rho_surf_undissolvable' : rho_surf_undissolvable,
+    'rho_surf_dissolvable' : rho_surf_dissolvable,
     'mu_friction_gg' : mu_friction_gg,
     'mu_friction_gw' : mu_friction_gw,
     'coeff_restitution' : coeff_restitution,
@@ -107,7 +115,10 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #Sample definition
 
-    Lenght_mean = (R_mean*N_grain_disk + Dimension_mean/2*N_grain_square)/N_grain #mean characteristic lenght
+    if Shape == 'Disk' :
+        Lenght_mean = (R_mean*N_grain_undissolvable + Dimension_mean*N_grain_dissolvable)/N_grain #mean characteristic lenght
+    elif Shape == 'Square' :
+        Lenght_mean = (R_mean*N_grain_undissolvable + Dimension_mean/2*N_grain_dissolvable)/N_grain #mean characteristic lenght
 
     #Box définition
     x_box_min = 0 #µm
@@ -129,8 +140,12 @@ def All_parameters():
     n_t_PF = 10 #number of iterations PF-DEM
     MovePF_selector = 'DeconstructRebuild' #Move PF
     n_local = 40 #number of node inside local PF simulation
-    dx_local = min(2*min(dict_geometry['L_R']),min(dict_geometry['L_Dimension']))/(n_local-1)
-    dy_local = min(2*min(dict_geometry['L_R']),min(dict_geometry['L_Dimension']))/(n_local-1)
+    if Shape == 'Disk':
+        dx_local = min(2*min(dict_geometry['L_R']),2*min(dict_geometry['L_Dimension']))/(n_local-1)
+        dy_local = min(2*min(dict_geometry['L_R']),2*min(dict_geometry['L_Dimension']))/(n_local-1)
+    elif Shape == 'Square':
+        dx_local = min(2*min(dict_geometry['L_R']),min(dict_geometry['L_Dimension']))/(n_local-1)
+        dy_local = min(2*min(dict_geometry['L_R']),min(dict_geometry['L_Dimension']))/(n_local-1)
     #add into material dict from this data
     w = 4*math.sqrt(dx_local**2+dy_local**2)
     double_well_height = 10*dict_material['kc_pf']/w/w
@@ -138,7 +153,10 @@ def All_parameters():
     dict_material['double_well_height'] = double_well_height
 
     #DEM parameters
-    dt_DEM_crit = math.pi*min(min(L_Dimension)/2,min(L_R))/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
+    if Shape == 'Disk' :
+        dt_DEM_crit = math.pi*min(min(L_Dimension),min(L_R))/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
+    elif Shape == 'Square':
+        dt_DEM_crit = math.pi*min(min(L_Dimension)/2,min(L_R))/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
 
     dt_DEM = dt_DEM_crit/8 #s time step during DEM simulation
     factor_neighborhood = 1.5 #margin to detect a grain into a neighborhood
@@ -199,8 +217,7 @@ def All_parameters():
     #Initial condition parameters
 
     n_generation = 2 #number of grains generation
-    #/!\ Work only for 2 /!\
-    factor_ymax_box = 2.5 #margin to generate grains
+    factor_ymax_box = 1.4 #margin to generate grains
     N_test_max = 5000 # maximum number of tries to generate a grain without overlap
     i_DEM_stop_IC = 3000 #stop criteria for DEM during IC
     Debug_DEM_IC = False #plot configuration inside DEM during IC

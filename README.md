@@ -58,12 +58,12 @@ Inputs are sorted in different dictionnaries.
 - <i>R_mean</i> : is the mean radius of the undissolvable grains. It is computed from the particle size distribution used
 - <i>L_R</i> : is the list of the radius. It defines the particle size distribution of the undissolvable grains with the variable <i>L_percentage_R</i>
 - <i>L_percentage_R</i> : is the percentage of total number of undissolvable grains with a linked radius. It defines the particle size distribution of the undissolvable grains with the variable <i>L_R</i>
-- <i>grain_discretisation</i> : is the discretization of the undissolvable grains
+- <i>grain_discretization</i> : is the discretization of the undissolvable grains
 - <i>N_grain_square</i> : is the number of the dissolvable grains. It is computed from the variables <i>N_grain</i> and <i>frac_dissolved</i>
 - <i>Dimension_mean</i> : is the mean dimension of the dissolvable grains. Following the shape of the dissolvable grains, the dimension can be different things (radius, lenght for example). It is computed from the particle size distribution used
 - <i>L_Dimension</i> : is the list of the dimension. It defines the particle size distribution of the dissolvable grains with the variable <i>L_percentage_Dimension</i>
 - <i>L_percentage_Dimension</i> : is the percentage of total number of dissolvable grains with a linked dimension. It defines the particle size distribution of the dissolvable grains with the variable <i>L_Dimension</i>
-- <i>grain_discretisation_square</i> : is the discretization of the dissolvable grains
+- <i>grain_discretization_square</i> : is the discretization of the dissolvable grains
 
 #### Material
 

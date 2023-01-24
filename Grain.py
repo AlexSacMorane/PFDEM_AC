@@ -38,7 +38,7 @@ class Grain:
     self.id = dict_ic_to_real['Id']
     self.id_eta = Id_Eta
     #Material property
-    self.dissolved = dict_ic_to_real['Type'] == 'Square'
+    self.dissolved = dict_ic_to_real['Dissolved']
     self.y = dict_ic_to_real['Y']
     self.nu = dict_ic_to_real['Nu']
     self.g = self.y /2/(1+self.nu) #shear modulus
@@ -174,7 +174,7 @@ class Grain:
       """
       #-------------------------------------------------------------------------
       #load data needed
-      n = dict_geometry['grain_discretisation']
+      n = dict_geometry['grain_discretization']
       x_L = self.x_L_local
       y_L = self.y_L_local
       #-------------------------------------------------------------------------
