@@ -808,25 +808,25 @@ def Compute_Contact_Grain_Distribution(dict_sample):
         elif not contact.g1.dissolved and not contact.g2.dissolved :
              n_contact_undiss_undiss = n_contact_undiss_undiss + 1
 
-     #count grains
-     n_grain = 0
-     n_grain_diss = 0
-     n_grain_undiss = 0
-     for grain in dict_sample['L_g']:
-         n_grain = n_grain + 1
-         if grain.dissolved :
-             n_grain_diss = n_grain_diss + 1
-         else :
-             n_grain_undiss = n_grain_undiss + 1
+    #count grains
+    n_grain = 0
+    n_grain_diss = 0
+    n_grain_undiss = 0
+    for grain in dict_sample['L_g']:
+        n_grain = n_grain + 1
+        if grain.dissolved :
+            n_grain_diss = n_grain_diss + 1
+        else :
+            n_grain_undiss = n_grain_undiss + 1
 
-     #update dict
-     dict_sample['n_contact'] = n_contact
-     dict_sample['n_contact_diss_diss'] = n_contact_diss_diss
-     dict_sample['n_contact_undiss_diss'] = n_contact_undiss_diss
-     dict_sample['n_contact_undiss_undiss'] = n_contact_undiss_undiss
-     dict_sample['n_grain'] = n_grain
-     dict_sample['n_grain_diss'] = n_grain_diss
-     dict_sample['n_grain_undiss'] = n_grain_undiss
+    #update dict
+    dict_sample['n_contact'] = n_contact
+    dict_sample['n_contact_diss_diss'] = n_contact_diss_diss
+    dict_sample['n_contact_undiss_diss'] = n_contact_undiss_diss
+    dict_sample['n_contact_undiss_undiss'] = n_contact_undiss_undiss
+    dict_sample['n_grain'] = n_grain
+    dict_sample['n_grain_diss'] = n_grain_diss
+    dict_sample['n_grain_undiss'] = n_grain_undiss
 
 #-------------------------------------------------------------------------------
 
