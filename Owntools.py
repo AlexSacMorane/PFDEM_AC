@@ -829,6 +829,26 @@ def Compute_Contact_Grain_Distribution(dict_sample):
 
 #-------------------------------------------------------------------------------
 
+def Plot_YBoxMax(dict_tracker):
+    """
+    Plot the evolution of the upper wall position.
+
+        Input :
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    plt.figure(1,figsize=(16,9))
+
+    plt.plot(dict_tracker['t_L'], dict_tracker['y_box_max_L'])
+    plt.title('Upper wall position (µm)')
+    plt.xlabel('Time (s)')
+
+    plt.savefig('Debug/UpperWallPosition.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
 def Plot_Contact_Distribution(dict_tracker):
     """
     Plot the evolution of the total contact and mean contact distributions.

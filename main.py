@@ -200,6 +200,7 @@ def main_iteration_until_pf(dict_algorithm, dict_geometry, dict_material, dict_s
     #Update element in dict
     dict_tracker['k0_xmin_L'].append(dict_sample['k0_xmin'])
     dict_tracker['k0_xmax_L'].append(dict_sample['k0_xmax'])
+    dict_tracker['y_box_max_L'].append(dict_sample['y_box_max'])
 
     #-----------------------------------------------------------------------------
     # Contact distribution
@@ -291,6 +292,7 @@ def main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_so
         Owntools.Debug_configuration(dict_algorithm,dict_sample)
         Owntools.Debug_Trackers(dict_tracker)
         Owntools.Plot_Contact_Distribution(dict_tracker)
+        Owntools.Plot_YBoxMax(dict_tracker)
 
     #-----------------------------------------------------------------------------
     # Save tempo
@@ -454,6 +456,7 @@ if '__main__' == __name__:
         'S_dissolved_perc_L' : [],
         'S_dissolved_perc_dissolvable_L' : [],
         'n_grains_L' : [len(dict_sample['L_g'])],
+        'y_box_max_L' : [dict_sample['y_box_max']],
         'k0_xmin_L' : [],
         'k0_xmax_L' : [],
         'porosity_L' : [dict_sample['porosity']],
