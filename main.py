@@ -340,6 +340,7 @@ def close_simulation(dict_algorithm, dict_tracker, simulation_report):
         os.remove('../'+dict_algorithm['main_folder_name']+'/User_'+dict_algorithm['name_folder']+'_tempo.txt')
         os.remove('../'+dict_algorithm['main_folder_name']+'/Report_'+dict_algorithm['name_folder']+'_tempo.txt')
         os.remove(dict_algorithm['name_folder']+'_save_dicts')
+        os.remove(dict_algorithm['name_folder']+'_save_dicts_before_pf')
 
 #-------------------------------------------------------------------------------
 
