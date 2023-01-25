@@ -170,7 +170,7 @@ def All_parameters():
     dy_box_max_stop = 0.5
 
     #PF-DEM
-    n_t_PFDEM = 30 #number of cycle PF-DEM
+    n_t_PFDEM = 100 #number of cycle PF-DEM
 
     #Number of processor
     np_proc = 4
