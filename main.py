@@ -196,12 +196,28 @@ def main_iteration_until_pf(dict_algorithm, dict_geometry, dict_material, dict_s
 
     Owntools.Control_y_max_NR(dict_sample,dict_sollicitations)
     Owntools.Compute_k0(dict_sample,dict_sollicitations)
-
     simulation_report.write('k0_xmin : '+str(round(dict_sample['k0_xmin'],2))+' / k0_xmax : '+str(round(dict_sample['k0_xmax'],2))+'\n')
-
     #Update element in dict
     dict_tracker['k0_xmin_L'].append(dict_sample['k0_xmin'])
     dict_tracker['k0_xmax_L'].append(dict_sample['k0_xmax'])
+
+    #-----------------------------------------------------------------------------
+    # Contact distribution
+    #-----------------------------------------------------------------------------
+
+    Owntools.Compute_Contact_Grain_Distribution(dict_sample)
+    #Update trackers
+    dict_tracker['n_contact_diss_diss_L'].append(dict_sample['n_contact_diss_diss'])
+    dict_tracker['n_contact_undiss_diss_L'].append(dict_sample['n_contact_undiss_diss'])
+    dict_tracker['n_contact_undiss_undiss_L'].append(dict_sample['n_contact_undiss_undiss'])
+    dict_tracker['mean_diss_undiss_L'].append(dict_sample['n_contact_undiss_diss']/dict_sample['n_grain_diss']) #as diss with undiss
+    dict_tracker['mean_undiss_diss_L'].append(dict_sample['n_contact_undiss_diss']/dict_sample['n_grain_undiss']) #as undiss with diss
+    dict_tracker['mean_diss_diss_L'].append(2*dict_sample['n_contact_diss_diss']/dict_sample['n_grain_diss']) #as diss with diss
+    dict_tracker['mean_undiss_undiss_L'].append(2*dict_sample['n_contact_undiss_undiss']/dict_sample['n_grain_undiss']) #as undiss with undiss
+
+    #-----------------------------------------------------------------------------
+    # Tempo save
+    #-----------------------------------------------------------------------------
 
     Owntools.save_dicts_before_pf(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
     simulation_report.tac_tempo(datetime.now(),'DEM loop '+str(dict_algorithm['i_PF']))
@@ -268,13 +284,13 @@ def main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_so
         contact.init_contact_gw(dict_sample['L_g'])
 
     #-----------------------------------------------------------------------------
-    # Print Grains configuration
+    # Print Grains configuration and trackers
     #-----------------------------------------------------------------------------
 
     if dict_algorithm['Debug'] :
         Owntools.Debug_configuration(dict_algorithm,dict_sample)
-        #Trackers
         Owntools.Debug_Trackers(dict_tracker)
+        Owntools.Plot_Contact_Distribution(dict_tracker)
 
     #-----------------------------------------------------------------------------
     # Save tempo
@@ -439,7 +455,14 @@ if '__main__' == __name__:
         'n_grains_L' : [len(dict_sample['L_g'])],
         'k0_xmin_L' : [],
         'k0_xmax_L' : [],
-        'porosity_L' : [dict_sample['porosity']]
+        'porosity_L' : [dict_sample['porosity']],
+        'n_contact_diss_diss_L' : [],
+        'n_contact_undiss_diss_L' : [],
+        'n_contact_undiss_undiss_L' : [],
+        'mean_diss_undiss_L' : [],
+        'mean_undiss_diss_L' : [],
+        'mean_diss_diss_L' : [],
+        'mean_undiss_undiss_L' : []
     }
 
     # Preparation and add elements in dicts

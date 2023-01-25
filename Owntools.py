@@ -31,14 +31,14 @@ import Grain
 
 #-------------------------------------------------------------------------------
 
-class Grain_pp:
+class Grain_cf:
 
     def __init__(self, Id, Dissolved, Center, Coordinate_x, Coordinate_y):
         """
-        Defining a grain for the postprocess
+        Defining a grain for the chain force plot.
 
             Input :
-                itself (a grain_pp)
+                itself (a Grain_cf)
                 an id (a int)
                 a Boolean to know if the grain is dissolvable (a Boolean)
                 a center (a 1 x 2 numpy array)
@@ -54,14 +54,14 @@ class Grain_pp:
 
 #-------------------------------------------------------------------------------
 
-class Contact_pp:
+class Contact_cf:
 
     def __init__(self, Id_g1, Id_g2, L_g, Normal):
         """
-        Defining a contact grain - grain for the postprocess.
+        Defining a contact grain - grain for the chain force plot.
 
             Input :
-                itself (a contact_pp)
+                itself (a Contact_cf)
                 the ids of the grains (two int)
                 a list of post process grains (a list)
                 the value of normal reaction of the contact (a float)
@@ -80,7 +80,7 @@ class Contact_pp:
         Prepare the chain force plot.
 
             Input :
-                itself (a contact_pp)
+                itself (a Contact_cf)
                 a reference value (a float)
             Output :
                 Nothing, but the post process contact gets the ratio of the normal force with the reference value as a new attribut (a float)
@@ -92,14 +92,14 @@ class Contact_pp:
 
 #-------------------------------------------------------------------------------
 
-class Contact_gw_pp:
+class Contact_gw_cf:
 
     def __init__(self, Id_g, L_g, Nature, Limit, Normal):
         """
-        Defining a contact grain-wall for the postprocess.
+        Defining a contact grain-wall for the chain force plot.
 
             Input :
-                itself (a contact_gw_pp)
+                itself (a Contact_gw_cf)
                 a id of the grain (a float)
                 the list of the post process grain (a list)
                 the nature of the wall (a string)
@@ -117,7 +117,7 @@ class Contact_gw_pp:
         Prepare the chain force plot.
 
             Input :
-                itself (a contact_gw_pp)
+                itself (a Contact_gw_cf)
                 a reference value (a float)
             Output :
                 Nothing, but the post process contact gets the ratio of the normal force with the reference value as a new attribut (a float)
@@ -276,9 +276,9 @@ def Debug_Trackers(dict_tracker):
     plt.close(1)
 
     fig = plt.figure(1,figsize=(16,9.12))
-    plt.plot(dict_tracker['t_L'], dict_tracker['porosity_L'])
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'], dict_tracker['porosity_L'][1:])
     plt.title('Evolution of the porosity')
-    plt.xlabel('Time (s)')
+    plt.xlabel('Percentage of dissolvable grains surface dissolved (%)')
     fig.savefig('Debug/Evolution_porosity.png')
     plt.close(1)
 
@@ -610,13 +610,13 @@ def Plot_chain_force(i_PF,i_DEM):
 
         if line == '<grain_c>\n':
             Read_one_grain = False
-            L_g.append(Grain_pp(id,dissolved,center,coordinate_x,coordinate_y))
+            L_g.append(Grain_cf(id,dissolved,center,coordinate_x,coordinate_y))
         elif line == '<contact_c>\n':
             Read_one_contact = False
-            L_contact.append(Contact_pp(L_id_g[0], L_id_g[1], L_g, normal_reaction+normal_damping))
+            L_contact.append(Contact_cf(L_id_g[0], L_id_g[1], L_g, normal_reaction+normal_damping))
         elif line == '<contact_w_c>\n':
             Read_one_contact_wall = False
-            L_contact_gw.append(Contact_gw_pp(id_g, L_g, type, limit, normal_reaction+normal_damping))
+            L_contact_gw.append(Contact_gw_cf(id_g, L_g, type, limit, normal_reaction+normal_damping))
 
         if Read_one_grain:
             if line[:len('\tid : ')] == '\tid : ':
@@ -779,6 +779,88 @@ def Plot_chain_force(i_PF,i_DEM):
         plt.plot(L_x,L_y,linewidth = ratio_normal,color = 'k')
     plt.axis("equal")
     plt.savefig('Debug/DEM_ite/Chain_force_'+str(i_PF)+'.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
+def Compute_Contact_Grain_Distribution(dict_sample):
+    """
+    Compute the repartition of grain-grain contacts in three categories : dissolvable-dissolvable, undissolvable-dissolvable or undissolvable-undissolvable.
+
+    Compute the repartition of grains two categories : dissolvable or undissolvable.
+
+        Input :
+            a sample dictionnary (a dict)
+        Output :
+            Nothing, but the dictionnary gets updated values (7 ints)
+    """
+    #count contacts
+    n_contact = 0
+    n_contact_diss_diss = 0
+    n_contact_undiss_diss = 0
+    n_contact_undiss_undiss = 0
+    for contact in dict_sample['L_contact'] :
+        n_contact = n_contact + 1
+        if contact.g1.dissolved and contact.g2.dissolved :
+             n_contact_diss_diss = n_contact_diss_diss + 1
+        elif (contact.g1.dissolved and not contact.g2.dissolved) or (not contact.g1.dissolved and contact.g2.dissolved) :
+             n_contact_undiss_diss = n_contact_undiss_diss + 1
+        elif not contact.g1.dissolved and not contact.g2.dissolved :
+             n_contact_undiss_undiss = n_contact_undiss_undiss + 1
+
+     #count grains
+     n_grain = 0
+     n_grain_diss = 0
+     n_grain_undiss = 0
+     for grain in dict_sample['L_g']:
+         n_grain = n_grain + 1
+         if grain.dissolved :
+             n_grain_diss = n_grain_diss + 1
+         else :
+             n_grain_undiss = n_grain_undiss + 1
+
+     #update dict
+     dict_sample['n_contact'] = n_contact
+     dict_sample['n_contact_diss_diss'] = n_contact_diss_diss
+     dict_sample['n_contact_undiss_diss'] = n_contact_undiss_diss
+     dict_sample['n_contact_undiss_undiss'] = n_contact_undiss_undiss
+     dict_sample['n_grain'] = n_grain
+     dict_sample['n_grain_diss'] = n_grain_diss
+     dict_sample['n_grain_undiss'] = n_grain_undiss
+
+#-------------------------------------------------------------------------------
+
+def Plot_Contact_Distribution(dict_tracker):
+    """
+    Plot the evolution of the total contact and mean contact distributions.
+
+    The function Compute_Contact_Grain_Distribution() needed to be runned before.
+
+        Input :
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    plt.figure(1,figsize=(16,9))
+
+    plt.subplot(121)
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'], dict_tracker['n_contact_diss_diss_L'], label = 'Contact diss-diss')
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'], dict_tracker['n_contact_undiss_diss_L'], label = 'Contact undiss-diss')
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'], dict_tracker['n_contact_undiss_undiss_L'], label = 'Contact undiss-undiss')
+    plt.legend()
+    plt.title('Total contact distribution')
+    plt.xlabel('Percentage of dissolvable grains surface dissolved (%)')
+
+    plt.subplot(122)
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'], dict_tracker['mean_diss_undiss_L'], label = 'As diss with undiss')
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'], dict_tracker['mean_undiss_diss_L'], label = 'As undiss with diss')
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'], dict_tracker['mean_diss_diss_L'], label = 'As diss with diss')
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'], dict_tracker['mean_undiss_undiss_L'], label = 'As undiss with undiss')
+    plt.legend()
+    plt.title('Mean contact distribution, following cases')
+    plt.xlabel('Percentage of dissolvable grains surface dissolved (%)')
+
+    plt.savefig('Debug/Contact_distribution.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
