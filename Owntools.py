@@ -14,17 +14,16 @@ This tools can be : - a little function
 #-------------------------------------------------------------------------------
 
 import numpy as np
+import matplotlib.pyplot as plt
 import math
 import Report
-import matplotlib.pyplot as plt
 import os
 import shutil
-from pathlib import Path
 import pickle
-from pathlib import Path
-from datetime import datetime
 import random
 import imageio
+from pathlib import Path
+from datetime import datetime
 import Contact
 import Contact_gw
 import Grain
