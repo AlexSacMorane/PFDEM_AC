@@ -217,7 +217,7 @@ def main_iteration_until_pf(dict_algorithm, dict_geometry, dict_material, dict_s
     dict_tracker['mean_undiss_undiss_L'].append(2*dict_sample['n_contact_undiss_undiss']/dict_sample['n_grain_undiss']) #as undiss with undiss
 
     #-----------------------------------------------------------------------------
-    # Tempo save
+    # Save tempo
     #-----------------------------------------------------------------------------
 
     Owntools.save_dicts_before_pf(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
@@ -297,6 +297,15 @@ def main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_so
     #-----------------------------------------------------------------------------
     # Save tempo
     #-----------------------------------------------------------------------------
+
+    #clean memory
+    if dict_algorithm['clean_memory']:
+        shutil.rmtree('Data')
+        os.mkdir('Data')
+        shutil.rmtree('Input')
+        os.mkdir('Input')
+        shutil.rmtree('Output')
+        os.mkdir('Output')
 
     if dict_algorithm['SaveData'] :
         Owntools.save_tempo(dict_algorithm,dict_tracker)
