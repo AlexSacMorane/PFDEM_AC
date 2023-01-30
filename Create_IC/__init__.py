@@ -44,7 +44,7 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
         R_mean = (dict_geometry['R_mean']*dict_geometry['N_grain_undissolvable'] + dict_geometry['Dimension_mean']*dict_geometry['N_grain_dissolvable'])/dict_geometry['N_grain']
         dy_creation = dict_geometry['N_grain']/dict_ic['n_generation']*dict_ic['factor_ymax_box']*(2*R_mean)**2/(dict_sample['x_box_max']-dict_sample['x_box_min'])
     elif dict_geometry['Shape_dissolvable'] == 'Square':
-        R_mean = (dict_geometry['R_mean']*dict_geometry['N_grain_undissolvable'] + math.sqrt(2)*dict_geometry['Dimension_mean']*dict_geometry['N_grain_dissolvable'])/dict_geometry['N_grain']
+        R_mean = (dict_geometry['R_mean']*dict_geometry['N_grain_undissolvable'] + math.sqrt(2)*dict_geometry['Dimension_mean']/2*dict_geometry['N_grain_dissolvable'])/dict_geometry['N_grain']
         dy_creation = dict_geometry['N_grain']/dict_ic['n_generation']*dict_ic['factor_ymax_box']*(2*R_mean)**2/(dict_sample['x_box_max']-dict_sample['x_box_min'])
     dict_sample['dy_creation'] = dy_creation
 
@@ -299,7 +299,7 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, simulation
         if dict_geometry['Shape_dissolvable'] == 'Disk':
             radius = dict_geometry['L_Dimension'][i]
         elif dict_geometry['Shape_dissolvable'] == 'Square':
-            radius = math.sqrt(2)*dict_geometry['L_Dimension'][i]
+            radius = math.sqrt(2)*dict_geometry['L_Dimension'][i]/2
         n_grain = L_n_grain_dim[i]
         n_grain_done = dict_ic['L_n_grain_dim_done'][i]
         last_id_grain_created = dict_ic['last_id']

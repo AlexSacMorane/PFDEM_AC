@@ -76,7 +76,7 @@ class Grain_Tempo_Polygonal:
                                 [math.sin(angle),  math.cos(angle)]])
             p = np.dot(P_rot_p,p)
             p = np.dot(P_rot,p)
-            p = p + np.array(Center)
+            p = p + np.array(grain_sphere.center)
             L_border.append(p)
             L_border_x.append(p[0])
             L_border_y.append(p[1])
