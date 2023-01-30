@@ -157,8 +157,8 @@ def main_iteration_until_pf(dict_algorithm, dict_geometry, dict_material, dict_s
             if dict_algorithm['i_DEM'] > dict_algorithm['n_window_stop'] :
                 k0_xmin_window = dict_tracker['k0_xmin'][dict_algorithm['i_DEM']+1-dict_algorithm['n_window_stop']:dict_algorithm['i_DEM']+1]
                 y_box_max_window = dict_tracker['y_box_max'][dict_algorithm['i_DEM']+1-dict_algorithm['n_window_stop']:dict_algorithm['i_DEM']+1]
-                print(r'$\Delta$k0',max(k0_xmin_window) - min(k0_xmin_window),'/',dict_algorithm['dk0_stop'],'('+str(int((max(k0_xmin_window)-min(k0_xmin_window))/dict_algorithm['dk0_stop']*100))+')')
-                print(r'$\Delta$y max',max(y_box_max_window) - min(y_box_max_window),'/',dict_algorithm['dy_box_max_stop'],'('+str(int((max(y_box_max_window)-min(y_box_max_window))/dict_algorithm['dy_box_max_stop']*100))+')')
+                print('Delta k0',max(k0_xmin_window) - min(k0_xmin_window),'/',dict_algorithm['dk0_stop'],'('+str(int((max(k0_xmin_window)-min(k0_xmin_window))/dict_algorithm['dk0_stop']*100))+')')
+                print('Delta y max',max(y_box_max_window) - min(y_box_max_window),'/',dict_algorithm['dy_box_max_stop'],'('+str(int((max(y_box_max_window)-min(y_box_max_window))/dict_algorithm['dy_box_max_stop']*100))+')')
 
             Owntools.save_DEM_tempo(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker)
 
