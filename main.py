@@ -298,6 +298,7 @@ def main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_so
         Owntools.Debug_Trackers(dict_tracker)
         Owntools.Plot_Contact_Distribution(dict_tracker)
         Owntools.Plot_YBoxMax(dict_tracker)
+        Owntools.Plot_Radius_Reduction(dict_sample, dict_tracker)
 
     #-----------------------------------------------------------------------------
     # Save tempo

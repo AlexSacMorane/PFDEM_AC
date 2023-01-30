@@ -884,6 +884,53 @@ def Plot_Contact_Distribution(dict_tracker):
 
 #-------------------------------------------------------------------------------
 
+def Plot_Radius_Reduction(dict_sample, dict_tracker):
+    """
+    Plot the surface and radius reduction.
+
+    A post process is done to quantify the radius reduction (comparison with initial radius and current radius)
+
+        Input :
+            a sample dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    rmean_diss_L = []
+    S_dr0_L = []
+    S_dri_L = []
+    for i_Surface in range(len(dict_tracker['S_grains_dissolvable_L'])):
+        S_g = dict_tracker['S_grains_dissolvable_L'][i_Surface] / dict_sample['n_grain_diss']
+        Rmean = math.sqrt(S_g/math.pi)
+        rmean_diss_L.append(Rmean)
+        if i_Surface > 0 :
+            S_dr0_L.append((rmean_diss_L[0]-Rmean)/rmean_diss_L[0]*100/i_Surface)
+            S_dri_L.append((rmean_diss_L[i_Surface-1]-Rmean)/rmean_diss_L[i_Surface]*100)
+
+    #plot
+    plt.figure(1,figsize = (16,9))
+
+    plt.subplot(221)
+    plt.plot(dict_tracker['S_grains_dissolvable_L'])
+    plt.title('Surface')
+
+    plt.subplot(222)
+    plt.plot(rmean_diss_L)
+    plt.title('Mean radius')
+
+    plt.subplot(223)
+    plt.plot(S_dr0_L)
+    plt.title('Radius reduction (% of R0)')
+
+    plt.subplot(224)
+    plt.plot(S_dri_L)
+    plt.title('Radius reduction (% of Ri-1)')
+
+    plt.savefig('Debug/SizeReduction.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
 def make_mp4():
     """
     The goal of this function is to create a movie with all configuration pictures.
