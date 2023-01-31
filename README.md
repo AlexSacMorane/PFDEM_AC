@@ -50,4 +50,72 @@ Some next releases are presented here.
 
 ## Understand User.py
 
-Description in progress
+## Understand User.py
+
+Inputs are sorted in different dictionnaries.
+
+#### Geometry
+
+- <i>N_grain_disk</i> : is the number of the undissolvable grains. It is computed from the variables <i>N_grain</i> and <i>frac_dissolved</i>
+- <i>R_mean</i> : is the mean radius of the undissolvable grains. It is computed from the particle size distribution used
+- <i>L_R</i> : is the list of the radius. It defines the particle size distribution of the undissolvable grains with the variable <i>L_percentage_R</i>
+- <i>L_percentage_R</i> : is the percentage of total number of undissolvable grains with a linked radius. It defines the particle size distribution of the undissolvable grains with the variable <i>L_R</i>
+- <i>grain_discretization</i> : is the discretization of the undissolvable grains
+- <i>N_grain_square</i> : is the number of the dissolvable grains. It is computed from the variables <i>N_grain</i> and <i>frac_dissolved</i>
+- <i>Dimension_mean</i> : is the mean dimension of the dissolvable grains. Following the shape of the dissolvable grains, the dimension can be different things (radius, lenght for example). It is computed from the particle size distribution used
+- <i>L_Dimension</i> : is the list of the dimension. It defines the particle size distribution of the dissolvable grains with the variable <i>L_percentage_Dimension</i>
+- <i>L_percentage_Dimension</i> : is the percentage of total number of dissolvable grains with a linked dimension. It defines the particle size distribution of the dissolvable grains with the variable <i>L_Dimension</i>
+- <i>grain_discretization_square</i> : is the discretization of the dissolvable grains
+
+#### Material
+
+- <i>Y</i> : the Young modulus
+- <i>nu</i> : the Poisson ratio
+- <i>rho</i> : the density of the grain, it defines the surface mass for dissolvable and undissolvable grains.
+- <i>mu_friction_gg</i> : the friction coefficient for the contact grain-grain
+- <i>mu_friction_gw</i> : the friction coefficient for the contact grain-wall
+- <i>coeff_restitution</i> : the restitution coefficient (= 1 perfect elastic, = 0 perfect plastic)
+- <i>M_pf</i> : The mobility of the phase variables
+- <i>kc_pf</i> : the gradient coefficient for the phase variables
+
+#### Sample
+
+- <i>x_box_min</i> : the coordinate of the left wall
+- <i>x_box_max</i> : the coordinate of the right wall
+- <i>y_box_min</i> : the coordinate of the lower wall. The position of the upper wall is moving to verify the confinement pressure
+
+#### Algorithm
+
+- <i>dt_PF</i> : the time step used for the phase-field simulation
+- <i>n_t_PF</i> : approximatively the time step of the phase-field simulation. It defines with <i>dt_PF</i> the total duration of the phase-field simulation
+- <i>dx_local</i> and <i>dy_local</i> : define the mesh of the phase-field simulations.
+- <i>dt_DEM</i> : the time step for the DEM simulation
+- <i>i_DEM_stop</i> : the maximum iterations done during a DEM simulation
+- <i>i_update_neighborhoods</i>: the frequency of neighborhood update
+- <i>factor_neighborhood</i> : defines the size of the neighborhood
+- <i>Spring_type</i> : model used during DEM simulation
+- <i>Ecin_ratio</i> : defines a stop criteria for the DEM simulation. The steady-state is assumed when the mean displacement during one DEM step is lower than the ratio of the mean radius
+- <i>n_window_stop</i> : defines a steps window to detect the steady state
+- <i>dk0_stop</i> : in the window defined by <i>n_window_stop</i>, the steady-state is detected if the difference between the maximum and the minimum k0 (= &sigma;<sub>1</sub>/&sigma;<sub>2</sub>) is lower than <i>dk0_stop</i>
+- <i>dy_box_max_stop</i> : in the window defined by <i>n_window_stop</i>, the steady-state is detected if the difference between the maximum and the minimum upper wall position is lower than <i>dy_box_max_stop</i>
+- <i>n_t_PFDEM</i> : the total number of PFDEM iteration. A PFDEM iteration is composed by one DEM and one phase-field simulations.
+- <i>MovePF_selector</i> : method to move the phase-field
+- <i>np_proc</i> : number of processor used for the simulation
+
+#### Initial condition
+
+- <i>n_generation</i> : number of grain generation
+- <i>N_test_max</i> : the maximum number of try to generate a grain without overlap with grains already created
+- <i>factor_ymax_box</i> : define the upper wall position for the grain generation
+- <i>i_update_neighborhoods_gen</i>: frequency of neighborhood update during one generation step.
+- <i>i_update_neighborhoods_com</i>: frequency of neighborhood update during multi generation step.
+- <i>factor_neighborhood_IC</i> : defines the size of the neighborhood
+- <i>i_DEM_stop_IC</i> : the maximum DEM iterations
+- <i>dt_DEM_IC</i> : the DEM time step
+- <i>Ecin_ratio_IC</i> : defines a stop criteria for the DEM simulation. The steady-state is assumed when the mean displacement during one DEM step is lower than the ratio of the mean radius
+
+#### Sollicitations
+
+- <i>Dissolution_Energy</i> : the dissolution energy introduced in the phase-field simulations
+- <i>Vertical_Confinement_Force</i> : the vertical confinement force applied on the upper wall
+- <i>gravity</i> : value of the gravity
