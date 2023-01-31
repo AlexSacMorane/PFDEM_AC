@@ -50,8 +50,6 @@ Some next releases are presented here.
 
 ## Understand User.py
 
-## Understand User.py
-
 Inputs are sorted in different dictionnaries.
 
 #### Geometry
