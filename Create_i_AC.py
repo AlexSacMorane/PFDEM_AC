@@ -32,7 +32,7 @@ def Create_i_AC(dict_algorithm, dict_material, dict_sample, dict_sollicitations)
             a file is generated (a .i file)
     """
     #Create .txt files
-    Owntools.Write_txt_data(dict_algorithm, dict_material, dict_sample)
+    Owntools.Write_txt_data(dict_algorithm, dict_material, dict_sample, dict_sollicitations)
 
     # create .i
     file_to_write = open(f"PF_{dict_algorithm['i_PF']}.i",'w')
