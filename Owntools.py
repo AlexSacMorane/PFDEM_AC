@@ -441,6 +441,91 @@ def Compute_k0(dict_sample,dict_sollicitations):
 
 #-------------------------------------------------------------------------------
 
+def Write_txt_data(dict_algorithm, dict_material, dict_sample):
+    '''
+    Compute .txt files for PF simulation.
+
+    Grains are sorted one over the other even if there is no interations between them. The goal is to have only one simulation.
+
+        Input :
+            an algorithm dictionnary (a dict)
+            an material dictionnary (a dict)
+            an sample dictionnary (a dict)
+        Output :
+            Nothing, but 2 . txt files are generated
+    '''
+
+    #compute dx and dy maximum
+    dx_max = 0
+    dy_max = 0
+    for grain in dict_sample['L_g']:
+        if grain.dissolved :
+            x_min_local = min(grain.l_border_x)-dict_material['w']
+            x_max_local = max(grain.l_border_x)+dict_material['w']
+            if x_max_local - x_min_local > dx_max:
+                dx_max = x_max_local - x_min_local
+            y_min_local = min(grain.l_border_y)-dict_material['w']
+            y_max_local = max(grain.l_border_y)+dict_material['w']
+            if y_max_local - y_min_local > dy_max:
+                dy_max = y_max_local - y_min_local
+    dict_algorithm['x_L_local'] = np.arange(0,dx_max,dict_algorithm['nx_local'])
+    dict_algorithm['y_L_local'] = np.arange(0,dy_max,dict_algorithm['ny_local'])
+
+    #Compute phase map
+    for grain in dict_sample['L_g']:
+        grain.Compute_etaiM_global(dict_algorithm, dict_material, dx_max, dy_max)
+
+    #Write data for grains
+    file_to_write = open('Data/g_'+str(dict_algorithm['i_PF'])+'.txt','w')
+    file_to_write.write('AXIS X\n')
+    line = ''
+    for x in dict_algorithm['x_L_local']:
+        line = line + str(x)+ ' '
+    line = line + '\n'
+    file_to_write.write(line)
+    file_to_write.write('AXIS Y\n')
+    line = ''
+    counter_grain = 0
+    for grain in dict_sample['L_g']:
+        if grain.dissolved :
+            for y in dict_algorithm['y_L_local']:
+                line = line + str(y + counter_grain*(dy_max+dict_algorithm['dy_local'][1]-dict_algorithm['dy_local'][0])) + ' '
+            counter_grain = counter_grain + 1
+    line = line + '\n'
+    file_to_write.write(line)
+    file_to_write.write('DATA\n')
+    for grain in dict_sample['L_g']:
+        if grain.dissolved :
+            for l in range(len(dict_algorithm['y_L_local'])):
+                for c in range(len(dict_algorithm['x_L_local'])):
+                    file_to_write.write(str(grain.etai_M[-l-1][c])+'\n')
+    file_to_write.close()
+
+    #Write dissolution map
+    file_to_write = open('Data/e_diss_'+str(dict_algorithm['i_PF'])+'.txt','w')
+    file_to_write.write('AXIS X\n')
+    line = ''
+    for x in dict_algorithm['x_L_local']:
+        line = line + str(x)+ ' '
+    line = line + '\n'
+    file_to_write.write(line)
+    file_to_write.write('AXIS Y\n')
+    line = ''
+    counter_grain = 0
+    for grain in dict_sample['L_g']:
+        if grain.dissolved :
+            for y in dict_algorithm['y_L_local']:
+                line = line + str(y + counter_grain*(dy_max+dict_algorithm['dy_local'][1]-dict_algorithm['dy_local'][0])) + ' '
+            counter_grain = counter_grain + 1
+    line = line + '\n'
+    file_to_write.write(line)
+    file_to_write.write('DATA\n')
+    for grain in dict_sample['L_g']:
+        if grain.dissolved :
+            for l in range(len(dict_algorithm['y_L_local'])):
+                for c in range(len(dict_algorithm['x_L_local'])):
+                    file_to_write.write(str(dict_sollicitations['Dissolution_Energy'])+'\n')
+    file_to_write.close()
 
 #-------------------------------------------------------------------------------
 
@@ -655,6 +740,24 @@ def make_mp4():
 
     duration_movie  = 10 #sec
     writer = imageio.get_writer('Debug/PF_ite.mp4', fps=int(i_f/duration_movie))
+    for im in fileList:
+        writer.append_data(imageio.imread(im))
+    writer.close()
+
+    #look for the largest iteration
+    template_name = 'Debug/DEM_ite/Chain_force_'
+    i_f = 0
+    plotpath = Path(template_name+str(i_f)+'.png')
+    while plotpath.exists():
+        i_f = i_f + 1
+        plotpath = Path(template_name+str(i_f)+'.png')
+
+    fileList = []
+    for i in range(0,i_f):
+        fileList.append(template_name+str(i)+'.png')
+
+    duration_movie  = 10 #sec
+    writer = imageio.get_writer('Debug/ChainForce_ite.mp4', fps=int(i_f/duration_movie))
     for im in fileList:
         writer.append_data(imageio.imread(im))
     writer.close()

@@ -389,6 +389,36 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
+  def Compute_etaiM_global(self,dict_material):
+      '''from the grain geometry the phase variable is rebuilt
+      the distance between the point of the mesh and the particle center determines the value of the variable
+      a cosine profile is applied inside the interface
+      '''
+      # compute phase field
+      etai_M = np.array(np.zeros((len(y_L_local),len(x_L_local))))
+      for i_x in range(len(x_L_local)):
+          for i_y in range(len(y_L_local)):
+              p = np.array([x_L_local[i_x]+min(self.l_border_x)-dict_material['w'],
+                            y_L_local[len(y_L_local)-1-i_y]+min(self.l_border_y)-dict_material['w']])
+              r = np.linalg.norm(self.center - p)
+              if p[1]>self.center[1]:
+                  theta = math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
+              else :
+                  theta= 2*math.pi - math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
+
+              L_theta_R_i = list(abs(np.array(self.l_theta_r)-theta))
+              R = self.l_r[L_theta_R_i.index(min(L_theta_R_i))]
+              #Cosine_Profile
+              if r<R-dict_material['w']/2:
+                  etai_M[i_y][i_x] = 1
+              elif r>R+dict_material['w']/2:
+                  etai_M[i_y][i_x] = 0
+              else :
+                  etai_M[i_y][i_x] = 0.5*(1 + np.cos(math.pi*(r-R+dict_material['w']/2)/dict_material['w']))
+      self.etai_M = etai_M.copy()
+
+#-------------------------------------------------------------------------------
+
   def Write_txt_Decons_rebuild_local(self,dict_algorithm):
       '''write a .txt file
       this file is used to define initial condition of MOOSE simulation
