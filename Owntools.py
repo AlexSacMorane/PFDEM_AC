@@ -402,6 +402,23 @@ def Debug_Control_y_max_NR(L_g,y_max,mu,eta):
 
 #-------------------------------------------------------------------------------
 
+def Compute_porosity(dict_sample):
+    """
+    Compute the porosity = grains surface / box surface.
+
+        Input :
+            a sample dictionnary (a dict)
+        Output :
+            Nothing, but the sample dictionnary gets updated value concerning the porosity
+    """
+    Sg = 0
+    for grain in dict_sample['L_g']:
+        Sg = Sg + grain.surface
+    Sb = (dict_sample['x_box_max']-dict_sample['x_box_min'])*(dict_sample['y_box_max']-dict_sample['y_box_min'])
+    dict_sample['porosity'] = Sg/Sb
+
+#-------------------------------------------------------------------------------
+
 def Compute_k0(dict_sample,dict_sollicitations):
     '''Compute the varibale k0 = sigmaI/sigmaII'''
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
