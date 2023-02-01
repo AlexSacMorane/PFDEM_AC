@@ -249,11 +249,12 @@ def main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_so
     '''
     simulation_report.tic_tempo(datetime.now())
 
-    for grain in dict_sample['L_g']:
+    j_str = Owntools.Sort_Files('PF_'+str(dict_algorithm['i_PF']),dict_algorithm)
+
+    raise ValueError('Work to do after !')
+
+    for grain in dict_sample['L_g'] :
         if grain.dissolved :
-            Create_i_AC_local(grain,dict_algorithm, dict_material, dict_sample,dict_sollicitations)
-            os.system('mpiexec -n '+str(dict_algorithm['np_proc'])+' ~/projects/moose/modules/combined/combined-opt -i PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'.i')
-            j_str = Owntools.Sort_Files('PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id),dict_algorithm)
             grain.PFtoDEM_Multi_local('Output/PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'/PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'_other_'+str(j_str),dict_algorithm)
             grain.Geometricstudy_local(dict_geometry,dict_sample,simulation_report)
 
