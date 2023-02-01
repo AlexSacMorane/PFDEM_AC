@@ -490,7 +490,7 @@ def Write_txt_data(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
 
     #Compute phase map
     for grain in dict_sample['L_g']:
-        grain.Compute_etaiM_global(dict_algorithm, dict_material, dx_max, dy_max)
+        grain.Compute_etaiM_global(dict_algorithm, dict_material)
 
     #Write data for grains
     file_to_write = open('Data/g_'+str(dict_algorithm['i_PF'])+'.txt','w')

@@ -323,7 +323,7 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def Compute_etaiM_global(self,dict_material):
+  def Compute_etaiM_global(self,dict_algorithm,dict_material):
       '''from the grain geometry the phase variable is rebuilt
       the distance between the point of the mesh and the particle center determines the value of the variable
       a cosine profile is applied inside the interface
@@ -332,8 +332,8 @@ class Grain:
       etai_M = np.array(np.zeros((len(y_L_local),len(x_L_local))))
       for i_x in range(len(x_L_local)):
           for i_y in range(len(y_L_local)):
-              p = np.array([x_L_local[i_x]+min(self.l_border_x)-dict_material['w'],
-                            y_L_local[len(y_L_local)-1-i_y]+min(self.l_border_y)-dict_material['w']])
+              p = np.array([dict_algorithm['x_L_local'][i_x]+self.center[0]-(dict_algorithm['x_L_local'][0]+dict_algorithm['x_L_local'][-1])/2,
+                            dict_algorithm['y_L_local'][len(y_L_local)-1-i_y]+self.center[1]-(dict_algorithm['y_L_local'][0]+dict_algorithm['y_L_local'][-1])/2])
               r = np.linalg.norm(self.center - p)
               if p[1]>self.center[1]:
                   theta = math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
