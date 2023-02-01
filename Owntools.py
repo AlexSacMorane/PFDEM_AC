@@ -441,7 +441,7 @@ def Compute_k0(dict_sample,dict_sollicitations):
 
 #-------------------------------------------------------------------------------
 
-def Write_txt_data(dict_algorithm, dict_material, dict_sample):
+def Write_txt_data(dict_algorithm, dict_material, dict_sample, dict_sollicitations):
     '''
     Compute .txt files for PF simulation.
 
