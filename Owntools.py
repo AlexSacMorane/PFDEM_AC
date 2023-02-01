@@ -188,20 +188,10 @@ def Debug_DEM_f(dict_algorithm, dict_sample):
 
     fig = plt.figure(1,figsize=(16,9.12))
     for grain in dict_sample['L_g']:
-        plt.plot(grain.l_border_x,grain.l_border_y,'k')
-    for contact in dict_sample['L_contact'] :
-        alpha = (contact.g1.r_mean*0.1 + contact.g2.r_mean*0.1)/2
-        M = (contact.g1.center + contact.g2.center)/2
-        plt.plot([M[0], M[0]+contact.pc_normal[0]*alpha], [M[1], M[1]+contact.pc_normal[1]*alpha],'k')
-        plt.plot([M[0], M[0]+contact.pc_tangential[0]*alpha], [M[1], M[1]+contact.pc_tangential[1]*alpha],'k')
-    for contact in dict_sample['L_contact_gw'] :
-        alpha = contact.g.r_mean*0.1
-        if contact.nature == 'gwy_min' or contact.nature == 'gwy_max':
-            M = np.array([contact.g.center[0],contact.limit])
-        elif contact.nature == 'gwx_min' or contact.nature == 'gwx_max':
-            M = np.array([contact.limit,contact.g.center[1]])
-        plt.plot([M[0], M[0]+contact.nwg[0]*alpha], [M[1], M[1]+contact.nwg[1]*alpha],'k')
-        plt.plot([M[0], M[0]+contact.twg[0]*alpha], [M[1], M[1]+contact.twg[1]*alpha],'k')
+        if grain.dissolved :
+            plt.plot(grain.l_border_x,grain.l_border_y,'k-.')
+        else :
+            plt.plot(grain.l_border_x,grain.l_border_y,'k')
     plt.plot([x_min,x_max,x_max,x_min,x_min],[y_min,y_min,y_max,y_max,y_min],'k')
     plt.axis("equal")
     fig.savefig('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/png/Config_'+str(dict_algorithm['i_DEM'])+'.png')
