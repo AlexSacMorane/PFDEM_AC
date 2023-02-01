@@ -18,7 +18,7 @@ from pathlib import Path
 
 #Own function and class
 from Write_txt import Write_txt
-from Create_i_AC import Create_i_AC_local
+from Create_i_AC import Create_i_AC
 import Create_IC
 import Create_IC_Polygonal
 import Owntools

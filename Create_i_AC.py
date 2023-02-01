@@ -92,11 +92,11 @@ def Create_i_AC(dict_algorithm, dict_material, dict_sample, dict_sollicitations)
         elif j ==  56:
             line = line[:-1] +'\t[etai_txt]\n'+\
                               '\t\ttype = PiecewiseMultilinear\n'+\
-                              '\t\tdata_file = Data/g'+str(grain.id)+'_'+str(dict_algorithm['i_PF'])+'.txt\n'+\
+                              '\t\tdata_file = Data/g_'+str(dict_algorithm['i_PF'])+'.txt\n'+\
                               '\t[]\n'+\
                               '\t[e_dissolution_txt]\n'+\
                               '\t\ttype = PiecewiseMultilinear\n'+\
-                              '\t\tdata_file = Data/e_diss_g'+str(grain.id)+'_ite'+str(dict_algorithm['i_PF'])+'.txt\n'+\
+                              '\t\tdata_file = Data/e_diss_'+str(dict_algorithm['i_PF'])+'.txt\n'+\
                               '\t[]\n'
         elif j == 80:
             line = line[:-1] + ' ' + str(dict_algorithm['n_t_PF']*dict_algorithm['dt_PF']) + '\n'
