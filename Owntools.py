@@ -441,38 +441,6 @@ def Compute_k0(dict_sample,dict_sollicitations):
 
 #-------------------------------------------------------------------------------
 
-def Write_e_dissolution_txt(dict_sample,dict_sollicitations):
-      '''write an .txt file for MOOSE
-      this file described an homogenous dissolution field
-      '''
-      #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
-      #Load data needed
-      x_L = dict_sample['x_L']
-      y_L = dict_sample['y_L']
-      e_dissolution = dict_sollicitations['Dissolution_Energy']
-      #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
-
-      file_to_write = open('Data/e_dissolution.txt','w')
-      file_to_write.write('AXIS X\n')
-      line = ''
-      for x in x_L:
-          line = line + str(x)+ ' '
-      line = line + '\n'
-      file_to_write.write(line)
-
-      file_to_write.write('AXIS Y\n')
-      line = ''
-      for y in y_L:
-        line = line + str(y)+ ' '
-      line = line + '\n'
-      file_to_write.write(line)
-
-      file_to_write.write('DATA\n')
-      for l in range(len(y_L)):
-          for c in range(len(x_L)):
-              file_to_write.write(str(e_dissolution)+'\n')
-
-      file_to_write.close()
 
 #-------------------------------------------------------------------------------
 
