@@ -960,6 +960,24 @@ def make_mp4():
         writer.append_data(imageio.imread(im))
     writer.close()
 
+    #look for the largest iteration
+    template_name = 'Debug/DEM_ite/Chain_force_'
+    i_f = 0
+    plotpath = Path(template_name+str(i_f)+'.png')
+    while plotpath.exists():
+        i_f = i_f + 1
+        plotpath = Path(template_name+str(i_f)+'.png')
+
+    fileList = []
+    for i in range(0,i_f):
+        fileList.append(template_name+str(i)+'.png')
+
+    duration_movie  = 10 #sec
+    writer = imageio.get_writer('Debug/ChainForce_ite.mp4', fps=int(i_f/duration_movie))
+    for im in fileList:
+        writer.append_data(imageio.imread(im))
+    writer.close()
+
 #-------------------------------------------------------------------------------
 
 def save_DEM_tempo(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker):
