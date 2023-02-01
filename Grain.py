@@ -323,72 +323,6 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def Write_e_dissolution_local_txt(self,dict_algorithm,dict_sollicitations):
-      '''write an .txt file for MOOSE
-      this file described an homogenous dissolution field'''
-      file_to_write = open(f"Data/e_diss_g{self.id}_ite{dict_algorithm['i_PF']}.txt",'w')
-      file_to_write.write('AXIS X\n')
-      line = ''
-      for x in self.x_L_local:
-          line = line + str(x)+ ' '
-      line = line + '\n'
-      file_to_write.write(line)
-
-      file_to_write.write('AXIS Y\n')
-      line = ''
-      for y in self.y_L_local:
-        line = line + str(y)+ ' '
-      line = line + '\n'
-      file_to_write.write(line)
-
-      file_to_write.write('DATA\n')
-      for l in range(len(self.y_L_local)):
-          for c in range(len(self.x_L_local)):
-              file_to_write.write(str(dict_sollicitations['Dissolution_Energy'])+'\n')
-
-      file_to_write.close()
-
-#-------------------------------------------------------------------------------
-
-  def Compute_etaiM_local(self,dict_algorithm,dict_material):
-      '''from the grain geometry the phase variable is rebuilt
-      the distance between the point of the mesh and the particle center determines the value of the variable
-      a cosine profile is applied inside the interface
-      '''
-      x_min_local = min(self.l_border_x)-dict_material['w']
-      x_max_local = max(self.l_border_x)+dict_material['w']
-      y_min_local = min(self.l_border_y)-dict_material['w']
-      y_max_local = max(self.l_border_y)+dict_material['w']
-      x_L_local = np.arange(x_min_local,x_max_local+dict_algorithm['dx_local'],dict_algorithm['dx_local'])
-      y_L_local = np.arange(y_min_local,y_max_local+dict_algorithm['dy_local'],dict_algorithm['dy_local'])
-
-      self.x_L_local = x_L_local
-      self.y_L_local = y_L_local
-
-      # compute phase field
-      etai_M = np.array(np.zeros((len(y_L_local),len(x_L_local))))
-      for i_x in range(len(x_L_local)):
-          for i_y in range(len(y_L_local)):
-              p = np.array([x_L_local[i_x],y_L_local[len(y_L_local)-1-i_y]])
-              r = np.linalg.norm(self.center - p)
-              if p[1]>self.center[1]:
-                  theta = math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
-              else :
-                  theta= 2*math.pi - math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
-
-              L_theta_R_i = list(abs(np.array(self.l_theta_r)-theta))
-              R = self.l_r[L_theta_R_i.index(min(L_theta_R_i))]
-              #Cosine_Profile
-              if r<R-dict_material['w']/2:
-                  etai_M[i_y][i_x] = 1
-              elif r>R+dict_material['w']/2:
-                  etai_M[i_y][i_x] = 0
-              else :
-                  etai_M[i_y][i_x] = 0.5*(1 + np.cos(math.pi*(r-R+dict_material['w']/2)/dict_material['w']))
-      self.etai_M = etai_M.copy()
-
-#-------------------------------------------------------------------------------
-
   def Compute_etaiM_global(self,dict_material):
       '''from the grain geometry the phase variable is rebuilt
       the distance between the point of the mesh and the particle center determines the value of the variable
@@ -416,34 +350,6 @@ class Grain:
               else :
                   etai_M[i_y][i_x] = 0.5*(1 + np.cos(math.pi*(r-R+dict_material['w']/2)/dict_material['w']))
       self.etai_M = etai_M.copy()
-
-#-------------------------------------------------------------------------------
-
-  def Write_txt_Decons_rebuild_local(self,dict_algorithm):
-      '''write a .txt file
-      this file is used to define initial condition of MOOSE simulation
-      '''
-      file_to_write = open('Data/g'+str(self.id)+'_'+str(dict_algorithm['i_PF'])+'.txt','w')
-      file_to_write.write('AXIS X\n')
-      line = ''
-      for x in self.x_L_local:
-          line = line + str(x)+ ' '
-      line = line + '\n'
-      file_to_write.write(line)
-
-      file_to_write.write('AXIS Y\n')
-      line = ''
-      for y in self.y_L_local:
-        line = line + str(y)+ ' '
-      line = line + '\n'
-      file_to_write.write(line)
-
-      file_to_write.write('DATA\n')
-      for l in range(len(self.y_L_local)):
-          for c in range(len(self.x_L_local)):
-              file_to_write.write(str(self.etai_M[-l-1][c])+'\n')
-
-      file_to_write.close()
 
 #-------------------------------------------------------------------------------
 
