@@ -435,6 +435,23 @@ class Grain:
     # Update
     self.etai_M = etai_M.copy()
 
+#-------------------------------------------------------------------------------
+
+  def extract_PF(self, etai_M, counter_grain, dict_algorithm):
+     """
+     Extract from the global phase map the part for the grain.
+
+        Input :
+            itself (a grain)
+            a phase map (a numpy array)
+            a counter (an int)
+            an algorithm dictionnary (a dict)
+        Output :
+            Nothing, but the grain gets an updated phase map (a numpy array)
+     """
+     for x_i in range(dict_algorithm['nx_local']):
+         for y_i in range(dict_algorithm['ny_local']):
+             self.etai_M[y_i][x_i] = etai_M[y_i + counter_grain*(dict_algorithm['ny_local'])][x_i]
 
 #-------------------------------------------------------------------------------
 #Function
