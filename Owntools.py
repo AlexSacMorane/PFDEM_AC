@@ -536,6 +536,98 @@ def Write_txt_data(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
 
 #-------------------------------------------------------------------------------
 
+def PFtoDEM_Multi_global(FileToRead,dict_algorithm):
+    '''
+    Convert result from phase-field simulation to a discrete element modelization.
+
+        Input :
+            the name of file to read (a string)
+            an algorithm dictionnary (a dict)
+        Output :
+            the map of phase variables (a numpy array)
+    '''
+    #---------------------------------------------------------------------------
+    #Global parameters
+    #---------------------------------------------------------------------------
+
+    etai_M = np.zeros((len(dict_algorithm['y_L_global']),len(dict_algorithm['x_L_global']))) #etai
+
+    id_L = None
+    eta_selector_len = len('        <DataArray type="Float64" Name="etai')
+    end_len = len('        </DataArray>')
+    XYZ_selector_len = len('        <DataArray type="Float64" Name="Points"')
+    data_jump_len = len('          ')
+
+    for i_proc in range(dict_algorithm['np_proc']):
+
+        L_Work = [[], #X
+                  [], #Y
+                  []] #etai
+
+    #---------------------------------------------------------------------------
+    #Reading file
+    #---------------------------------------------------------------------------
+
+        f = open(f'{FileToRead}_{i_proc}.vtu','r')
+        data = f.read()
+        f.close()
+        lines = data.splitlines()
+
+        #iterations on line
+        for line in lines:
+
+            if line[0:eta_selector_len] == '        <DataArray type="Float64" Name="etai':
+                id_L = 2
+
+            elif line[0:XYZ_selector_len] == '        <DataArray type="Float64" Name="Points"':
+                id_L = 0
+
+            elif (line[0:end_len] == '        </DataArray>' or  line[0:len('          <InformationKey')] == '          <InformationKey') and id_L != None:
+                id_L = None
+
+            elif line[0:data_jump_len] == '          ' and id_L == 2: #Read etai
+                line = line[data_jump_len:]
+                c_start = 0
+                for c_i in range(0,len(line)):
+                    if line[c_i]==' ':
+                        c_end = c_i
+                        L_Work[id_L].append(float(line[c_start:c_end]))
+                        c_start = c_i+1
+                L_Work[id_L].append(float(line[c_start:]))
+
+            elif line[0:data_jump_len] == '          ' and id_L == 0: #Read [X, Y, Z]
+                line = line[data_jump_len:]
+                XYZ_temp = []
+                c_start = 0
+                for c_i in range(0,len(line)):
+                    if line[c_i]==' ':
+                        c_end = c_i
+                        XYZ_temp.append(float(line[c_start:c_end]))
+                        if len(XYZ_temp)==3:
+                            L_Work[0].append(XYZ_temp[0])
+                            L_Work[1].append(XYZ_temp[1])
+                            XYZ_temp = []
+                        c_start = c_i+1
+                XYZ_temp.append(float(line[c_start:]))
+                L_Work[0].append(XYZ_temp[0])
+                L_Work[1].append(XYZ_temp[1])
+
+        #Adaptating data
+        for i in range(len(L_Work[0])):
+            #Interpolation method
+            L_dy = []
+            for y_i in dict_algorithm['y_L_global'] :
+                L_dy.append(abs(y_i - L_Work[1][i]))
+            L_dx = []
+            for x_i in dict_algorithm['x_L_global'] :
+                L_dx.append(abs(x_i - L_Work[0][i]))
+            etai_M[-1-list(L_dy).index(min(L_dy))][list(L_dx).index(min(L_dx))] = L_Work[2][i]
+
+    # Update
+    return etai_M
+
+#-------------------------------------------------------------------------------
+
 def Plot_chain_force(i_PF,i_DEM):
     '''plot the chain force'''
     normal_ref = 5*10**6 #can be changed
