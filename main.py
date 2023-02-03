@@ -254,23 +254,12 @@ def main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_so
     j_str = Owntools.Sort_Files('PF_'+str(dict_algorithm['i_PF']),dict_algorithm)
 
     etai_M = Owntools.PFtoDEM_Multi_global('Output/PF_'+str(dict_algorithm['i_PF'])+'/PF_'+str(dict_algorithm['i_PF'])+'_other_'+str(j_str),dict_algorithm)
-
-
-    raise ValueError('Work to do after !')
-
+    counter_grain = 0
     for grain in dict_sample['L_g'] :
         if grain.dissolved :
-            grain.PFtoDEM_Multi_local('Output/PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'/PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'_other_'+str(j_str),dict_algorithm)
-            grain.Geometricstudy_local(dict_geometry,dict_sample,simulation_report)
-
-            #clean memory
-            if dict_algorithm['clean_memory']:
-                shutil.rmtree('Data')
-                os.mkdir('Data')
-                shutil.rmtree('Input')
-                os.mkdir('Input')
-                shutil.rmtree('Output')
-                os.mkdir('Output')
+            grain.extract_PF(etai_M.copy(), counter_grain, dict_algorithm)
+            counter_grain = counter_grain + 1
+            grain.Geometricstudy_local(dict_algorithm,dict_geometry,dict_sample,simulation_report)
 
     #Geometric study
     S_grains = 0
