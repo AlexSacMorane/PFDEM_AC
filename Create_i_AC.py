@@ -44,17 +44,17 @@ def Create_i_AC(dict_algorithm, dict_material, dict_sample, dict_sollicitations)
     for line in lines :
         j = j+1
         if j == 4:
-            line = line[:-1] + ' ' + str(len(grain.x_L_local)-1)+'\n'
+            line = line[:-1] + ' ' + str(len(dict_algorithm['x_L_global'])-1)+'\n'
         elif j == 5:
-            line = line[:-1] + ' ' + str(len(grain.y_L_local)-1)+'\n'
+            line = line[:-1] + ' ' + str(len(dict_algorithm['y_L_global'])-1)+'\n'
         elif j == 7:
-            line = line[:-1] + ' ' + str(min(grain.x_L_local))+'\n'
+            line = line[:-1] + ' ' + str(min(dict_algorithm['x_L_global']))+'\n'
         elif j == 8:
-            line = line[:-1] + ' ' + str(max(grain.x_L_local))+'\n'
+            line = line[:-1] + ' ' + str(max(dict_algorithm['x_L_local']))+'\n'
         elif j == 9:
-            line = line[:-1] + ' ' + str(min(grain.y_L_local))+'\n'
+            line = line[:-1] + ' ' + str(min(dict_algorithm['y_L_global']))+'\n'
         elif j == 10:
-            line = line[:-1] + ' ' + str(max(grain.y_L_local))+'\n'
+            line = line[:-1] + ' ' + str(max(dict_algorithm['y_L_global']))+'\n'
         elif j == 21:
             line = line[:-1] + '\t[./etai]\n'+\
                               '\t\torder = FIRST\n'+\
