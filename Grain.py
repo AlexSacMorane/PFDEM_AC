@@ -135,9 +135,13 @@ class Grain:
       '''
       #-------------------------------------------------------------------------
       #load data needed
-      n = dict_geometry['grain_discretisation']
-      x_L = self.x_L_local
-      y_L = self.y_L_local
+      n = dict_geometry['grain_discretization']
+      x_L = []
+      for x in dict_algorithm['x_L_local'] :
+          x_L.append(x + self.center[0]-(dict_algorithm['x_L_local'][0]+dict_algorithm['x_L_local'][-1])/2)
+      y_L = []
+      for y in dict_algorithm['y_L_local'] :
+          y_L.append(y + self.center[1]-(dict_algorithm['y_L_local'][0]+dict_algorithm['y_L_local'][-1])/2)
       #-------------------------------------------------------------------------
 
       L_border_old = []
