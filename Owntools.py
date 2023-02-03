@@ -475,8 +475,8 @@ def Write_txt_data(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
             y_max_local = max(grain.l_border_y)+dict_material['w']
             if y_max_local - y_min_local > dy_max:
                 dy_max = y_max_local - y_min_local
-    dict_algorithm['x_L_local'] = np.arange(0,dx_max,dict_algorithm['nx_local'])
-    dict_algorithm['y_L_local'] = np.arange(0,dy_max,dict_algorithm['ny_local'])
+    dict_algorithm['x_L_local'] = np.arange(0,dx_max,dict_algorithm['n_local'])
+    dict_algorithm['y_L_local'] = np.arange(0,dy_max,dict_algorithm['n_local'])
 
     #Compute phase map
     for grain in dict_sample['L_g']:
