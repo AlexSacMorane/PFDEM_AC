@@ -253,6 +253,9 @@ def main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_so
     os.system('mpiexec -n '+str(dict_algorithm['np_proc'])+' ~/projects/moose/modules/combined/combined-opt -i PF_'+str(dict_algorithm['i_PF'])+'.i')
     j_str = Owntools.Sort_Files('PF_'+str(dict_algorithm['i_PF']),dict_algorithm)
 
+    etai_M = Owntools.PFtoDEM_Multi_global('Output/PF_'+str(dict_algorithm['i_PF'])+'/PF_'+str(dict_algorithm['i_PF'])+'_other_'+str(j_str),dict_algorithm)
+
+
     raise ValueError('Work to do after !')
 
     for grain in dict_sample['L_g'] :
