@@ -260,6 +260,15 @@ def main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_so
             grain.PFtoDEM_Multi_local('Output/PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'/PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'_other_'+str(j_str),dict_algorithm)
             grain.Geometricstudy_local(dict_geometry,dict_sample,simulation_report)
 
+            #clean memory
+            if dict_algorithm['clean_memory']:
+                shutil.rmtree('Data')
+                os.mkdir('Data')
+                shutil.rmtree('Input')
+                os.mkdir('Input')
+                shutil.rmtree('Output')
+                os.mkdir('Output')
+
     #Geometric study
     S_grains = 0
     S_grains_dissolvable = 0
@@ -306,15 +315,6 @@ def main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_so
     #-----------------------------------------------------------------------------
     # Save tempo
     #-----------------------------------------------------------------------------
-
-    #clean memory
-    if dict_algorithm['clean_memory']:
-        shutil.rmtree('Data')
-        os.mkdir('Data')
-        shutil.rmtree('Input')
-        os.mkdir('Input')
-        shutil.rmtree('Output')
-        os.mkdir('Output')
 
     if dict_algorithm['SaveData'] :
         Owntools.save_tempo(dict_algorithm,dict_tracker)
