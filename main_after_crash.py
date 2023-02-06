@@ -33,14 +33,14 @@ import main
 #User
 #-------------------------------------------------------------------------------
 
-name_to_load = 'frac_5_run_1_save_dicts'
+name_to_load = 'LG_frac_15_run_2_save_dicts_before_pf'
 
 #-------------------------------------------------------------------------------
 #load data
 #-------------------------------------------------------------------------------
 
 toload = open(name_to_load,'rb')
-dict_save = pickle.load(toload,encoding = 'bytes')
+dict_save = pickle.load(toload)
 toload.close()
 dict_algorithm = dict_save['algorithm']
 dict_geometry = dict_save['geometry']
@@ -55,6 +55,9 @@ simulation_report = dict_save['report']
 #-------------------------------------------------------------------------------
 
 simulation_report.write('\nA crash occurs...\n\n')
+dict_algorithm['Debug_DEM'] = True
+dict_algorithm['i_print_plot'] = 50
+
 
 #-------------------------------------------------------------------------------
 #main

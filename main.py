@@ -150,7 +150,7 @@ def main_iteration_until_pf(dict_algorithm, dict_geometry, dict_material, dict_s
         dict_tracker['k0_xmin'].append(dict_sample['k0_xmin'])
         dict_tracker['k0_xmax'].append(dict_sample['k0_xmax'])
 
-        if dict_algorithm['i_DEM'] % dict_algorithm['i_print_plot'] == 0:
+        if dict_algorithm['i_DEM'] %dict_algorithm['i_print_plot'] == 0:
             print('\nPF '+str(dict_algorithm['i_PF'])+' -> i_DEM '+str(dict_algorithm['i_DEM']+1)+' / '+str(dict_algorithm['i_DEM_stop']+1)+' (max)')
             print('Ecin',int(Ecin),'/',int(dict_algorithm['Ecin_stop']),'('+str(int(100*Ecin/dict_algorithm['Ecin_stop'])),' %)')
             print('F_confinement',int(dict_sollicitations['Force_on_upper_wall']),'/',int(dict_sollicitations['Vertical_Confinement_Force']),'('+str(int(100*dict_sollicitations['Force_on_upper_wall']/dict_sollicitations['Vertical_Confinement_Force'])),' %)')
@@ -257,6 +257,15 @@ def main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_so
             grain.PFtoDEM_Multi_local('Output/PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'/PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'_other_'+str(j_str),dict_algorithm)
             grain.Geometricstudy_local(dict_geometry,dict_sample,simulation_report)
 
+            #clean memory
+            if dict_algorithm['clean_memory']:
+                shutil.rmtree('Data')
+                os.mkdir('Data')
+                shutil.rmtree('Input')
+                os.mkdir('Input')
+                shutil.rmtree('Output')
+                os.mkdir('Output')
+
     #Geometric study
     S_grains = 0
     S_grains_dissolvable = 0
@@ -298,20 +307,14 @@ def main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_so
         Owntools.Debug_Trackers(dict_tracker)
         Owntools.Plot_Contact_Distribution(dict_tracker)
         Owntools.Plot_YBoxMax(dict_tracker)
-        Owntools.Plot_Radius_Reduction(dict_sample, dict_tracker)
+        if dict_geometry['Shape_dissolvable'] == 'Disk' :
+            Owntools.Plot_Radius_Reduction(dict_sample, dict_tracker)
+        elif dict_geometry['Shape_dissolvable'] == 'Square' :
+            Owntools.Plot_Dimension_Reduction(dict_sample, dict_tracker)
 
     #-----------------------------------------------------------------------------
     # Save tempo
     #-----------------------------------------------------------------------------
-
-    #clean memory
-    if dict_algorithm['clean_memory']:
-        shutil.rmtree('Data')
-        os.mkdir('Data')
-        shutil.rmtree('Input')
-        os.mkdir('Input')
-        shutil.rmtree('Output')
-        os.mkdir('Output')
 
     if dict_algorithm['SaveData'] :
         Owntools.save_tempo(dict_algorithm,dict_tracker)

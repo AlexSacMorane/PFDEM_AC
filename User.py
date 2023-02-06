@@ -50,7 +50,7 @@ def All_parameters():
         R_mean = R_mean + L_R[i]*L_percentage_R[i]
     #Dissolvable
     Shape = 'Disk'
-    Dimension_mean = 300 #µm radius
+    Dimension_mean = 420 #µm radius
     L_Dimension = [1.2*Dimension_mean,1.1*Dimension_mean,0.9*Dimension_mean,0.8*Dimension_mean] #from larger to smaller
     L_percentage_Dimension = [1/6,1/3,1/3,1/6] #distribution of the different radius
     #Recompute the mean dimension
@@ -159,18 +159,18 @@ def All_parameters():
         dt_DEM_crit = math.pi*min(min(L_Dimension)/2,min(L_R))/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
 
     dt_DEM = dt_DEM_crit/8 #s time step during DEM simulation
-    factor_neighborhood = 1.5 #margin to detect a grain into a neighborhood
-    i_update_neighborhoods = 200 #the frequency of the update of the neighborhood of the grains and the walls
+    factor_neighborhood = 2.5 #margin to detect a grain into a neighborhood
+    i_update_neighborhoods = 100 #the frequency of the update of the neighborhood of the grains and the walls
     Spring_type = 'Ponctual' #Kind of contact
     #Stop criteria of the DEM
     i_DEM_stop = 3000 #maximum iteration for one DEM simulation
     Ecin_ratio = 0.0002
-    n_window_stop = 50
+    n_window_stop = 150
     dk0_stop = 0.05
     dy_box_max_stop = 0.5
 
     #PF-DEM
-    n_t_PFDEM = 100 #number of cycle PF-DEM
+    n_t_PFDEM = 60 #number of cycle PF-DEM
 
     #Number of processor
     np_proc = 4
@@ -182,7 +182,7 @@ def All_parameters():
     clean_memory = True #delete Data, Input, Output at the end of the simulation
     SaveData = True #save simulation
     main_folder_name = 'Data_AC_'+Shape #where data are saved
-    template_simulation_name = 'frac_'+str(int(frac_dissolved*100))+'_run_' #template of the simulation name
+    template_simulation_name = 'LG_frac_'+str(int(frac_dissolved*100))+'_run_' #template of the simulation name
 
     #write dict
     dict_algorithm = {
@@ -217,14 +217,14 @@ def All_parameters():
     #Initial condition parameters
 
     n_generation = 2 #number of grains generation
-    factor_ymax_box = 1.5 #margin to generate grains
+    factor_ymax_box = 1.7 #margin to generate grains
     N_test_max = 5000 # maximum number of tries to generate a grain without overlap
     i_DEM_stop_IC = 3000 #stop criteria for DEM during IC
     Debug_DEM_IC = False #plot configuration inside DEM during IC
     i_print_plot_IC = 200 #frenquency of the print and plot (if Debug_DEM_IC) for IC
     dt_DEM_IC = dt_DEM_crit/5 #s time step during IC
     Ecin_ratio_IC = 0.0005
-    factor_neighborhood_IC = 1.5 #margin to detect a grain into a neighborhood
+    factor_neighborhood_IC = 2 #margin to detect a grain into a neighborhood
     i_update_neighborhoods_gen = 20 #the frequency of the update of the neighborhood of the grains and the walls during IC generations
     i_update_neighborhoods_com = 100 #the frequency of the update of the neighborhood of the grains and the walls during IC combination
 

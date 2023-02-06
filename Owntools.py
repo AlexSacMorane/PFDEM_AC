@@ -884,6 +884,53 @@ def Plot_Contact_Distribution(dict_tracker):
 
 #-------------------------------------------------------------------------------
 
+def Plot_Dimension_Reduction(dict_sample, dict_tracker):
+    """
+    Plot the surface and dimension reduction.
+
+    A post process is done to quantify the dimension reduction (comparison with initial dimension and current dimension)
+
+        Input :
+            a sample dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    Lmean_diss_L = []
+    S_dL0_L = []
+    S_dLi_L = []
+    for i_Surface in range(len(dict_tracker['S_grains_dissolvable_L'])):
+        S_g = dict_tracker['S_grains_dissolvable_L'][i_Surface] / dict_sample['n_grain_diss']
+        Lmean = math.sqrt(S_g)
+        Lmean_diss_L.append(Lmean)
+        if i_Surface > 0 :
+            S_dL0_L.append((Lmean_diss_L[0]-Lmean)/Lmean_diss_L[0]*100/i_Surface)
+            S_dLi_L.append((Lmean_diss_L[i_Surface-1]-Lmean)/Lmean_diss_L[i_Surface]*100)
+
+    #plot
+    plt.figure(1,figsize = (16,9))
+
+    plt.subplot(221)
+    plt.plot(dict_tracker['S_grains_dissolvable_L'])
+    plt.title('Surface')
+
+    plt.subplot(222)
+    plt.plot(Lmean_diss_L)
+    plt.title('Mean dimension')
+
+    plt.subplot(223)
+    plt.plot(S_dL0_L)
+    plt.title('Dimension reduction (% of L0)')
+
+    plt.subplot(224)
+    plt.plot(S_dLi_L)
+    plt.title('Dimension reduction (% of Li-1)')
+
+    plt.savefig('Debug/SizeReduction.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
 def Plot_Radius_Reduction(dict_sample, dict_tracker):
     """
     Plot the surface and radius reduction.
