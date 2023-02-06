@@ -24,14 +24,21 @@ class Grain:
 #-------------------------------------------------------------------------------
 
   def __init__(self, dict_ic_to_real, Id_Eta = None, V = np.array([0,0]), A = np.array([0,0])):
-    '''defining the grain
-    each grain is described from a tempo grain (see Create_LG_IC)'''
+    """
+    Defining the grain.
 
+    The ic to real dictionnary is the data transmission between the temporary grain and the real one.
+        Input :
+            itself (a grain)
+            a ic to real dictionnary (a dict)
+        Output :
+            a grain is generated (a grain)
+    """
     #Id of the grain
     self.id = dict_ic_to_real['Id']
     self.id_eta = Id_Eta
     #Material property
-    self.dissolved = False
+    self.dissolved = dict_ic_to_real['Dissolved']
     self.y = dict_ic_to_real['Y']
     self.nu = dict_ic_to_real['Nu']
     self.g = self.y /2/(1+self.nu) #shear modulus
@@ -58,14 +65,19 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def __str__(self):
-      pass
-
-#-------------------------------------------------------------------------------
-
   def update_geometry_kinetic(self, V, A, W, DT):
-    '''update the acceleration and the velocity of a grain
-    update geometrical parameters as border and center nodes'''
+    """
+    Update the acceleration and the velocity of a grain. Update geometrical parameters as border and center nodes.
+
+        Input :
+            itself (a grain)
+            a speed (a 1 x 2 numpy array)
+            an acceleration (a 1 x 2 numpy array)
+            an angular speed (a float)
+            a time step (a float)
+        Ouput :
+            Nothing, but the position of the grain is updated
+    """
     #translation
     self.v = V
     self.a = A
@@ -100,22 +112,35 @@ class Grain:
 #-------------------------------------------------------------------------------
 
   def init_f_control(self,dict_sollicitations):
-      '''initialize the force applied to the grain
-      a gravity of g is applied'''
-      #-------------------------------------------------------------------------
-      #load data needed
-      g = dict_sollicitations['gravity']
-      #-------------------------------------------------------------------------
+      """
+      Initialize the force applied to the grain.
 
+      A gravity of g is applied.
+
+        Input :
+            itself (a grain)
+            a sollicitations dictionnary (a dict)
+        Ouput :
+            Nothing, but the force applied on the grain is initialized
+      """
       self.fx = 0
-      self.fy = -g*self.m
+      self.fy = -dict_sollicitations['gravity']*self.m
       self.f = np.array([self.fx,self.fy])
       self.mz = 0
 
 #-------------------------------------------------------------------------------
 
   def update_f(self, Fx, Fy, p_application):
-    '''add a force (an array [Fx,Fy]) to the grain'''
+    """
+    Add a force to the grain.
+
+        Input :
+            itself (a grain)
+            the value x and y of the force (two float)
+            an applicaiton point (a 1 x 2 numpy array)
+        Output :
+            Nothing, but a force is applied to the grain
+    """
     self.fx = self.fx + Fx
     self.fy = self.fy + Fy
     self.f = np.array([self.fx,self.fy])
@@ -127,12 +152,26 @@ class Grain:
 #-------------------------------------------------------------------------------
 
   def Geometricstudy_local(self,dict_geometry,dict_sample,simulation_report):
-      '''Searching limits
-      Not best method but first approach
-      We iterate on y constant, we look for a value under and over 0.5
+      """
+      Searching border of the grain.
+
+      We iterate on y constant, we look for a value under and over 0.5.
       If both conditions are verified, there is a limit at this y
-      Same with iteration on x constant
-      '''
+      Same with iteration on x constant.
+
+      Then, searching Surface, Center of mass and Inertia.
+      A Monte Carlo Method is applied.
+      A box is defined, we take a random point and we look if it is inside or outside the grain.
+      Properties are the statistic times the box properties.
+
+        Input :
+            itself (a grain)
+            a geometry dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a simulation report (a report)
+        Output :
+            Nothing, but geometric parameters are updated
+      """
       #-------------------------------------------------------------------------
       #load data needed
       n = dict_geometry['grain_discretization']
@@ -227,10 +266,7 @@ class Grain:
       self.l_border = L_border
 
       #-------------------------------------------------------------------------------
-      #Searching Surface, Center of mass and Inertia.
-      #Monte Carlo Method
-      #A box is defined, we take a random point and we look if it is inside or outside the grain
-      #Properties are the statistic times the box properties
+      #Monte carlo method
       #-------------------------------------------------------------------------------
 
       min_max_defined = False
@@ -288,11 +324,15 @@ class Grain:
       L_border_x.append(L_border_x[0])
       L_border_y.append(L_border_y[0])
       #reorganize lists
-      L_R.reverse()
-      L_theta_R.reverse()
-      i_min_theta = L_theta_R.index(min(L_theta_R))
-      L_R = L_R[i_min_theta:]+L_R[:i_min_theta]
-      L_theta_R = L_theta_R[i_min_theta:]+L_theta_R[:i_min_theta]
+      i_theta = 0
+      while L_theta_R[i_theta] < 2*math.pi/10 or 2*math.pi*9/10 < L_theta_R[i_theta]:
+          i_theta = i_theta + 1
+      if L_theta_R[i_theta + 1] < L_theta_R[i_theta] :
+          L_R.reverse()
+          L_theta_R.reverse()
+          L_border_x.reverse()
+          L_border_y.reverse()
+          L_border.reverse()
 
       self.r_min = np.min(L_R)
       self.r_max = np.max(L_R)
@@ -304,15 +344,23 @@ class Grain:
       self.center = Center_Mass
       self.l_border_x = L_border_x
       self.l_border_y = L_border_y
+      self.l_border = L_border
       self.inertia = Inertia
 
 #-------------------------------------------------------------------------------
 
   def P_is_inside(self,P):
-      '''Franklin 1994, see Alonso-Marroquin 2009
-      determine if a point P is inside of a grain
-      slide on y constant
-      '''
+      """
+      Determine if a point P is inside a grain.
+
+      See Franklin 1994, see Alonso-Marroquin 2009
+
+        Input :
+            itself (a grain)
+            a point (a 1 x 2 numpy array)
+        Output :
+            a Boolean, True if the point is inside the grain (a Boolean²)
+      """
       counter = 0
       for i_p_border in range(len(self.l_border)-1):
           #consider only points if the coordinates frame the y-coordinate of the point
@@ -358,7 +406,16 @@ class Grain:
 #-------------------------------------------------------------------------------
 
   def PFtoDEM_Multi_local(self,FileToRead,dict_algorithm):
-    '''Convert result from phase-field simulation to a discrete element modelization'''
+    """
+    Read data from the moose simulation.
+
+        Input :
+            itself (a grain)
+            the template of the name to read (a string)
+            an algorithm dictionnary (a dict)
+        Output :
+            Nothing, but the phase field variable is updated (a nx x ny numpy array)
+    """
     #---------------------------------------------------------------------------
     #Global parameters
     #---------------------------------------------------------------------------
