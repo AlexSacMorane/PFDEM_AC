@@ -14,32 +14,37 @@ This tools can be : - a little function
 #-------------------------------------------------------------------------------
 
 import numpy as np
+import matplotlib.pyplot as plt
 import math
 import Report
-import matplotlib.pyplot as plt
 import os
-from pathlib import Path
+import shutil
 import pickle
-from pathlib import Path
-from datetime import datetime
 import random
 import imageio
+from pathlib import Path
+from datetime import datetime
 import Contact
 import Contact_gw
 import Grain
 
 #-------------------------------------------------------------------------------
 
-class Grain_pp:
+class Grain_cf:
 
     def __init__(self, Id, Dissolved, Center, Coordinate_x, Coordinate_y):
-        '''defining a grain for the postprocess
+        """
+        Defining a grain for the chain force plot.
 
-        each grain is described by a id (an integer class)
-                                   a center (an array [x,y])
-                                   a list of x-coordinate of border (a list)
-                                   a list of y-coordinate of border (a list)
-        '''
+            Input :
+                itself (a Grain_cf)
+                an id (a int)
+                a Boolean to know if the grain is dissolvable (a Boolean)
+                a center (a 1 x 2 numpy array)
+                two lists of vertices coordinates x and y (two lists)
+            Output :
+                Nothing, but a post process grain is generated
+        """
         self.id = Id
         self.dissolved = Dissolved
         self.center = Center
@@ -48,15 +53,20 @@ class Grain_pp:
 
 #-------------------------------------------------------------------------------
 
-class Contact_pp:
+class Contact_cf:
 
     def __init__(self, Id_g1, Id_g2, L_g, Normal):
-        '''defining a contact grain-grain for the postprocess
-        each contact is described by a grain 1 id (an integer class)
-                                     a grain 2 id (an integer class)
-                                     the list of all grain (list of grain_pp)
-                                     the value of the normal reaction (a float)
-        '''
+        """
+        Defining a contact grain - grain for the chain force plot.
+
+            Input :
+                itself (a Contact_cf)
+                the ids of the grains (two int)
+                a list of post process grains (a list)
+                the value of normal reaction of the contact (a float)
+            Output :
+                Nothing, but a post process contact grain - grain is generated
+        """
         for g in L_g:
             if g.id == Id_g1:
                 self.g1 = g
@@ -65,8 +75,15 @@ class Contact_pp:
         self.normal = Normal
 
     def plot(self, normal_ref):
-        #prepare the chain force plot
+        """
+        Prepare the chain force plot.
 
+            Input :
+                itself (a Contact_cf)
+                a reference value (a float)
+            Output :
+                Nothing, but the post process contact gets the ratio of the normal force with the reference value as a new attribut (a float)
+        """
         L_x = [self.g1.center[0], self.g2.center[0]]
         L_y = [self.g1.center[1], self.g2.center[1]]
         ratio_normal = self.normal/normal_ref
@@ -74,17 +91,19 @@ class Contact_pp:
 
 #-------------------------------------------------------------------------------
 
-class Contact_gw_pp:
+class Contact_gw_cf:
 
     def __init__(self, Id_g, L_g, Nature, Limit, Normal):
-        '''defining a contact grain-wall for the postprocess
+        """
+        Defining a contact grain-wall for the chain force plot.
 
-        each contact is described by a grain id (an integer class)
-                                     the list of all grain (list of grain_pp)
-                                     the contact nature (a string)
-                                     the wall coordinate (a float)
-                                     the value of the normal reaction (a float)
-        '''
+            Input :
+                itself (a Contact_gw_cf)
+                a id of the grain (a float)
+                the list of the post process grain (a list)
+                the nature of the wall (a string)
+                the value of normal reaction of the contact (a float)
+        """
         for g in L_g:
             if g.id == Id_g:
                 self.g = g
@@ -93,8 +112,15 @@ class Contact_gw_pp:
         self.normal = Normal
 
     def plot(self, normal_ref):
-        #prepare the chain force plot
+        """
+        Prepare the chain force plot.
 
+            Input :
+                itself (a Contact_gw_cf)
+                a reference value (a float)
+            Output :
+                Nothing, but the post process contact gets the ratio of the normal force with the reference value as a new attribut (a float)
+        """
         if self.nature == 'gwx_min' or self.nature == 'gwx_max':
             virtual_center = [self.limit, self.g.center[1]]
         elif self.nature == 'gwy_min' or self.nature == 'gwy_max':
@@ -109,7 +135,14 @@ class Contact_gw_pp:
 #-------------------------------------------------------------------------------
 
 def index_to_str(j):
-      '''an integer is converted to a float with 3 components'''
+      """
+      Convert an integer to a float with 3 components
+
+        Input :
+            an integer (a int)
+        Output :
+            a string (a string)
+      """
       if j < 10:
           j_str = '00'+str(j)
       elif 10 <= j and j < 100:
@@ -121,7 +154,14 @@ def index_to_str(j):
 #-------------------------------------------------------------------------------
 
 def Stop_Debug(simulation_report):
-      '''stop simulation'''
+      """
+      Stop simulation for debugging.
+
+        Input :
+            the simulation report (a report)
+        Output :
+            Nothing, but simulations stops
+      """
       simulation_report.write('Stop because after it is not corrected !\n')
       simulation_report.end(datetime.now())
       raise ValueError('Stop because after it is not corrected !')
@@ -129,9 +169,15 @@ def Stop_Debug(simulation_report):
 #-------------------------------------------------------------------------------
 
 def Debug_DEM_f(dict_algorithm, dict_sample):
-    '''plot the configuration of the grains during a DEM step
+    """
+    Plot the configuration of the grains during a DEM step.
 
-    Only if Debug_DEM is True'''
+        Input:
+            an algorithm dictionnary (a dict)
+            a sample dictionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
     #load data needed
     x_min = dict_sample['x_box_min']
@@ -154,9 +200,15 @@ def Debug_DEM_f(dict_algorithm, dict_sample):
 #-------------------------------------------------------------------------------
 
 def Debug_configuration(dict_algorithm,dict_sample):
-  '''plot the configuration of the grains after the DEM step
+  """
+  Plot the configuration of the grains before / after the DEM step.
 
-  Only if Debug is True'''
+        Input:
+            an algorithm dictionnary (a dict)
+            a sample dictionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+  """
   #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
   #load data needed
   x_min = dict_sample['x_box_min']
@@ -189,38 +241,49 @@ def Debug_configuration(dict_algorithm,dict_sample):
 #-------------------------------------------------------------------------------
 
 def Debug_Trackers(dict_tracker):
-    '''plot the trakers used during DEM simulation
+    """
+    Plot the trakers used during PFDEM simulation
 
-    only if Debug is True'''
+        Input :
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but severals .png files are generated (files)
+    """
     #Trackers
     fig = plt.figure(1,figsize=(16,9.12))
-    plt.plot(dict_tracker['t_L'],dict_tracker['S_grains_L'])
-    plt.title('Evolution of the grains surface')
-    fig.savefig('Debug/Evolution_Surface.png')
+    plt.plot(dict_tracker['t_L'],dict_tracker['S_grains_dissolvable_L'])
+    plt.title('Evolution of the dissolvable grains surface')
+    fig.savefig('Debug/Evolution_Dissolvable_Surface.png')
     plt.close(1)
 
     fig = plt.figure(1,figsize=(16,9.12))
-    plt.plot(dict_tracker['S_dissolved_L'][:-1],dict_tracker['k0_xmin_L'],label='k0 with xmin')
-    plt.plot(dict_tracker['S_dissolved_L'][:-1],dict_tracker['k0_xmax_L'],label='k0 with xmax')
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'],dict_tracker['k0_xmin_L'],label='k0 with xmin')
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'],dict_tracker['k0_xmax_L'],label='k0 with xmax')
     plt.title('Evolution of the k0')
-    plt.xlabel('Grains surface dissolved (µm2)')
-    fig.savefig('Debug/Evolution_k0_with_TotalSurface.png')
-    plt.close(1)
-
-    fig = plt.figure(1,figsize=(16,9.12))
-    plt.plot(dict_tracker['S_dissolved_perc_L'][:-1],dict_tracker['k0_xmin_L'],label='k0 with xmin')
-    plt.plot(dict_tracker['S_dissolved_perc_L'][:-1],dict_tracker['k0_xmax_L'],label='k0 with xmax')
-    plt.title('Evolution of the k0')
-    plt.xlabel('Percentage of grains surface dissolved (%)')
+    plt.xlabel('Percentage of dissolvable grains surface dissolved (%)')
     fig.savefig('Debug/Evolution_k0_with_percentage_dissolved.png')
+    plt.close(1)
+
+    fig = plt.figure(1,figsize=(16,9.12))
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'], dict_tracker['porosity_L'][1:])
+    plt.title('Evolution of the porosity')
+    plt.xlabel('Percentage of dissolvable grains surface dissolved (%)')
+    fig.savefig('Debug/Evolution_porosity.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
 
 def Debug_Trackers_DEM(dict_algorithm,dict_sollicitations,dict_tracker):
-    '''plot the trakers used during DEM simulation
+    """
+    Plot the trakers used during DEM simulation.
 
-    only if Debug is True'''
+        Input :
+            an algorithm dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but .png file is generated (a file)
+    """
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2, figsize=(16,9),num=1)
 
     ax1.set_title('Mean kinetic energy (e-12 J)')
@@ -251,10 +314,20 @@ def Debug_Trackers_DEM(dict_algorithm,dict_sollicitations,dict_tracker):
 #-------------------------------------------------------------------------------
 
 def Sort_Files(name_template,dict_algorithm):
-     '''sort files generated by MOOSE to different directories'''
+     """
+     Sort files generated by MOOSE to different directories.
+
+        Input :
+            a template of the simulation files (a string)
+            an algorithm dictionnary (a dict)
+        Output :
+            Nothing, but files are sorted
+     """
      #master simulation
      os.rename(name_template+'_out.e','Output/'+name_template+'_out.e')
      os.rename(name_template+'.i','Input/'+name_template+'.i')
+     if Path('Output/'+name_template).exists():
+         shutil.rmtree('Output/'+name_template)
      os.mkdir('Output/'+name_template)
      j = 0
      j_str = index_to_str(j)
@@ -286,8 +359,17 @@ def Dissolution_Distribution(dict_sample,dict_sollicitations,simulation_report):
 #-------------------------------------------------------------------------------
 
 def error_on_ymax_f(dy,overlap_L,k_L,Force_target) :
-    '''compute the function f to control the upper wall
-    difference between the force applied and the target value'''
+    """
+    Compute the function f to control the upper wall. It is the difference between the force applied and the target value.
+
+        Input :
+            an increment of the upper wall position (a float)
+            a list of overlap for contact between grain and upper wall (a list)
+            a list of spring for contact between grain and upper wall (a list)
+            a confinement force (a float)
+        Output :
+            the difference between the force applied and the confinement (a float)
+    """
     f = Force_target
     for i in range(len(overlap_L)):
         f = f - k_L[i]*(max(overlap_L[i]-dy,0))**(3/2)
@@ -296,7 +378,16 @@ def error_on_ymax_f(dy,overlap_L,k_L,Force_target) :
 #-------------------------------------------------------------------------------
 
 def error_on_ymax_df(dy,overlap_L,k_L) :
-    '''compute the derivative function df to control the upper wall'''
+    """
+    Compute the derivative function df to control the upper wall (error_on_ymax_f()).
+
+        Input :
+            an increment of the upper wall position (a float)
+            a list of overlap for contact between grain and upper wall (a list)
+            a list of spring for contact between grain and upper wall (a list)
+        Output :
+            the derivative of error_on_ymax_f() (a float)
+    """
     df = 0
     for i in range(len(overlap_L)):
         df = df + 3/2*k_L[i]*(max(overlap_L[i]-dy,0))**(1/2)
@@ -305,9 +396,16 @@ def error_on_ymax_df(dy,overlap_L,k_L) :
 #-------------------------------------------------------------------------------
 
 def Control_y_max_NR(dict_sample,dict_sollicitations):
-    '''Control the upper wall to apply force
-    a Newton-Raphson method is applied
-    '''
+    """
+    Control the upper wall to apply force.
+
+    A Newton-Raphson method is applied to verify the confinement.
+        Input :
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+        Output :
+            Nothing, but the sample dictionnary is updated, concerning the upper wall position and force applied (two floats)
+    """
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #load data needed
     Force_target = dict_sollicitations['Vertical_Confinement_Force']
@@ -353,7 +451,15 @@ def Control_y_max_NR(dict_sample,dict_sollicitations):
 #-------------------------------------------------------------------------------
 
 def Reset_y_max(L_g,Force):
-    '''the upper wall is located as a single contact verify the target value'''
+    """
+    The upper wall is located as a single contact verify the target value.
+
+        Input :
+            the list of temporary grains (a list)
+            the confinement force (a float)
+        Output :
+            the upper wall position (a float)
+    """
     print('Reset of the y_max on the upper grain')
     y_max = None
     id_grain_max = None
@@ -375,23 +481,6 @@ def Reset_y_max(L_g,Force):
 
 #-------------------------------------------------------------------------------
 
-def Debug_Control_y_max_NR(L_g,y_max,mu,eta):
-    '''recompute the force applied on upper wall after the control step
-    debug function
-    '''
-    F = 0
-    for grain in L_g:
-        p_y_max = max(grain.l_border_y)
-        #grain-wall y_max
-        if p_y_max > y_max :
-            overlap = p_y_max - y_max
-            k = 5*4/3*grain.y/(1-grain.nu*grain.nu)*math.sqrt(grain.r_mean)
-            F = F + k*overlap**(3/2)
-
-    return F
-
-#-------------------------------------------------------------------------------
-
 def Compute_porosity(dict_sample):
     """
     Compute the porosity = grains surface / box surface.
@@ -410,7 +499,15 @@ def Compute_porosity(dict_sample):
 #-------------------------------------------------------------------------------
 
 def Compute_k0(dict_sample,dict_sollicitations):
-    '''Compute the varibale k0 = sigmaI/sigmaII'''
+    """
+    Compute the k0 = sigma_2 / sigma_1 ratio.
+
+        Input :
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+        Output :
+            Nothing, but the sample dictionnary gets updated value concerning the k0
+    """
     #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     #Load data needed
     L_contact_gw = dict_sample['L_contact_gw']
@@ -647,13 +744,13 @@ def Plot_chain_force(i_PF,i_DEM):
 
         if line == '<grain_c>\n':
             Read_one_grain = False
-            L_g.append(Grain_pp(id,dissolved,center,coordinate_x,coordinate_y))
+            L_g.append(Grain_cf(id,dissolved,center,coordinate_x,coordinate_y))
         elif line == '<contact_c>\n':
             Read_one_contact = False
-            L_contact.append(Contact_pp(L_id_g[0], L_id_g[1], L_g, normal_reaction+normal_damping))
+            L_contact.append(Contact_cf(L_id_g[0], L_id_g[1], L_g, normal_reaction+normal_damping))
         elif line == '<contact_w_c>\n':
             Read_one_contact_wall = False
-            L_contact_gw.append(Contact_gw_pp(id_g, L_g, type, limit, normal_reaction+normal_damping))
+            L_contact_gw.append(Contact_gw_cf(id_g, L_g, type, limit, normal_reaction+normal_damping))
 
         if Read_one_grain:
             if line[:len('\tid : ')] == '\tid : ':
@@ -820,11 +917,213 @@ def Plot_chain_force(i_PF,i_DEM):
 
 #-------------------------------------------------------------------------------
 
-def make_mp4():
-    '''The goal of this function is to create a movie with all configuration pictures
+def Compute_Contact_Grain_Distribution(dict_sample):
+    """
+    Compute the repartition of grain-grain contacts in three categories : dissolvable-dissolvable, undissolvable-dissolvable or undissolvable-undissolvable.
 
-    from https://www.blog.pythonlibrary.org/2021/06/23/creating-an-animated-gif-with-python/
-    '''
+    Compute the repartition of grains two categories : dissolvable or undissolvable.
+
+        Input :
+            a sample dictionnary (a dict)
+        Output :
+            Nothing, but the dictionnary gets updated values (7 ints)
+    """
+    #count contacts
+    n_contact = 0
+    n_contact_diss_diss = 0
+    n_contact_undiss_diss = 0
+    n_contact_undiss_undiss = 0
+    for contact in dict_sample['L_contact'] :
+        n_contact = n_contact + 1
+        if contact.g1.dissolved and contact.g2.dissolved :
+             n_contact_diss_diss = n_contact_diss_diss + 1
+        elif (contact.g1.dissolved and not contact.g2.dissolved) or (not contact.g1.dissolved and contact.g2.dissolved) :
+             n_contact_undiss_diss = n_contact_undiss_diss + 1
+        elif not contact.g1.dissolved and not contact.g2.dissolved :
+             n_contact_undiss_undiss = n_contact_undiss_undiss + 1
+
+    #count grains
+    n_grain = 0
+    n_grain_diss = 0
+    n_grain_undiss = 0
+    for grain in dict_sample['L_g']:
+        n_grain = n_grain + 1
+        if grain.dissolved :
+            n_grain_diss = n_grain_diss + 1
+        else :
+            n_grain_undiss = n_grain_undiss + 1
+
+    #update dict
+    dict_sample['n_contact'] = n_contact
+    dict_sample['n_contact_diss_diss'] = n_contact_diss_diss
+    dict_sample['n_contact_undiss_diss'] = n_contact_undiss_diss
+    dict_sample['n_contact_undiss_undiss'] = n_contact_undiss_undiss
+    dict_sample['n_grain'] = n_grain
+    dict_sample['n_grain_diss'] = n_grain_diss
+    dict_sample['n_grain_undiss'] = n_grain_undiss
+
+#-------------------------------------------------------------------------------
+
+def Plot_YBoxMax(dict_tracker):
+    """
+    Plot the evolution of the upper wall position.
+
+        Input :
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    plt.figure(1,figsize=(16,9))
+
+    plt.plot(dict_tracker['t_L'], dict_tracker['y_box_max_L'])
+    plt.title('Upper wall position (µm)')
+    plt.xlabel('Time (s)')
+
+    plt.savefig('Debug/UpperWallPosition.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
+def Plot_Contact_Distribution(dict_tracker):
+    """
+    Plot the evolution of the total contact and mean contact distributions.
+
+    The function Compute_Contact_Grain_Distribution() needed to be runned before.
+
+        Input :
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    plt.figure(1,figsize=(16,9))
+
+    plt.subplot(121)
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'], dict_tracker['n_contact_diss_diss_L'], label = 'Contact diss-diss')
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'], dict_tracker['n_contact_undiss_diss_L'], label = 'Contact undiss-diss')
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'], dict_tracker['n_contact_undiss_undiss_L'], label = 'Contact undiss-undiss')
+    plt.legend()
+    plt.title('Total contact distribution')
+    plt.xlabel('Percentage of dissolvable grains surface dissolved (%)')
+
+    plt.subplot(122)
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'], dict_tracker['mean_diss_undiss_L'], label = 'As diss with undiss')
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'], dict_tracker['mean_undiss_diss_L'], label = 'As undiss with diss')
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'], dict_tracker['mean_diss_diss_L'], label = 'As diss with diss')
+    plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'], dict_tracker['mean_undiss_undiss_L'], label = 'As undiss with undiss')
+    plt.legend()
+    plt.title('Mean contact distribution, following cases')
+    plt.xlabel('Percentage of dissolvable grains surface dissolved (%)')
+
+    plt.savefig('Debug/Contact_distribution.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
+def Plot_Dimension_Reduction(dict_sample, dict_tracker):
+    """
+    Plot the surface and dimension reduction.
+
+    A post process is done to quantify the dimension reduction (comparison with initial dimension and current dimension)
+
+        Input :
+            a sample dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    Lmean_diss_L = []
+    S_dL0_L = []
+    S_dLi_L = []
+    for i_Surface in range(len(dict_tracker['S_grains_dissolvable_L'])):
+        S_g = dict_tracker['S_grains_dissolvable_L'][i_Surface] / dict_sample['n_grain_diss']
+        Lmean = math.sqrt(S_g)
+        Lmean_diss_L.append(Lmean)
+        if i_Surface > 0 :
+            S_dL0_L.append((Lmean_diss_L[0]-Lmean)/Lmean_diss_L[0]*100/i_Surface)
+            S_dLi_L.append((Lmean_diss_L[i_Surface-1]-Lmean)/Lmean_diss_L[i_Surface]*100)
+
+    #plot
+    plt.figure(1,figsize = (16,9))
+
+    plt.subplot(221)
+    plt.plot(dict_tracker['S_grains_dissolvable_L'])
+    plt.title('Surface')
+
+    plt.subplot(222)
+    plt.plot(Lmean_diss_L)
+    plt.title('Mean dimension')
+
+    plt.subplot(223)
+    plt.plot(S_dL0_L)
+    plt.title('Dimension reduction (% of L0)')
+
+    plt.subplot(224)
+    plt.plot(S_dLi_L)
+    plt.title('Dimension reduction (% of Li-1)')
+
+    plt.savefig('Debug/SizeReduction.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
+def Plot_Radius_Reduction(dict_sample, dict_tracker):
+    """
+    Plot the surface and radius reduction.
+
+    A post process is done to quantify the radius reduction (comparison with initial radius and current radius)
+
+        Input :
+            a sample dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    rmean_diss_L = []
+    S_dr0_L = []
+    S_dri_L = []
+    for i_Surface in range(len(dict_tracker['S_grains_dissolvable_L'])):
+        S_g = dict_tracker['S_grains_dissolvable_L'][i_Surface] / dict_sample['n_grain_diss']
+        Rmean = math.sqrt(S_g/math.pi)
+        rmean_diss_L.append(Rmean)
+        if i_Surface > 0 :
+            S_dr0_L.append((rmean_diss_L[0]-Rmean)/rmean_diss_L[0]*100/i_Surface)
+            S_dri_L.append((rmean_diss_L[i_Surface-1]-Rmean)/rmean_diss_L[i_Surface]*100)
+
+    #plot
+    plt.figure(1,figsize = (16,9))
+
+    plt.subplot(221)
+    plt.plot(dict_tracker['S_grains_dissolvable_L'])
+    plt.title('Surface')
+
+    plt.subplot(222)
+    plt.plot(rmean_diss_L)
+    plt.title('Mean radius')
+
+    plt.subplot(223)
+    plt.plot(S_dr0_L)
+    plt.title('Radius reduction (% of R0)')
+
+    plt.subplot(224)
+    plt.plot(S_dri_L)
+    plt.title('Radius reduction (% of Ri-1)')
+
+    plt.savefig('Debug/SizeReduction.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
+def make_mp4():
+    """
+    The goal of this function is to create a movie with all configuration pictures.
+
+    From https://www.blog.pythonlibrary.org/2021/06/23/creating-an-animated-gif-with-python/
+
+        Input :
+            Nothing
+        Output :
+            Nothing, but a .mp4 file is generated (a file)
+    """
     #look for the largest iteration
     template_name = 'Debug/DEM_ite/PF_ite_'
     i_f = 0
@@ -832,11 +1131,9 @@ def make_mp4():
     while plotpath.exists():
         i_f = i_f + 1
         plotpath = Path(template_name+str(i_f)+'.png')
-
     fileList = []
     for i in range(0,i_f):
         fileList.append(template_name+str(i)+'.png')
-
     duration_movie  = 10 #sec
     writer = imageio.get_writer('Debug/PF_ite.mp4', fps=int(i_f/duration_movie))
     for im in fileList:
@@ -850,11 +1147,9 @@ def make_mp4():
     while plotpath.exists():
         i_f = i_f + 1
         plotpath = Path(template_name+str(i_f)+'.png')
-
     fileList = []
     for i in range(0,i_f):
         fileList.append(template_name+str(i)+'.png')
-
     duration_movie  = 10 #sec
     writer = imageio.get_writer('Debug/ChainForce_ite.mp4', fps=int(i_f/duration_movie))
     for im in fileList:
@@ -864,8 +1159,17 @@ def make_mp4():
 #-------------------------------------------------------------------------------
 
 def save_DEM_tempo(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker):
-    '''save trackers and configuration during DEM interations
-    '''
+    """
+    Save trackers and configuration during DEM interations.
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a save file is generated (a file)
+    """
     outfile = open('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/save_tempo','wb')
     dict_save = {}
     dict_save['E_cin_stop'] = dict_algorithm['Ecin_stop']
@@ -888,8 +1192,18 @@ def save_DEM_tempo(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker):
 
 #-------------------------------------------------------------------------------
 
-def save_DEM_final(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker):
-    '''save trackers and configuration at the end of DEM iteration'''
+def save_DEM_final(dict_algorithm, dict_sample, dict_sollicitations, dict_tracker):
+    """
+    Save trackers and configuration at the end of DEM iteration.
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a save file is generated (a file)
+    """
     os.remove('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/save_tempo')
     outfile = open('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/save','wb')
     dict_save = {}
@@ -913,8 +1227,20 @@ def save_DEM_final(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker):
 
 #-------------------------------------------------------------------------------
 
-def save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker):
-    '''save dicts during PFDEM interations'''
+def save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
+    """
+    Save dictionnaries at the end of PFDEM iteration.
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a geometry dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a save file is generated (a file)
+    """
     outfile = open(dict_algorithm['name_folder']+'_save_dicts','wb')
     dict_save = {}
     dict_save['algorithm'] = dict_algorithm
@@ -923,34 +1249,87 @@ def save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_s
     dict_save['sample'] = dict_sample
     dict_save['sollicitations'] = dict_sollicitations
     dict_save['tracker'] = dict_tracker
+    dict_save['report'] = simulation_report
+    pickle.dump(dict_save,outfile)
+    outfile.close()
+
+#-------------------------------------------------------------------------------
+
+def save_dicts_before_pf(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
+    """
+    Save dictionnaries at the end of PFDEM iteration.
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a geometry dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a save file is generated (a file)
+    """
+    outfile = open(dict_algorithm['name_folder']+'_save_dicts_before_pf','wb')
+    dict_save = {}
+    dict_save['algorithm'] = dict_algorithm
+    dict_save['geometry'] = dict_geometry
+    dict_save['material'] = dict_material
+    dict_save['sample'] = dict_sample
+    dict_save['sollicitations'] = dict_sollicitations
+    dict_save['tracker'] = dict_tracker
+    dict_save['report'] = simulation_report
     pickle.dump(dict_save,outfile)
     outfile.close()
 
 #-------------------------------------------------------------------------------
 
 def save_tempo(dict_algorithm,dict_tracker):
-    '''save trackers during PFDEM interations'''
+    """
+    Save trackers and configuration during  PFDEM iteration.
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a save file is generated (a file)
+    """
     outfile = open('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['name_folder']+'_save_tempo','wb')
     dict_save = {}
+    dict_save['t_L'] = dict_tracker['t_L']
     dict_save['k0_xmin_L'] = dict_tracker['k0_xmin_L']
     dict_save['k0_xmax_L'] = dict_tracker['k0_xmax_L']
+    dict_save['S_grains_L'] = dict_tracker['S_grains_L']
     dict_save['S_dissolved_L'] = dict_tracker['S_dissolved_L']
     dict_save['S_dissolved_perc_L'] = dict_tracker['S_dissolved_perc_L']
-    dict_save['S_grains_L'] = dict_tracker['S_grains_L']
+    dict_save['S_grains_dissolvable_L'] = dict_tracker['S_grains_dissolvable_L']
+    dict_save['S_dissolved_perc_dissolvable_L'] = dict_tracker['S_dissolved_perc_dissolvable_L']
+    dict_save['porosity'] = dict_tracker['porosity_L']
     pickle.dump(dict_save,outfile)
     outfile.close()
 
 #-------------------------------------------------------------------------------
 
 def save_final(dict_algorithm,dict_tracker):
-    '''save trackers at the end of the simulation'''
+    """
+    Save trackers and configuration at the end of simulation.
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a save file is generated (a file)
+    """
     os.remove('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['name_folder']+'_save_tempo')
     outfile = open('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['name_folder']+'_save','wb')
     dict_save = {}
+    dict_save['t_L'] = dict_tracker['t_L']
     dict_save['k0_xmin_L'] = dict_tracker['k0_xmin_L']
     dict_save['k0_xmax_L'] = dict_tracker['k0_xmax_L']
+    dict_save['S_grains_L'] = dict_tracker['S_grains_L']
     dict_save['S_dissolved_L'] = dict_tracker['S_dissolved_L']
     dict_save['S_dissolved_perc_L'] = dict_tracker['S_dissolved_perc_L']
-    dict_save['S_grains_L'] = dict_tracker['S_grains_L']
+    dict_save['S_grains_dissolvable_L'] = dict_tracker['S_grains_dissolvable_L']
+    dict_save['S_dissolved_perc_dissolvable_L'] = dict_tracker['S_dissolved_perc_dissolvable_L']
+    dict_save['porosity'] = dict_tracker['porosity_L']
     pickle.dump(dict_save,outfile)
     outfile.close()
