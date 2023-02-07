@@ -18,7 +18,7 @@ from pathlib import Path
 
 #Own function and class
 from Write_txt import Write_txt
-from Create_i_AC import Create_i_AC
+from Create_i_AC import Create_i_AC_local
 import Create_IC
 import Create_IC_Polygonal
 import Owntools
@@ -249,17 +249,22 @@ def main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_so
     '''
     simulation_report.tic_tempo(datetime.now())
 
-    Create_i_AC(dict_algorithm, dict_material, dict_sample, dict_sollicitations)
-    os.system('mpiexec -n '+str(dict_algorithm['np_proc'])+' ~/projects/moose/modules/combined/combined-opt -i PF_'+str(dict_algorithm['i_PF'])+'.i')
-    j_str = Owntools.Sort_Files('PF_'+str(dict_algorithm['i_PF']),dict_algorithm)
-
-    etai_M = Owntools.PFtoDEM_Multi_global('Output/PF_'+str(dict_algorithm['i_PF'])+'/PF_'+str(dict_algorithm['i_PF'])+'_other_'+str(j_str),dict_algorithm)
-    counter_grain = 0
     for grain in dict_sample['L_g']:
         if grain.dissolved :
-            grain.extract_PF(etai_M.copy(), counter_grain, dict_algorithm)
-            counter_grain = counter_grain + 1
-            grain.Geometricstudy_local(dict_algorithm,dict_geometry,dict_sample,simulation_report)
+            Create_i_AC_local(grain,dict_algorithm, dict_material, dict_sample,dict_sollicitations)
+            os.system('mpiexec -n '+str(dict_algorithm['np_proc'])+' ~/projects/moose/modules/combined/combined-opt -i PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'.i')
+            j_str = Owntools.Sort_Files('PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id),dict_algorithm)
+            grain.PFtoDEM_Multi_local('Output/PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'/PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'_other_'+str(j_str),dict_algorithm)
+            grain.Geometricstudy_local(dict_geometry,dict_sample,simulation_report)
+
+            #clean memory
+            if dict_algorithm['clean_memory']:
+                shutil.rmtree('Data')
+                os.mkdir('Data')
+                shutil.rmtree('Input')
+                os.mkdir('Input')
+                shutil.rmtree('Output')
+                os.mkdir('Output')
 
     #Geometric study
     S_grains = 0

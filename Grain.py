@@ -175,12 +175,8 @@ class Grain:
       #-------------------------------------------------------------------------
       #load data needed
       n = dict_geometry['grain_discretization']
-      x_L = []
-      for x in dict_algorithm['x_L_local'] :
-          x_L.append(x + self.center[0]-(dict_algorithm['x_L_local'][0]+dict_algorithm['x_L_local'][-1])/2)
-      y_L = []
-      for y in dict_algorithm['y_L_local'] :
-          y_L.append(y + self.center[1]-(dict_algorithm['y_L_local'][0]+dict_algorithm['y_L_local'][-1])/2)
+      x_L = self.x_L_local
+      y_L = self.y_L_local
       #-------------------------------------------------------------------------
 
       L_border_old = []
@@ -375,17 +371,70 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def Compute_etaiM_global(self,dict_algorithm,dict_material):
-      '''from the grain geometry the phase variable is rebuilt
-      the distance between the point of the mesh and the particle center determines the value of the variable
-      a cosine profile is applied inside the interface
-      '''
+  def Write_e_dissolution_local_txt(self,dict_algorithm,dict_sollicitations):
+      """
+      Write an .txt file for MOOSE. This file described an homogenous dissolution field.
+
+        Input :
+            itself (a grain)
+            an algorithm dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+        Output :
+            Nothing, but a .txt file is generated (a file)
+      """
+      file_to_write = open(f"Data/e_diss_g{self.id}_ite{dict_algorithm['i_PF']}.txt",'w')
+      file_to_write.write('AXIS X\n')
+      line = ''
+      for x in self.x_L_local:
+          line = line + str(x)+ ' '
+      line = line + '\n'
+      file_to_write.write(line)
+
+      file_to_write.write('AXIS Y\n')
+      line = ''
+      for y in self.y_L_local:
+        line = line + str(y)+ ' '
+      line = line + '\n'
+      file_to_write.write(line)
+
+      file_to_write.write('DATA\n')
+      for l in range(len(self.y_L_local)):
+          for c in range(len(self.x_L_local)):
+              file_to_write.write(str(dict_sollicitations['Dissolution_Energy'])+'\n')
+
+      file_to_write.close()
+
+#-------------------------------------------------------------------------------
+
+  def Compute_etaiM_local(self,dict_algorithm,dict_material):
+      """
+      From the grain geometry the phase variable is rebuilt.
+
+      The distance between the point of the mesh and the particle center determines the value of the variable
+      A cosine profile is applied inside the interface
+
+        Input :
+            itself (a grain)
+            an algorithm dictionnary (a dict)
+            a material dictionnary (a dict)
+        Output :
+            Nothing, but the grain gets an updated phase field (a nx x ny numpy array)
+      """
+      x_min_local = min(self.l_border_x)-dict_material['w']
+      x_max_local = max(self.l_border_x)+dict_material['w']
+      y_min_local = min(self.l_border_y)-dict_material['w']
+      y_max_local = max(self.l_border_y)+dict_material['w']
+      x_L_local = np.arange(x_min_local,x_max_local+dict_algorithm['dx_local'],dict_algorithm['dx_local'])
+      y_L_local = np.arange(y_min_local,y_max_local+dict_algorithm['dy_local'],dict_algorithm['dy_local'])
+
+      self.x_L_local = x_L_local
+      self.y_L_local = y_L_local
+
       # compute phase field
       etai_M = np.array(np.zeros((len(y_L_local),len(x_L_local))))
       for i_x in range(len(x_L_local)):
           for i_y in range(len(y_L_local)):
-              p = np.array([dict_algorithm['x_L_local'][i_x]+self.center[0]-(dict_algorithm['x_L_local'][0]+dict_algorithm['x_L_local'][-1])/2,
-                            dict_algorithm['y_L_local'][len(y_L_local)-1-i_y]+self.center[1]-(dict_algorithm['y_L_local'][0]+dict_algorithm['y_L_local'][-1])/2])
+              p = np.array([x_L_local[i_x],y_L_local[len(y_L_local)-1-i_y]])
               r = np.linalg.norm(self.center - p)
               if p[1]>self.center[1]:
                   theta = math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
@@ -402,6 +451,40 @@ class Grain:
               else :
                   etai_M[i_y][i_x] = 0.5*(1 + np.cos(math.pi*(r-R+dict_material['w']/2)/dict_material['w']))
       self.etai_M = etai_M.copy()
+
+#-------------------------------------------------------------------------------
+
+  def Write_txt_Decons_rebuild_local(self,dict_algorithm):
+      """
+      Write a .txt file. This file is used to define initial condition of MOOSE simulation.
+
+        Input :
+            itself (a grain)
+            an algorithm dictionnary (a dict)
+        Output :
+            Nothing, but a .txt file is generated (a file)
+      """
+      file_to_write = open('Data/g'+str(self.id)+'_'+str(dict_algorithm['i_PF'])+'.txt','w')
+      file_to_write.write('AXIS X\n')
+      line = ''
+      for x in self.x_L_local:
+          line = line + str(x)+ ' '
+      line = line + '\n'
+      file_to_write.write(line)
+
+      file_to_write.write('AXIS Y\n')
+      line = ''
+      for y in self.y_L_local:
+        line = line + str(y)+ ' '
+      line = line + '\n'
+      file_to_write.write(line)
+
+      file_to_write.write('DATA\n')
+      for l in range(len(self.y_L_local)):
+          for c in range(len(self.x_L_local)):
+              file_to_write.write(str(self.etai_M[-l-1][c])+'\n')
+
+      file_to_write.close()
 
 #-------------------------------------------------------------------------------
 
@@ -496,23 +579,6 @@ class Grain:
     # Update
     self.etai_M = etai_M.copy()
 
-#-------------------------------------------------------------------------------
-
-  def extract_PF(self, etai_M, counter_grain, dict_algorithm):
-     """
-     Extract from the global phase map the part for the grain.
-
-        Input :
-            itself (a grain)
-            a phase map (a numpy array)
-            a counter (an int)
-            an algorithm dictionnary (a dict)
-        Output :
-            Nothing, but the grain gets an updated phase map (a numpy array)
-     """
-     for x_i in range(dict_algorithm['nx_local']):
-         for y_i in range(dict_algorithm['ny_local']):
-             self.etai_M[y_i][x_i] = etai_M[y_i + counter_grain*(dict_algorithm['ny_local'])][x_i]
 
 #-------------------------------------------------------------------------------
 #Function
