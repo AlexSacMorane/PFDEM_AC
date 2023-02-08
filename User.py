@@ -139,13 +139,13 @@ def All_parameters():
     dt_PF = 0.01 #s time step during MOOSE simulation
     n_t_PF = 10 #number of iterations PF-DEM
     MovePF_selector = 'DeconstructRebuild' #Move PF
-    n_local = 40 #number of node inside local PF simulation
+    n_local = 50 #number of node inside local PF simulation
     if Shape == 'Disk':
-        dx_local = min(2*min(dict_geometry['L_R']),2*min(dict_geometry['L_Dimension']))/(n_local-1)
-        dy_local = min(2*min(dict_geometry['L_R']),2*min(dict_geometry['L_Dimension']))/(n_local-1)
+        dx_local = max(2*max(dict_geometry['L_R']),2*max(dict_geometry['L_Dimension']))/(n_local-1)
+        dy_local = max(2*max(dict_geometry['L_R']),2*max(dict_geometry['L_Dimension']))/(n_local-1)
     elif Shape == 'Square':
-        dx_local = min(2*min(dict_geometry['L_R']),min(dict_geometry['L_Dimension']))/(n_local-1)
-        dy_local = min(2*min(dict_geometry['L_R']),min(dict_geometry['L_Dimension']))/(n_local-1)
+        dx_local = max(2*max(dict_geometry['L_R']),max(dict_geometry['L_Dimension']))/(n_local-1)
+        dy_local = max(2*max(dict_geometry['L_R']),max(dict_geometry['L_Dimension']))/(n_local-1)
     #add into material dict from this data
     w = 4*math.sqrt(dx_local**2+dy_local**2)
     double_well_height = 10*dict_material['kc_pf']/w/w
