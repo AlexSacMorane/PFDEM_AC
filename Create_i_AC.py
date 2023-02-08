@@ -12,19 +12,19 @@ The function use PF_base_AC.i as a template
 #-------------------------------------------------------------------------------
 
 import Grain
+import Owntools
 
 #-------------------------------------------------------------------------------
 #Function Definition
 #-------------------------------------------------------------------------------
 
-def Create_i_AC_local(grain,dict_algorithm, dict_material, dict_sample, dict_sollicitations):
+def Create_i_AC(dict_algorithm, dict_material, dict_sample, dict_sollicitations):
     """
     The goal of this file is to write a new .i file from PF_base_AC.i.
 
-    There is a input file for each grain dissolvable by iteration.
+    There is a global input file for every grains.
 
         Input :
-            a grain (a grain)
             an algorithm dictionnary (a dict)
             a material dictionnary (a dict)
             a sample dictionnary (a dict)
@@ -32,15 +32,11 @@ def Create_i_AC_local(grain,dict_algorithm, dict_material, dict_sample, dict_sol
         Output :
             a file is generated (a .i file)
     """
-    # create spatial discretisation
-    grain.Compute_etaiM_local(dict_algorithm,dict_material)
-
-    # write data
-    grain.Write_txt_Decons_rebuild_local(dict_algorithm)
-    grain.Write_e_dissolution_local_txt(dict_algorithm,dict_sollicitations)
+    #Create .txt files
+    Owntools.Write_txt_data(dict_algorithm, dict_material, dict_sample, dict_sollicitations)
 
     # create .i
-    file_to_write = open(f"PF_{dict_algorithm['i_PF']}_g{grain.id}.i",'w')
+    file_to_write = open(f"PF_{dict_algorithm['i_PF']}.i",'w')
     file_to_read = open('PF_base_AC.i','r')
     lines = file_to_read.readlines()
     file_to_read.close()
@@ -49,17 +45,17 @@ def Create_i_AC_local(grain,dict_algorithm, dict_material, dict_sample, dict_sol
     for line in lines :
         j = j+1
         if j == 4:
-            line = line[:-1] + ' ' + str(len(grain.x_L_local)-1)+'\n'
+            line = line[:-1] + ' ' + str(len(dict_algorithm['x_L_global'])-1)+'\n'
         elif j == 5:
-            line = line[:-1] + ' ' + str(len(grain.y_L_local)-1)+'\n'
+            line = line[:-1] + ' ' + str(len(dict_algorithm['y_L_global'])-1)+'\n'
         elif j == 7:
-            line = line[:-1] + ' ' + str(min(grain.x_L_local))+'\n'
+            line = line[:-1] + ' ' + str(min(dict_algorithm['x_L_global']))+'\n'
         elif j == 8:
-            line = line[:-1] + ' ' + str(max(grain.x_L_local))+'\n'
+            line = line[:-1] + ' ' + str(max(dict_algorithm['x_L_local']))+'\n'
         elif j == 9:
-            line = line[:-1] + ' ' + str(min(grain.y_L_local))+'\n'
+            line = line[:-1] + ' ' + str(min(dict_algorithm['y_L_global']))+'\n'
         elif j == 10:
-            line = line[:-1] + ' ' + str(max(grain.y_L_local))+'\n'
+            line = line[:-1] + ' ' + str(max(dict_algorithm['y_L_global']))+'\n'
         elif j == 21:
             line = line[:-1] + '\t[./etai]\n'+\
                               '\t\torder = FIRST\n'+\
@@ -97,11 +93,11 @@ def Create_i_AC_local(grain,dict_algorithm, dict_material, dict_sample, dict_sol
         elif j ==  56:
             line = line[:-1] +'\t[etai_txt]\n'+\
                               '\t\ttype = PiecewiseMultilinear\n'+\
-                              '\t\tdata_file = Data/g'+str(grain.id)+'_'+str(dict_algorithm['i_PF'])+'.txt\n'+\
+                              '\t\tdata_file = Data/g_'+str(dict_algorithm['i_PF'])+'.txt\n'+\
                               '\t[]\n'+\
                               '\t[e_dissolution_txt]\n'+\
                               '\t\ttype = PiecewiseMultilinear\n'+\
-                              '\t\tdata_file = Data/e_diss_g'+str(grain.id)+'_ite'+str(dict_algorithm['i_PF'])+'.txt\n'+\
+                              '\t\tdata_file = Data/e_diss_'+str(dict_algorithm['i_PF'])+'.txt\n'+\
                               '\t[]\n'
         elif j == 80:
             line = line[:-1] + ' ' + str(dict_algorithm['n_t_PF']*dict_algorithm['dt_PF']) + '\n'

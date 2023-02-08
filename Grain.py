@@ -166,7 +166,7 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def Geometricstudy_local(self,dict_geometry,dict_sample,simulation_report):
+  def Geometricstudy_local(self,dict_algorithm,dict_geometry,dict_sample,simulation_report):
       """
       Searching border of the grain.
 
@@ -190,8 +190,12 @@ class Grain:
       #-------------------------------------------------------------------------
       #load data needed
       n = dict_geometry['grain_discretization']
-      x_L = self.x_L_local
-      y_L = self.y_L_local
+      x_L = []
+      for x in dict_algorithm['x_L_local'] :
+          x_L.append(x + self.center[0]-(dict_algorithm['x_L_local'][0]+dict_algorithm['x_L_local'][-1])/2)
+      y_L = []
+      for y in dict_algorithm['y_L_local'] :
+          y_L.append(y + self.center[1]-(dict_algorithm['y_L_local'][0]+dict_algorithm['y_L_local'][-1])/2)
       #-------------------------------------------------------------------------
 
       L_border_old = []
@@ -386,70 +390,17 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def Write_e_dissolution_local_txt(self,dict_algorithm,dict_sollicitations):
-      """
-      Write an .txt file for MOOSE. This file described an homogenous dissolution field.
-
-        Input :
-            itself (a grain)
-            an algorithm dictionnary (a dict)
-            a sollicitations dictionnary (a dict)
-        Output :
-            Nothing, but a .txt file is generated (a file)
-      """
-      file_to_write = open(f"Data/e_diss_g{self.id}_ite{dict_algorithm['i_PF']}.txt",'w')
-      file_to_write.write('AXIS X\n')
-      line = ''
-      for x in self.x_L_local:
-          line = line + str(x)+ ' '
-      line = line + '\n'
-      file_to_write.write(line)
-
-      file_to_write.write('AXIS Y\n')
-      line = ''
-      for y in self.y_L_local:
-        line = line + str(y)+ ' '
-      line = line + '\n'
-      file_to_write.write(line)
-
-      file_to_write.write('DATA\n')
-      for l in range(len(self.y_L_local)):
-          for c in range(len(self.x_L_local)):
-              file_to_write.write(str(dict_sollicitations['Dissolution_Energy'])+'\n')
-
-      file_to_write.close()
-
-#-------------------------------------------------------------------------------
-
-  def Compute_etaiM_local(self,dict_algorithm,dict_material):
-      """
-      From the grain geometry the phase variable is rebuilt.
-
-      The distance between the point of the mesh and the particle center determines the value of the variable
-      A cosine profile is applied inside the interface
-
-        Input :
-            itself (a grain)
-            an algorithm dictionnary (a dict)
-            a material dictionnary (a dict)
-        Output :
-            Nothing, but the grain gets an updated phase field (a nx x ny numpy array)
-      """
-      x_min_local = min(self.l_border_x)-dict_material['w']
-      x_max_local = max(self.l_border_x)+dict_material['w']
-      y_min_local = min(self.l_border_y)-dict_material['w']
-      y_max_local = max(self.l_border_y)+dict_material['w']
-      x_L_local = np.arange(x_min_local,x_max_local+dict_algorithm['dx_local'],dict_algorithm['dx_local'])
-      y_L_local = np.arange(y_min_local,y_max_local+dict_algorithm['dy_local'],dict_algorithm['dy_local'])
-
-      self.x_L_local = x_L_local
-      self.y_L_local = y_L_local
-
+  def Compute_etaiM_global(self,dict_algorithm,dict_material):
+      '''from the grain geometry the phase variable is rebuilt
+      the distance between the point of the mesh and the particle center determines the value of the variable
+      a cosine profile is applied inside the interface
+      '''
       # compute phase field
-      etai_M = np.array(np.zeros((len(y_L_local),len(x_L_local))))
-      for i_x in range(len(x_L_local)):
-          for i_y in range(len(y_L_local)):
-              p = np.array([x_L_local[i_x],y_L_local[len(y_L_local)-1-i_y]])
+      etai_M = np.array(np.zeros((len(dict_algorithm['y_L_local']),len(dict_algorithm['x_L_local']))))
+      for i_x in range(len(dict_algorithm['x_L_local'])):
+          for i_y in range(len(dict_algorithm['y_L_local'])):
+              p = np.array([dict_algorithm['x_L_local'][i_x]+self.center[0]-(dict_algorithm['x_L_local'][0]+dict_algorithm['x_L_local'][-1])/2,
+                            dict_algorithm['y_L_local'][len(dict_algorithm['y_L_local'])-1-i_y]+self.center[1]-(dict_algorithm['y_L_local'][0]+dict_algorithm['y_L_local'][-1])/2])
               r = np.linalg.norm(self.center - p)
               if p[1]>self.center[1]:
                   theta = math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
@@ -469,131 +420,21 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def Write_txt_Decons_rebuild_local(self,dict_algorithm):
-      """
-      Write a .txt file. This file is used to define initial condition of MOOSE simulation.
+  def extract_PF(self, etai_M, counter_grain, dict_algorithm):
+     """
+     Extract from the global phase map the part for the grain.
 
         Input :
             itself (a grain)
+            a phase map (a numpy array)
+            a counter (an int)
             an algorithm dictionnary (a dict)
         Output :
-            Nothing, but a .txt file is generated (a file)
-      """
-      file_to_write = open('Data/g'+str(self.id)+'_'+str(dict_algorithm['i_PF'])+'.txt','w')
-      file_to_write.write('AXIS X\n')
-      line = ''
-      for x in self.x_L_local:
-          line = line + str(x)+ ' '
-      line = line + '\n'
-      file_to_write.write(line)
-
-      file_to_write.write('AXIS Y\n')
-      line = ''
-      for y in self.y_L_local:
-        line = line + str(y)+ ' '
-      line = line + '\n'
-      file_to_write.write(line)
-
-      file_to_write.write('DATA\n')
-      for l in range(len(self.y_L_local)):
-          for c in range(len(self.x_L_local)):
-              file_to_write.write(str(self.etai_M[-l-1][c])+'\n')
-
-      file_to_write.close()
-
-#-------------------------------------------------------------------------------
-
-  def PFtoDEM_Multi_local(self,FileToRead,dict_algorithm):
-    """
-    Read data from the moose simulation.
-
-        Input :
-            itself (a grain)
-            the template of the name to read (a string)
-            an algorithm dictionnary (a dict)
-        Output :
-            Nothing, but the phase field variable is updated (a nx x ny numpy array)
-    """
-    #---------------------------------------------------------------------------
-    #Global parameters
-    #---------------------------------------------------------------------------
-
-    etai_M = np.zeros((len(self.y_L_local),len(self.x_L_local))) #etai
-
-    id_L = None
-    eta_selector_len = len('        <DataArray type="Float64" Name="etai')
-    end_len = len('        </DataArray>')
-    XYZ_selector_len = len('        <DataArray type="Float64" Name="Points"')
-    data_jump_len = len('          ')
-
-    for i_proc in range(dict_algorithm['np_proc']):
-
-        L_Work = [[], #X
-                  [], #Y
-                  []] #etai
-
-    #---------------------------------------------------------------------------
-    #Reading file
-    #---------------------------------------------------------------------------
-
-        f = open(f'{FileToRead}_{i_proc}.vtu','r')
-        data = f.read()
-        f.close
-        lines = data.splitlines()
-
-        #iterations on line
-        for line in lines:
-
-            if line[0:eta_selector_len] == '        <DataArray type="Float64" Name="etai':
-                id_L = 2
-
-            elif line[0:XYZ_selector_len] == '        <DataArray type="Float64" Name="Points"':
-                id_L = 0
-
-            elif (line[0:end_len] == '        </DataArray>' or  line[0:len('          <InformationKey')] == '          <InformationKey') and id_L != None:
-                id_L = None
-
-            elif line[0:data_jump_len] == '          ' and id_L == 2: #Read etai
-                line = line[data_jump_len:]
-                c_start = 0
-                for c_i in range(0,len(line)):
-                    if line[c_i]==' ':
-                        c_end = c_i
-                        L_Work[id_L].append(float(line[c_start:c_end]))
-                        c_start = c_i+1
-                L_Work[id_L].append(float(line[c_start:]))
-
-            elif line[0:data_jump_len] == '          ' and id_L == 0: #Read [X, Y, Z]
-                line = line[data_jump_len:]
-                XYZ_temp = []
-                c_start = 0
-                for c_i in range(0,len(line)):
-                    if line[c_i]==' ':
-                        c_end = c_i
-                        XYZ_temp.append(float(line[c_start:c_end]))
-                        if len(XYZ_temp)==3:
-                            L_Work[0].append(XYZ_temp[0])
-                            L_Work[1].append(XYZ_temp[1])
-                            XYZ_temp = []
-                        c_start = c_i+1
-                XYZ_temp.append(float(line[c_start:]))
-                L_Work[0].append(XYZ_temp[0])
-                L_Work[1].append(XYZ_temp[1])
-
-        #Adaptating data
-        for i in range(len(L_Work[0])):
-            #Interpolation method
-            L_dy = []
-            for y_i in self.y_L_local :
-                L_dy.append(abs(y_i - L_Work[1][i]))
-            L_dx = []
-            for x_i in self.x_L_local :
-                L_dx.append(abs(x_i - L_Work[0][i]))
-            etai_M[-1-list(L_dy).index(min(L_dy))][list(L_dx).index(min(L_dx))] = L_Work[2][i]
-
-    # Update
-    self.etai_M = etai_M.copy()
-
+            Nothing, but the grain gets an updated phase map (a numpy array)
+     """
+     for x_i in range(dict_algorithm['n_local']):
+         for y_i in range(dict_algorithm['n_local']):
+             self.etai_M[-1-y_i][x_i] = etai_M[-1-y_i - counter_grain*(dict_algorithm['n_local'])][x_i]
 
 #-------------------------------------------------------------------------------
 #Function

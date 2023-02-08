@@ -191,7 +191,10 @@ def Debug_DEM_f(dict_algorithm, dict_sample):
         plt.plot(grain.l_border_x,grain.l_border_y,'k')
     for contact in dict_sample['L_contact'] :
         alpha = (contact.g1.r_mean*0.1 + contact.g2.r_mean*0.1)/2
-        M = (contact.g1.center + contact.g2.center)/2
+
+
+
+        M = (contact.g1.center*contact.g2.r_mean + contact.g2.center*contact.g1.r_mean)/2/(contact.g1.r_mean+contact.g2.r_mean)
         plt.plot([M[0], M[0]+contact.pc_normal[0]*alpha], [M[1], M[1]+contact.pc_normal[1]*alpha],'k')
         plt.plot([M[0], M[0]+contact.pc_tangential[0]*alpha], [M[1], M[1]+contact.pc_tangential[1]*alpha],'k')
     for contact in dict_sample['L_contact_gw'] :
@@ -260,12 +263,6 @@ def Debug_Trackers(dict_tracker):
             Nothing, but severals .png files are generated (files)
     """
     #Trackers
-    fig = plt.figure(1,figsize=(16,9.12))
-    plt.plot(dict_tracker['t_L'],dict_tracker['S_grains_dissolvable_L'])
-    plt.title('Evolution of the dissolvable grains surface')
-    fig.savefig('Debug/Evolution_Dissolvable_Surface.png')
-    plt.close(1)
-
     fig = plt.figure(1,figsize=(16,9.12))
     plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'],dict_tracker['k0_xmin_L'],label='k0 with xmin')
     plt.plot(dict_tracker['S_dissolved_perc_dissolvable_L'],dict_tracker['k0_xmax_L'],label='k0 with xmax')
@@ -541,44 +538,188 @@ def Compute_k0(dict_sample,dict_sollicitations):
 
 #-------------------------------------------------------------------------------
 
-def Write_e_dissolution_txt(dict_sample,dict_sollicitations):
-      """
-      Write an .txt file for MOOSE. This file described an homogenous dissolution field.
+def Write_txt_data(dict_algorithm, dict_material, dict_sample, dict_sollicitations):
+    '''
+    Compute .txt files for PF simulation.
+
+    Grains are sorted one over the other even if there is no interations between them. The goal is to have only one simulation.
 
         Input :
-            a sample dictionnary (a dict)
-            a sollicitations dictionnary (a dict)
+            an algorithm dictionnary (a dict)
+            an material dictionnary (a dict)
+            an sample dictionnary (a dict)
         Output :
-            Nothing, but a .txt file is generated (a file)
-      """
-      #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
-      #Load data needed
-      x_L = dict_sample['x_L']
-      y_L = dict_sample['y_L']
-      e_dissolution = dict_sollicitations['Dissolution_Energy']
-      #-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+            Nothing, but 2 . txt files are generated
+    '''
 
-      file_to_write = open('Data/e_dissolution.txt','w')
-      file_to_write.write('AXIS X\n')
-      line = ''
-      for x in x_L:
-          line = line + str(x)+ ' '
-      line = line + '\n'
-      file_to_write.write(line)
+    #compute dx and dy maximum
+    dx_max = 0
+    dy_max = 0
+    for grain in dict_sample['L_g']:
+        if grain.dissolved :
+            x_min_local = min(grain.l_border_x)-dict_material['w']
+            x_max_local = max(grain.l_border_x)+dict_material['w']
+            if x_max_local - x_min_local > dx_max:
+                dx_max = x_max_local - x_min_local
+            y_min_local = min(grain.l_border_y)-dict_material['w']
+            y_max_local = max(grain.l_border_y)+dict_material['w']
+            if y_max_local - y_min_local > dy_max:
+                dy_max = y_max_local - y_min_local
+    dict_algorithm['x_L_local'] = np.linspace(0,dx_max,dict_algorithm['n_local'])
+    dict_algorithm['y_L_local'] = np.linspace(0,dy_max,dict_algorithm['n_local'])
 
-      file_to_write.write('AXIS Y\n')
-      line = ''
-      for y in y_L:
-        line = line + str(y)+ ' '
-      line = line + '\n'
-      file_to_write.write(line)
+    dict_algorithm['x_L_global'] = dict_algorithm['x_L_local'].copy()
+    dict_algorithm['y_L_global'] = []
 
-      file_to_write.write('DATA\n')
-      for l in range(len(y_L)):
-          for c in range(len(x_L)):
-              file_to_write.write(str(e_dissolution)+'\n')
+    #Compute phase map
+    for grain in dict_sample['L_g']:
+        if grain.dissolved :
+            grain.Compute_etaiM_global(dict_algorithm, dict_material)
 
-      file_to_write.close()
+    #Write data for grains
+    file_to_write = open('Data/g_'+str(dict_algorithm['i_PF'])+'.txt','w')
+    file_to_write.write('AXIS X\n')
+    line = ''
+    for x in dict_algorithm['x_L_local']:
+        line = line + str(x)+ ' '
+    line = line + '\n'
+    file_to_write.write(line)
+    file_to_write.write('AXIS Y\n')
+    line = ''
+    counter_grain = 0
+    for grain in dict_sample['L_g']:
+        if grain.dissolved :
+            for y in dict_algorithm['y_L_local']:
+                line = line + str(y + counter_grain*(dy_max+dict_algorithm['y_L_local'][1]-dict_algorithm['y_L_local'][0])) + ' '
+                dict_algorithm['y_L_global'].append(y + counter_grain*(dy_max+dict_algorithm['y_L_local'][1]-dict_algorithm['y_L_local'][0]))
+            counter_grain = counter_grain + 1
+    line = line + '\n'
+    file_to_write.write(line)
+    file_to_write.write('DATA\n')
+    for grain in dict_sample['L_g']:
+        if grain.dissolved :
+            for l in range(len(dict_algorithm['y_L_local'])):
+                for c in range(len(dict_algorithm['x_L_local'])):
+                    file_to_write.write(str(grain.etai_M[-l-1][c])+'\n')
+    file_to_write.close()
+
+    #Write dissolution map
+    file_to_write = open('Data/e_diss_'+str(dict_algorithm['i_PF'])+'.txt','w')
+    file_to_write.write('AXIS X\n')
+    line = ''
+    for x in dict_algorithm['x_L_local']:
+        line = line + str(x)+ ' '
+    line = line + '\n'
+    file_to_write.write(line)
+    file_to_write.write('AXIS Y\n')
+    line = ''
+    counter_grain = 0
+    for grain in dict_sample['L_g']:
+        if grain.dissolved :
+            for y in dict_algorithm['y_L_local']:
+                line = line + str(y + counter_grain*(dy_max+dict_algorithm['y_L_local'][1]-dict_algorithm['y_L_local'][0])) + ' '
+            counter_grain = counter_grain + 1
+    line = line + '\n'
+    file_to_write.write(line)
+    file_to_write.write('DATA\n')
+    for grain in dict_sample['L_g']:
+        if grain.dissolved :
+            for l in range(len(dict_algorithm['y_L_local'])):
+                for c in range(len(dict_algorithm['x_L_local'])):
+                    file_to_write.write(str(dict_sollicitations['Dissolution_Energy'])+'\n')
+    file_to_write.close()
+
+#-------------------------------------------------------------------------------
+
+def PFtoDEM_Multi_global(FileToRead,dict_algorithm):
+    '''
+    Convert result from phase-field simulation to a discrete element modelization.
+
+        Input :
+            the name of file to read (a string)
+            an algorithm dictionnary (a dict)
+        Output :
+            the map of phase variables (a numpy array)
+    '''
+    #---------------------------------------------------------------------------
+    #Global parameters
+    #---------------------------------------------------------------------------
+
+    etai_M = np.zeros((len(dict_algorithm['y_L_global']),len(dict_algorithm['x_L_global']))) #etai
+
+    id_L = None
+    eta_selector_len = len('        <DataArray type="Float64" Name="etai')
+    end_len = len('        </DataArray>')
+    XYZ_selector_len = len('        <DataArray type="Float64" Name="Points"')
+    data_jump_len = len('          ')
+
+    for i_proc in range(dict_algorithm['np_proc']):
+
+        L_Work = [[], #X
+                  [], #Y
+                  []] #etai
+
+    #---------------------------------------------------------------------------
+    #Reading file
+    #---------------------------------------------------------------------------
+
+        f = open(f'{FileToRead}_{i_proc}.vtu','r')
+        data = f.read()
+        f.close()
+        lines = data.splitlines()
+
+        #iterations on line
+        for line in lines:
+
+            if line[0:eta_selector_len] == '        <DataArray type="Float64" Name="etai':
+                id_L = 2
+
+            elif line[0:XYZ_selector_len] == '        <DataArray type="Float64" Name="Points"':
+                id_L = 0
+
+            elif (line[0:end_len] == '        </DataArray>' or  line[0:len('          <InformationKey')] == '          <InformationKey') and id_L != None:
+                id_L = None
+
+            elif line[0:data_jump_len] == '          ' and id_L == 2: #Read etai
+                line = line[data_jump_len:]
+                c_start = 0
+                for c_i in range(0,len(line)):
+                    if line[c_i]==' ':
+                        c_end = c_i
+                        L_Work[id_L].append(float(line[c_start:c_end]))
+                        c_start = c_i+1
+                L_Work[id_L].append(float(line[c_start:]))
+
+            elif line[0:data_jump_len] == '          ' and id_L == 0: #Read [X, Y, Z]
+                line = line[data_jump_len:]
+                XYZ_temp = []
+                c_start = 0
+                for c_i in range(0,len(line)):
+                    if line[c_i]==' ':
+                        c_end = c_i
+                        XYZ_temp.append(float(line[c_start:c_end]))
+                        if len(XYZ_temp)==3:
+                            L_Work[0].append(XYZ_temp[0])
+                            L_Work[1].append(XYZ_temp[1])
+                            XYZ_temp = []
+                        c_start = c_i+1
+                XYZ_temp.append(float(line[c_start:]))
+                L_Work[0].append(XYZ_temp[0])
+                L_Work[1].append(XYZ_temp[1])
+
+        #Adaptating data
+        for i in range(len(L_Work[0])):
+            #Interpolation method
+            L_dy = []
+            for y_i in dict_algorithm['y_L_global'] :
+                L_dy.append(abs(y_i - L_Work[1][i]))
+            L_dx = []
+            for x_i in dict_algorithm['x_L_global'] :
+                L_dx.append(abs(x_i - L_Work[0][i]))
+            etai_M[-1-list(L_dy).index(min(L_dy))][list(L_dx).index(min(L_dx))] = L_Work[2][i]
+
+    # Update
+    return etai_M
 
 #-------------------------------------------------------------------------------
 
@@ -1007,13 +1148,13 @@ def make_mp4():
 
     #look for the largest iteration
     template_name = 'Debug/DEM_ite/Chain_force_'
-    i_f = 0
+    i_f = 1
     plotpath = Path(template_name+str(i_f)+'.png')
     while plotpath.exists():
         i_f = i_f + 1
         plotpath = Path(template_name+str(i_f)+'.png')
     fileList = []
-    for i in range(0,i_f):
+    for i in range(1,i_f):
         fileList.append(template_name+str(i)+'.png')
     duration_movie  = 10 #sec
     writer = imageio.get_writer('Debug/ChainForce_ite.mp4', fps=int(i_f/duration_movie))

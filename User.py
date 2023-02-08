@@ -181,8 +181,8 @@ def All_parameters():
     i_print_plot = 200 #frenquency of the print and plot (if Debug_DEM) in DEM step
     clean_memory = True #delete Data, Input, Output at the end of the simulation
     SaveData = True #save simulation
-    main_folder_name = 'Data_AC_'+Shape #where data are saved
-    template_simulation_name = 'LG_frac_'+str(int(frac_dissolved*100))+'_run_' #template of the simulation name
+    main_folder_name = 'ToDelete' #where data are saved
+    template_simulation_name = 'ToDelete_' #template of the simulation name
 
     #write dict
     dict_algorithm = {
@@ -217,7 +217,7 @@ def All_parameters():
     #Initial condition parameters
 
     n_generation = 2 #number of grains generation
-    factor_ymax_box = 1.7 #margin to generate grains
+    factor_ymax_box = 1.8 #margin to generate grains
     N_test_max = 5000 # maximum number of tries to generate a grain without overlap
     i_DEM_stop_IC = 3000 #stop criteria for DEM during IC
     Debug_DEM_IC = False #plot configuration inside DEM during IC

@@ -18,7 +18,7 @@ from pathlib import Path
 
 #Own function and class
 from Write_txt import Write_txt
-from Create_i_AC import Create_i_AC_local
+from Create_i_AC import Create_i_AC
 import Create_IC
 import Create_IC_Polygonal
 import Owntools
@@ -57,7 +57,8 @@ def main_iteration_until_pf(dict_algorithm, dict_geometry, dict_material, dict_s
         shutil.rmtree('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF']))
     os.mkdir('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF']))
     os.mkdir('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/txt')
-    os.mkdir('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/png')
+    if dict_algorithm['Debug_DEM'] :
+        os.mkdir('Debug/DEM_ite/PF_'+str(dict_algorithm['i_PF'])+'/png')
 
     if dict_algorithm['MovePF_selector'] == 'Interpolation':
         # Saving to compute a rigid body motion
@@ -160,7 +161,9 @@ def main_iteration_until_pf(dict_algorithm, dict_geometry, dict_material, dict_s
                 print('Delta k0',round(max(k0_xmin_window) - min(k0_xmin_window),3),'/',dict_algorithm['dk0_stop'],'('+str(int((max(k0_xmin_window)-min(k0_xmin_window))/dict_algorithm['dk0_stop']*100))+' %)')
                 print('Delta y_max',round(max(y_box_max_window) - min(y_box_max_window),3),'/',dict_algorithm['dy_box_max_stop'],'('+str(int((max(y_box_max_window)-min(y_box_max_window))/dict_algorithm['dy_box_max_stop']*100))+' %)')
 
-            Owntools.save_DEM_tempo(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker)
+
+            if not dict_algorithm['clean_memory'] :
+                Owntools.save_DEM_tempo(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker)
 
             if dict_algorithm['Debug_DEM'] :
                 Owntools.Debug_DEM_f(dict_algorithm, dict_sample)
@@ -192,8 +195,8 @@ def main_iteration_until_pf(dict_algorithm, dict_geometry, dict_material, dict_s
         Owntools.Debug_Trackers_DEM(dict_algorithm,dict_sollicitations,dict_tracker)
         Write_txt(dict_algorithm,dict_sample)
         Owntools.Plot_chain_force(dict_algorithm['i_PF'],dict_algorithm['i_DEM'])
-
-        Owntools.save_DEM_final(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker)
+        if not dict_algorithm['clean_memory'] :
+            Owntools.save_DEM_final(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker)
 
     #-----------------------------------------------------------------------------
     # Compute Vertical and horizontal sollicitations to compute k0
@@ -249,22 +252,17 @@ def main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_so
     '''
     simulation_report.tic_tempo(datetime.now())
 
+    Create_i_AC(dict_algorithm, dict_material, dict_sample, dict_sollicitations)
+    os.system('mpiexec -n '+str(dict_algorithm['np_proc'])+' ~/projects/moose/modules/combined/combined-opt -i PF_'+str(dict_algorithm['i_PF'])+'.i')
+    j_str = Owntools.Sort_Files('PF_'+str(dict_algorithm['i_PF']),dict_algorithm)
+
+    etai_M = Owntools.PFtoDEM_Multi_global('Output/PF_'+str(dict_algorithm['i_PF'])+'/PF_'+str(dict_algorithm['i_PF'])+'_other_'+str(j_str),dict_algorithm)
+    counter_grain = 0
     for grain in dict_sample['L_g']:
         if grain.dissolved :
-            Create_i_AC_local(grain,dict_algorithm, dict_material, dict_sample,dict_sollicitations)
-            os.system('mpiexec -n '+str(dict_algorithm['np_proc'])+' ~/projects/moose/modules/combined/combined-opt -i PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'.i')
-            j_str = Owntools.Sort_Files('PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id),dict_algorithm)
-            grain.PFtoDEM_Multi_local('Output/PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'/PF_'+str(dict_algorithm['i_PF'])+'_g'+str(grain.id)+'_other_'+str(j_str),dict_algorithm)
-            grain.Geometricstudy_local(dict_geometry,dict_sample,simulation_report)
-
-            #clean memory
-            if dict_algorithm['clean_memory']:
-                shutil.rmtree('Data')
-                os.mkdir('Data')
-                shutil.rmtree('Input')
-                os.mkdir('Input')
-                shutil.rmtree('Output')
-                os.mkdir('Output')
+            grain.extract_PF(etai_M.copy(), counter_grain, dict_algorithm)
+            counter_grain = counter_grain + 1
+            grain.Geometricstudy_local(dict_algorithm,dict_geometry,dict_sample,simulation_report)
 
     #Geometric study
     S_grains = 0
@@ -317,6 +315,16 @@ def main_iteration_from_pf(dict_algorithm, dict_geometry, dict_material, dict_so
     #-----------------------------------------------------------------------------
 
     if dict_algorithm['SaveData'] :
+
+        #clean memory
+        if dict_algorithm['clean_memory']:
+            shutil.rmtree('Data')
+            os.mkdir('Data')
+            shutil.rmtree('Input')
+            os.mkdir('Input')
+            shutil.rmtree('Output')
+            os.mkdir('Output')
+
         Owntools.save_tempo(dict_algorithm,dict_tracker)
         Owntools.save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
         shutil.copy('Debug/Report.txt','../'+dict_algorithm['main_folder_name']+'/Report_'+dict_algorithm['name_folder']+'_tempo.txt')
