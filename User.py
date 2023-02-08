@@ -49,8 +49,7 @@ def All_parameters():
     for i in range(len(L_R)):
         R_mean = R_mean + L_R[i]*L_percentage_R[i]
     #Dissolvable
-    Shape = 'Disk'
-    Dimension_mean = 420 #µm radius
+    Shape = 'Square'
     Dimension_mean = 420 #µm radius or lenght
     L_Dimension = [1.2*Dimension_mean,1.1*Dimension_mean,0.9*Dimension_mean,0.8*Dimension_mean] #from larger to smaller
     L_percentage_Dimension = [1/6,1/3,1/3,1/6] #distribution of the different radius
@@ -182,8 +181,8 @@ def All_parameters():
     i_print_plot = 200 #frenquency of the print and plot (if Debug_DEM) in DEM step
     clean_memory = True #delete Data, Input, Output at the end of the simulation
     SaveData = True #save simulation
-    main_folder_name = 'ToDelete' #where data are saved
-    template_simulation_name = 'ToDelete_' #template of the simulation name
+    main_folder_name = 'Data_AC_'+Shape #where data are saved
+    template_simulation_name = 'frac_'+str(int(100*frac_dissolved))+'_run_' #template of the simulation name
 
     #write dict
     dict_algorithm = {
