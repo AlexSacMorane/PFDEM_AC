@@ -51,6 +51,7 @@ def All_parameters():
     #Dissolvable
     Shape = 'Disk'
     Dimension_mean = 420 #µm radius
+    Dimension_mean = 420 #µm radius or lenght
     L_Dimension = [1.2*Dimension_mean,1.1*Dimension_mean,0.9*Dimension_mean,0.8*Dimension_mean] #from larger to smaller
     L_percentage_Dimension = [1/6,1/3,1/3,1/6] #distribution of the different radius
     #Recompute the mean dimension
