@@ -20,7 +20,7 @@ import pickle
 
 #Own function and class
 from Write_txt import Write_txt
-from Create_i_AC import Create_i_AC_local
+from Create_i_AC import Create_i_AC
 import Owntools
 import Grain
 import Contact
