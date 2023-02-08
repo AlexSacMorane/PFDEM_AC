@@ -136,7 +136,10 @@ def All_parameters():
     #Algorithm parameters
 
     #Phase field
-    dt_PF = 0.01 #s time step during MOOSE simulation
+    if Shape == 'Disk':
+        dt_PF = 0.01 #s time step during MOOSE simulation
+    elif Shape == 'Square':
+        dt_PF = 0.012 #s time step during MOOSE simulation
     n_t_PF = 10 #number of iterations PF-DEM
     MovePF_selector = 'DeconstructRebuild' #Move PF
     n_local = 50 #number of node inside local PF simulation
