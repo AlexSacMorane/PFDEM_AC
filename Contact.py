@@ -731,7 +731,7 @@ def Grains_Polyhedral_contact_Neighborhoods(dict_material,dict_sample):
     """
     for i_grain in range(len(dict_sample['L_g'])-1) :
         for neighbour in dict_sample['L_g'][i_grain].neighbourood:
-            j_grain = neighbour.id
+            j_grain = dict_sample['L_g'].index(neighbour)
             if Grains_Polyhedral_contact_Neighborhoods_bool(dict_sample['L_g'][i_grain],dict_sample['L_g'][j_grain]):
                 if (i_grain,j_grain) not in dict_sample['L_ij_contact']:  #contact not detected previously
                    #creation of contact

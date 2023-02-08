@@ -65,6 +65,21 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
+  def __eq__(self, other):
+      """
+      Define the equality between two grains.
+
+      To be equal two grains must have the same id.
+
+        Input :
+            two grains (grain)
+        Return
+            A Boolean (bool)
+      """
+      return self.id == other.id
+
+#-------------------------------------------------------------------------------
+
   def update_geometry_kinetic(self, V, A, W, DT):
     """
     Update the acceleration and the velocity of a grain. Update geometrical parameters as border and center nodes.
