@@ -50,7 +50,7 @@ def All_parameters():
         R_mean = R_mean + L_R[i]*L_percentage_R[i]
     #Dissolvable
     Shape = 'Square'
-    Dimension_mean = 420 #µm radius or lenght
+    Dimension_mean = 420 #µm radius or length
     L_Dimension = [1.2*Dimension_mean,1.1*Dimension_mean,0.9*Dimension_mean,0.8*Dimension_mean] #from larger to smaller
     L_percentage_Dimension = [1/6,1/3,1/3,1/6] #distribution of the different radius
     #Recompute the mean dimension
@@ -60,9 +60,9 @@ def All_parameters():
 
     #Compute number of grain (square or disk)
     if Shape == 'Square' :
-        N_grain_dissolvable = int(N_grain*frac_dissolved*math.pi*R_mean**2/(frac_dissolved*math.pi*R_mean**2 + Dimension_mean*Dimension_mean*(1-frac_dissolved)))
+        N_grain_dissolvable = int(N_grain*frac_dissolved*math.pi*R_mean**2/(frac_dissolved*math.pi*R_mean**2 + (1-frac_dissolved)*Dimension_mean*Dimension_mean))
     elif Shape == 'Disk':
-        N_grain_dissolvable = int(N_grain*frac_dissolved*math.pi*R_mean**2/(math.pi*R_mean**2*frac_dissolved + math.pi*Dimension_mean**2*(1-frac_dissolved)))
+        N_grain_dissolvable = int(N_grain*frac_dissolved*math.pi*R_mean**2/(frac_dissolved*math.pi*R_mean**2 + (1-frac_dissolved)*math.pi*Dimension_mean**2))
     N_grain_undissolvable = N_grain - N_grain_dissolvable
 
     #write dict
