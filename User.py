@@ -40,45 +40,54 @@ def All_parameters():
     N_grain = 300 #total number of grains
     frac_dissolved = 0.15 #V_soluble/V_total
 
-    #Undissolvalble - disk
-    R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
-    L_R = [1.2*R_mean,1.1*R_mean,0.9*R_mean,0.8*R_mean] #from larger to smaller
-    L_percentage_R = [1/6,1/3,1/3,1/6] #distribution of the different radius
-    #Recompute the mean radius
-    R_mean = 0
-    for i in range(len(L_R)):
-        R_mean = R_mean + L_R[i]*L_percentage_R[i]
-    #Dissolvable
-    Shape = 'Square'
-    if Shape == 'Square' :
-        Dimension_mean = 420 #µm length
-    elif Shape == 'Disk' :
-        Dimension_mean = 300 #µm radius
-    L_Dimension = [1.2*Dimension_mean,1.1*Dimension_mean,0.9*Dimension_mean,0.8*Dimension_mean] #from larger to smaller
-    L_percentage_Dimension = [1/6,1/3,1/3,1/6] #distribution of the different radius
+    #change here : R_mean -> L_mean
+
+    #Undissolvalble
+    Shape_undiss = 'Disk'
+    if Shape_undiss == 'Square' :
+        Dimension_mean = 495 #µm length
+    elif Shape_undiss == 'Disk' :
+        Dimension_mean = 350 #µm radius
+    L_Dimension_undiss = [1.2*Dimension_mean,1.1*Dimension_mean,0.9*Dimension_mean,0.8*Dimension_mean] #from larger to smaller
+    L_percentage_Dimension_undiss = [1/6,1/3,1/3,1/6] #distribution of the different dimension
     #Recompute the mean dimension
-    Dimension_mean = 0
-    for i in range(len(L_Dimension)):
-        Dimension_mean = Dimension_mean + L_Dimension[i]*L_percentage_Dimension[i]
+    Dimension_undiss_mean = 0
+    for i in range(len(L_Dimension_undiss)):
+        Dimension_undiss_mean = Dimension_undiss_mean + L_Dimension_undiss[i]*L_percentage_Dimension_undiss[i]
+    #Dissolvable
+    Shape_diss = 'Square'
+    if Shape_diss == 'Square' :
+        Dimension_mean = 420 #µm length
+    elif Shape_diss == 'Disk' :
+        Dimension_mean = 300 #µm radius
+    L_Dimension_diss = [1.2*Dimension_mean,1.1*Dimension_mean,0.9*Dimension_mean,0.8*Dimension_mean] #from larger to smaller
+    L_percentage_Dimension_diss = [1/6,1/3,1/3,1/6] #distribution of the different radius
+    #Recompute the mean dimension
+    Dimension_diss_mean = 0
+    for i in range(len(L_Dimension_diss)):
+        Dimension_diss_mean = Dimension_diss_mean + L_Dimension_diss[i]*L_percentage_Dimension_diss[i]
 
     #Compute number of grain (square or disk)
-    if Shape == 'Square' :
+    if Shape_undiss == 'Disk' and Shape_diss == 'Square' :
         N_grain_dissolvable = int(N_grain*frac_dissolved*math.pi*R_mean**2/(frac_dissolved*math.pi*R_mean**2 + (1-frac_dissolved)*Dimension_mean*Dimension_mean))
-    elif Shape == 'Disk':
+    elif Shape_undiss == 'Disk' and Shape_diss == 'Disk':
         N_grain_dissolvable = int(N_grain*frac_dissolved*math.pi*R_mean**2/(frac_dissolved*math.pi*R_mean**2 + (1-frac_dissolved)*math.pi*Dimension_mean**2))
+    elif Shape_undiss == 'Square' and Shape_diss == 'Square':
+        N_grain_dissolvable = int(N_grain*frac_dissolved*Dimension_undiss_mean*Dimension_undiss_mean/(frac_dissolved*Dimension_undiss_mean*Dimension_undiss_mean + (1-frac_dissolved)*Dimension_diss_mean*Dimension_diss_mean))
     N_grain_undissolvable = N_grain - N_grain_dissolvable
 
     #write dict
     dict_geometry = {
+    'Shape_undissolvable' : Shape_undiss,
     'N_grain_undissolvable' : N_grain_undissolvable,
-    'R_mean' : R_mean,
-    'L_R' : L_R,
-    'L_percentage_R' : L_percentage_R,
+    'Dimension_undiss_mean' : Dimension_undiss_mean,
+    'L_Dimension_diss' : L_Dimension_diss,
+    'L_percentage_Dimension_diss' : L_percentage_Dimension_diss,
+    'Shape_dissolvable' : Shape_diss,
     'N_grain_dissolvable' : N_grain_dissolvable,
-    'Shape_dissolvable' : Shape,
-    'Dimension_mean' : Dimension_mean,
-    'L_Dimension' : L_Dimension,
-    'L_percentage_Dimension' : L_percentage_Dimension,
+    'Dimension_diss_mean' : Dimension_diss_mean,
+    'L_Dimension_diss' : L_Dimension_diss,
+    'L_percentage_Dimension_diss' : L_percentage_Dimension_diss,
     'N_grain' : N_grain,
     'grain_discretization' : grain_discretization,
     }
@@ -89,11 +98,17 @@ def All_parameters():
     Y = 70*(10**9)*(10**6)*(10**(-12)) #Young Modulus µN/µm2
     nu = 0.3 #Poisson's ratio
     rho = 2500*10**(-6*3) #density kg/µm3
-    rho_surf_undissolvable = 4/3*rho*R_mean #kg/µm2
-    if Shape == 'Disk' :
-        rho_surf_dissolvable = 4/3*rho*Dimension_mean #kg/µm2
-    elif Shape == 'Square' :
-        rho_surf_dissolvable = rho*Dimension_mean #kg/µm2
+
+    #Undissolvalble
+    if Shape_undiss == 'Disk' :
+        rho_surf_undissolvable = 4/3*rho*Dimension_undiss_mean #kg/µm2
+    elif Shape_undiss == 'Square' :
+        rho_surf_undissolvable = rho*Dimension_undiss_mean #kg/µm2
+    #Dissolvalble
+    if Shape_diss == 'Disk' :
+        rho_surf_dissolvable = 4/3*rho*Dimension_diss_mean #kg/µm2
+    elif Shape_diss == 'Square' :
+        rho_surf_dissolvable = rho*Dimension_diss_mean #kg/µm2
     mu_friction_gg = 0.5 #grain-grain
     mu_friction_gw = 0 #grain-wall
     coeff_restitution = 0.2 #1 is perfect elastic
@@ -118,10 +133,12 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #Sample definition
 
-    if Shape == 'Disk' :
-        Lenght_mean = (R_mean*N_grain_undissolvable + Dimension_mean*N_grain_dissolvable)/N_grain #mean characteristic lenght
-    elif Shape == 'Square' :
-        Lenght_mean = (R_mean*N_grain_undissolvable + Dimension_mean/2*N_grain_dissolvable)/N_grain #mean characteristic lenght
+    if Shape_undiss == 'Disk' and Shape_diss == 'Disk' :
+        Lenght_mean = (Dimension_undiss_mean*N_grain_undissolvable + Dimension_diss_mean*N_grain_dissolvable)/N_grain #mean characteristic lenght
+    elif Shape_undiss == 'Disk' and Shape_diss == 'Square' :
+        Lenght_mean = (Dimension_undiss_mean*N_grain_undissolvable + Dimension_diss_mean/2*N_grain_dissolvable)/N_grain #mean characteristic lenght
+    elif Shape_undiss == 'Square' and Shape_diss == 'Square' :
+        Lenght_mean = (Dimension_undiss_mean/2*N_grain_undissolvable + Dimension_diss_mean/2*N_grain_dissolvable)/N_grain #mean characteristic lenght
 
     #Box définition
     x_box_min = 0 #µm
@@ -139,19 +156,24 @@ def All_parameters():
     #Algorithm parameters
 
     #Phase field
-    if Shape == 'Disk':
+    if Shape_undiss == 'Disk' and Shape_diss == 'Disk':
         dt_PF = 0.01 #s time step during MOOSE simulation
-    elif Shape == 'Square':
+    elif Shape_undiss == 'Disk' and Shape_diss == 'Square':
         dt_PF = 0.012 #s time step during MOOSE simulation
+    elif Shape_undiss == 'Square' and Shape_diss == 'Square':
+        dt_PF = 0.01 #s time step during MOOSE simulation
     n_t_PF = 10 #number of iterations PF-DEM
     MovePF_selector = 'DeconstructRebuild' #Move PF
     n_local = 50 #number of node inside local PF simulation
-    if Shape == 'Disk':
-        dx_local = max(2*max(dict_geometry['L_R']),2*max(dict_geometry['L_Dimension']))/(n_local-1)
-        dy_local = max(2*max(dict_geometry['L_R']),2*max(dict_geometry['L_Dimension']))/(n_local-1)
-    elif Shape == 'Square':
-        dx_local = max(2*max(dict_geometry['L_R']),max(dict_geometry['L_Dimension']))/(n_local-1)
-        dy_local = max(2*max(dict_geometry['L_R']),max(dict_geometry['L_Dimension']))/(n_local-1)
+    if Shape_undiss == 'Disk' and Shape_diss == 'Disk':
+        dx_local = max(2*max(dict_geometry['L_Dimension_undiss']),2*max(dict_geometry['L_Dimension_diss']))/(n_local-1)
+        dy_local = max(2*max(dict_geometry['L_Dimension_undiss']),2*max(dict_geometry['L_Dimension_diss']))/(n_local-1)
+    elif Shape_undiss == 'Disk' and Shape_diss == 'Square':
+        dx_local = max(2*max(dict_geometry['L_Dimension_undiss']),max(dict_geometry['L_Dimension_diss']))/(n_local-1)
+        dy_local = max(2*max(dict_geometry['L_Dimension_undiss']),max(dict_geometry['L_Dimension_diss']))/(n_local-1)
+    elif Shape_undiss == 'Square' and Shape_diss == 'Square':
+        dx_local = max(max(dict_geometry['L_Dimension_undiss']),max(dict_geometry['L_Dimension_diss']))/(n_local-1)
+        dy_local = max(max(dict_geometry['L_Dimension_undiss']),max(dict_geometry['L_Dimension_diss']))/(n_local-1)
     #add into material dict from this data
     w = 4*math.sqrt(dx_local**2+dy_local**2)
     double_well_height = 10*dict_material['kc_pf']/w/w
@@ -159,10 +181,12 @@ def All_parameters():
     dict_material['double_well_height'] = double_well_height
 
     #DEM parameters
-    if Shape == 'Disk' :
-        dt_DEM_crit = math.pi*min(min(L_Dimension),min(L_R))/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
-    elif Shape == 'Square':
-        dt_DEM_crit = math.pi*min(min(L_Dimension)/2,min(L_R))/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
+    if Shape_undiss == 'Disk' and Shape_diss == 'Disk' :
+        dt_DEM_crit = math.pi*min(min(L_Dimension_undiss),min(L_Dimension_diss))/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
+    elif Shape_undiss == 'Disk' and Shape_diss == 'Square':
+        dt_DEM_crit = math.pi*min(min(L_Dimension_undiss),min(L_Dimension_diss)/2)/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
+    elif Shape_undiss == 'Square' and Shape_diss == 'Square':
+        dt_DEM_crit = math.pi*min(min(L_Dimension_undiss)/2,min(L_Dimension_diss)/2)/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
 
     dt_DEM = dt_DEM_crit/8 #s time step during DEM simulation
     factor_neighborhood = 2.5 #margin to detect a grain into a neighborhood
@@ -187,7 +211,10 @@ def All_parameters():
     i_print_plot = 200 #frenquency of the print and plot (if Debug_DEM) in DEM step
     clean_memory = True #delete Data, Input, Output at the end of the simulation
     SaveData = True #save simulation
-    main_folder_name = 'Data_AC_'+Shape #where data are saved
+    if Shape_undiss == 'Disk' :
+        main_folder_name = 'Data_AC_'+Shape_diss #where data are saved
+    elif Shape_undiss == 'Square' :
+        main_folder_name = 'Data_AC_All_Square' #where data are saved
     template_simulation_name = 'frac_'+str(int(100*frac_dissolved))+'_run_' #template of the simulation name
 
     #write dict

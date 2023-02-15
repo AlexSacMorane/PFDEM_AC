@@ -40,35 +40,37 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
             Nothing, but dictionnaries are updated
     """
     #define the y_max for the grains generation
-    if dict_geometry['Shape_dissolvable'] == 'Disk':
-        R_mean = (dict_geometry['R_mean']*dict_geometry['N_grain_undissolvable'] + dict_geometry['Dimension_mean']*dict_geometry['N_grain_dissolvable'])/dict_geometry['N_grain']
-        dy_creation = dict_geometry['N_grain']/dict_ic['n_generation']*dict_ic['factor_ymax_box']*(2*R_mean)**2/(dict_sample['x_box_max']-dict_sample['x_box_min'])
-    elif dict_geometry['Shape_dissolvable'] == 'Square':
-        R_mean = (dict_geometry['R_mean']*dict_geometry['N_grain_undissolvable'] + math.sqrt(2)*dict_geometry['Dimension_mean']/2*dict_geometry['N_grain_dissolvable'])/dict_geometry['N_grain']
-        dy_creation = dict_geometry['N_grain']/dict_ic['n_generation']*dict_ic['factor_ymax_box']*(2*R_mean)**2/(dict_sample['x_box_max']-dict_sample['x_box_min'])
+    if dict_geometry['Shape_undissolvable'] == 'Disk' and dict_geometry['Shape_dissolvable'] == 'Disk':
+        R_mean = (dict_geometry['Dimension_undiss_mean']*dict_geometry['N_grain_undissolvable'] + dict_geometry['Dimension_diss_mean']*dict_geometry['N_grain_dissolvable'])/dict_geometry['N_grain']
+    elif dict_geometry['Shape_undissolvable'] == 'Disk' and dict_geometry['Shape_dissolvable'] == 'Square':
+        R_mean = (dict_geometry['Dimension_undiss_mean']*dict_geometry['N_grain_undissolvable'] + math.sqrt(2)*dict_geometry['Dimension_diss_mean']/2*dict_geometry['N_grain_dissolvable'])/dict_geometry['N_grain']
+    elif dict_geometry['Shape_undissolvable'] == 'Square' and dict_geometry['Shape_dissolvable'] == 'Square':
+        R_mean = (math.sqrt(2)*dict_geometry['Dimension_undiss_mean']/2*dict_geometry['N_grain_undissolvable'] + math.sqrt(2)*dict_geometry['Dimension_diss_mean']/2*dict_geometry['N_grain_dissolvable'])/dict_geometry['N_grain']
+    dy_creation = dict_geometry['N_grain']/dict_ic['n_generation']*dict_ic['factor_ymax_box']*(2*R_mean)**2/(dict_sample['x_box_max']-dict_sample['x_box_min'])
+
     dict_sample['dy_creation'] = dy_creation
 
     #plan the grains generation
-    L_n_grain_radius_ite = []
-    L_n_grain_radius_final = []
-    L_n_grain_radius_done = []
-    for percentage in dict_geometry['L_percentage_R']:
-        L_n_grain_radius_ite.append(round(dict_geometry['N_grain_undissolvable']*percentage/dict_ic['n_generation'],0))
-        L_n_grain_radius_final.append(round(dict_geometry['N_grain_undissolvable']*percentage,0))
-        L_n_grain_radius_done.append(0)
-    dict_ic['L_n_grain_radius_ite'] = L_n_grain_radius_ite
-    dict_ic['L_n_grain_radius_final'] = L_n_grain_radius_final
-    dict_ic['L_n_grain_radius_done'] = L_n_grain_radius_done
-    L_n_grain_dim_ite = []
-    L_n_grain_dim_final = []
-    L_n_grain_dim_done = []
-    for percentage in dict_geometry['L_percentage_Dimension']:
-        L_n_grain_dim_ite.append(round(dict_geometry['N_grain_dissolvable']*percentage/dict_ic['n_generation'],0))
-        L_n_grain_dim_final.append(round(dict_geometry['N_grain_dissolvable']*percentage,0))
-        L_n_grain_dim_done.append(0)
-    dict_ic['L_n_grain_dim_ite'] = L_n_grain_dim_ite
-    dict_ic['L_n_grain_dim_final'] = L_n_grain_dim_final
-    dict_ic['L_n_grain_dim_done'] = L_n_grain_dim_done
+    L_n_grain_undiss_ite = []
+    L_n_grain_undiss_final = []
+    L_n_grain_undiss_done = []
+    for percentage in dict_geometry['L_percentage_Dimension_undiss']:
+        L_n_grain_undiss_ite.append(round(dict_geometry['N_grain_undissolvable']*percentage/dict_ic['n_generation'],0))
+        L_n_grain_undiss_final.append(round(dict_geometry['N_grain_undissolvable']*percentage,0))
+        L_n_grain_undiss_done.append(0)
+    dict_ic['L_n_grain_undiss_ite'] = L_n_grain_undiss_ite
+    dict_ic['L_n_grain_undiss_final'] = L_n_grain_undiss_final
+    dict_ic['L_n_grain_undiss_done'] = L_n_grain_undiss_done
+    L_n_grain_diss_ite = []
+    L_n_grain_diss_final = []
+    L_n_grain_diss_done = []
+    for percentage in dict_geometry['L_percentage_Dimension_diss']:
+        L_n_grain_diss_ite.append(round(dict_geometry['N_grain_dissolvable']*percentage/dict_ic['n_generation'],0))
+        L_n_grain_diss_final.append(round(dict_geometry['N_grain_dissolvable']*percentage,0))
+        L_n_grain_diss_done.append(0)
+    dict_ic['L_n_grain_diss_ite'] = L_n_grain_diss_ite
+    dict_ic['L_n_grain_diss_final'] = L_n_grain_diss_final
+    dict_ic['L_n_grain_diss_done'] = L_n_grain_diss_done
 
     #Creation of grains
     #grains generation is decomposed in several steps (creation of grain then settlement)
@@ -258,23 +260,26 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, simulation
     """
     #Parameters for the method
     n_not_created = 0
-    L_n_grain_radius = []
+    L_n_grain_undiss = []
     if dict_ic['i_generation'] < dict_ic['n_generation']+1:
-        for i in range(len(dict_ic['L_n_grain_radius_ite'])):
-            L_n_grain_radius.append(dict_ic['L_n_grain_radius_ite'][i]*dict_ic['i_generation'])
+        for i in range(len(dict_ic['L_n_grain_undiss_ite'])):
+            L_n_grain_undiss.append(dict_ic['L_n_grain_undiss_ite'][i]*dict_ic['i_generation'])
     else :
-        L_n_grain_radius = dict_ic['L_n_grain_radius_final']
-    L_n_grain_dim = []
+        L_n_grain_undiss = dict_ic['L_n_grain_undiss_final']
+    L_n_grain_diss = []
     if dict_ic['i_generation'] < dict_ic['n_generation']+1:
-        for i in range(len(dict_ic['L_n_grain_dim_ite'])):
-            L_n_grain_dim.append(dict_ic['L_n_grain_dim_ite'][i]*dict_ic['i_generation'])
+        for i in range(len(dict_ic['L_n_grain_diss_ite'])):
+            L_n_grain_diss.append(dict_ic['L_n_grain_diss_ite'][i]*dict_ic['i_generation'])
     else :
-        L_n_grain_dim = dict_ic['L_n_grain_dim_final']
+        L_n_grain_diss = dict_ic['L_n_grain_diss_final']
 
-    for i in range(len(dict_geometry['L_R'])):
-        radius = dict_geometry['L_R'][i]
-        n_grain = L_n_grain_radius[i]
-        n_grain_done = dict_ic['L_n_grain_radius_done'][i]
+    for i in range(len(dict_geometry['L_Dimension_undiss'])):
+        if dict_geometry['Shape_undissolvable'] == 'Disk':
+            radius = dict_geometry['L_Dimension_undiss'][i]
+        elif dict_geometry['Shape_undissolvable'] == 'Square':
+            radius = math.sqrt(2)*dict_geometry['L_Dimension_undiss'][i]/2
+        n_grain = L_n_grain_undiss[i]
+        n_grain_done = dict_ic['L_n_grain_undiss_done'][i]
         last_id_grain_created = dict_ic['last_id']
         for id_grain in range(last_id_grain_created, int(last_id_grain_created + n_grain - n_grain_done)):
             i_test = 0
@@ -282,7 +287,7 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, simulation
             while (not grain_created) and i_test < dict_ic['N_test_max']:
                 i_test = i_test + 1
                 center = np.array([random.uniform(dict_sample['x_box_min']+1.1*radius,dict_sample['x_box_max']-1.1*radius),random.uniform(dict_sample['y_box_min_ic']+1.1*radius,dict_sample['y_box_min_ic'] + dict_sample['dy_creation'])])
-                g_tempo = Grain_ic.Grain_Tempo(id_grain-n_not_created, center, radius, False, 'Disk', dict_material)
+                g_tempo = Grain_ic.Grain_Tempo(id_grain-n_not_created, center, radius, False, dict_geometry['Shape_undissolvable'], dict_material)
                 grain_created = True
                 for grain in dict_ic['L_g_tempo']:
                     if Contact_gg_ic.Grains_contact_f(g_tempo,grain):
@@ -292,7 +297,7 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, simulation
                 simulation_report.write_and_print('Grain '+str(id_grain)+' has not been created after '+str(i_test)+' tries\n','Grain '+str(id_grain)+' has not been created after '+str(i_test)+' tries')
             else :
                 dict_ic['L_g_tempo'].append(g_tempo)
-                dict_ic['L_n_grain_radius_done'][i] = dict_ic['L_n_grain_radius_done'][i] + 1
+                dict_ic['L_n_grain_undiss_done'][i] = dict_ic['L_n_grain_undiss_done'][i] + 1
                 dict_ic['last_id'] = dict_ic['last_id'] + 1
 
     for i in range(len(dict_geometry['L_Dimension'])):
@@ -300,8 +305,8 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, simulation
             radius = dict_geometry['L_Dimension'][i]
         elif dict_geometry['Shape_dissolvable'] == 'Square':
             radius = math.sqrt(2)*dict_geometry['L_Dimension'][i]/2
-        n_grain = L_n_grain_dim[i]
-        n_grain_done = dict_ic['L_n_grain_dim_done'][i]
+        n_grain = L_n_grain_diss[i]
+        n_grain_done = dict_ic['L_n_grain_diss_done'][i]
         last_id_grain_created = dict_ic['last_id']
         for id_grain in range(last_id_grain_created, int(last_id_grain_created + n_grain - n_grain_done)):
             i_test = 0
@@ -319,7 +324,7 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, simulation
                 simulation_report.write_and_print('Grain '+str(id_grain)+' has not been created after '+str(i_test)+' tries\n','Grain '+str(id_grain)+' has not been created after '+str(i_test)+' tries')
             else :
                 dict_ic['L_g_tempo'].append(g_tempo)
-                dict_ic['L_n_grain_dim_done'][i] = dict_ic['L_n_grain_dim_done'][i] + 1
+                dict_ic['L_n_grain_diss_done'][i] = dict_ic['L_n_grain_diss_done'][i] + 1
                 dict_ic['last_id'] = dict_ic['last_id'] + 1
 
 #-------------------------------------------------------------------------------
