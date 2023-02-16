@@ -300,11 +300,11 @@ def Create_grains(dict_ic, dict_geometry, dict_sample, dict_material, simulation
                 dict_ic['L_n_grain_undiss_done'][i] = dict_ic['L_n_grain_undiss_done'][i] + 1
                 dict_ic['last_id'] = dict_ic['last_id'] + 1
 
-    for i in range(len(dict_geometry['L_Dimension'])):
+    for i in range(len(dict_geometry['L_Dimension_diss'])):
         if dict_geometry['Shape_dissolvable'] == 'Disk':
-            radius = dict_geometry['L_Dimension'][i]
+            radius = dict_geometry['L_Dimension_diss'][i]
         elif dict_geometry['Shape_dissolvable'] == 'Square':
-            radius = math.sqrt(2)*dict_geometry['L_Dimension'][i]/2
+            radius = math.sqrt(2)*dict_geometry['L_Dimension_diss'][i]/2
         n_grain = L_n_grain_diss[i]
         n_grain_done = dict_ic['L_n_grain_diss_done'][i]
         last_id_grain_created = dict_ic['last_id']

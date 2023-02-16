@@ -81,8 +81,8 @@ def All_parameters():
     'Shape_undissolvable' : Shape_undiss,
     'N_grain_undissolvable' : N_grain_undissolvable,
     'Dimension_undiss_mean' : Dimension_undiss_mean,
-    'L_Dimension_diss' : L_Dimension_diss,
-    'L_percentage_Dimension_diss' : L_percentage_Dimension_diss,
+    'L_Dimension_undiss' : L_Dimension_undiss,
+    'L_percentage_Dimension_undiss' : L_percentage_Dimension_undiss,
     'Shape_dissolvable' : Shape_diss,
     'N_grain_dissolvable' : N_grain_dissolvable,
     'Dimension_diss_mean' : Dimension_diss_mean,
@@ -279,7 +279,10 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #External sollicitations
 
-    Vertical_Confinement_Linear_Force = Y*2*R_mean/1000 #µN/µm used to compute the Vertical_Confinement_Force
+    if Shape_undiss == 'Square' :
+        Vertical_Confinement_Linear_Force = Y*Dimension_undiss_mean/1000 #µN/µm used to compute the Vertical_Confinement_Force
+    elif Shape_undiss == 'Disk' :
+        Vertical_Confinement_Linear_Force = Y*2*Dimension_undiss_mean/1000 #µN/µm used to compute the Vertical_Confinement_Force
     Vertical_Confinement_Force = Vertical_Confinement_Linear_Force*(x_box_max-x_box_min) #µN
     gravity = 0 #µm/s2
 
