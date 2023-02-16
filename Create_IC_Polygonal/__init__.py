@@ -315,7 +315,7 @@ def Reset_y_max(L_g,Force):
     id_grain_max = None
     for id_grain in range(len(L_g)):
         grain = L_g[id_grain]
-        y_max_grain = grain.center[1] + grain.radius
+        y_max_grain = max(grain.l_border_y)
 
         if y_max != None and y_max_grain > y_max:
             y_max = y_max_grain
