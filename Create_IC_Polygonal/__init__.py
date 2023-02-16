@@ -349,7 +349,10 @@ def Plot_Config_Loaded(L_g,x_min,x_max,y_min,y_max,i):
     L_u = []
     L_v = []
     for grain in L_g:
-        plt.plot(grain.l_border_x,grain.l_border_y,'k')
+        if grain.dissolved :
+            plt.plot(grain.l_border_x,grain.l_border_y,'k-.')
+        else :
+            plt.plot(grain.l_border_x,grain.l_border_y,'k')
         plt.plot(grain.center[0],grain.center[1],'xk')
         L_x.append(grain.center[0])
         L_y.append(grain.center[1])
@@ -379,7 +382,10 @@ def Plot_Config_Loaded_End(L_g,x_min,x_max,y_min,y_max):
     L_u = []
     L_v = []
     for grain in L_g:
-        plt.plot(grain.l_border_x,grain.l_border_y,'k')
+        if grain.dissolved :
+            plt.plot(grain.l_border_x,grain.l_border_y,'k-.')
+        else :
+            plt.plot(grain.l_border_x,grain.l_border_y,'k')
         plt.plot(grain.center[0],grain.center[1],'xk')
         L_x.append(grain.center[0])
         L_y.append(grain.center[1])
