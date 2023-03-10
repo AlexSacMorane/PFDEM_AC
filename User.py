@@ -49,7 +49,7 @@ def All_parameters():
     for i in range(len(L_R)):
         R_mean = R_mean + L_R[i]*L_percentage_R[i]
     #Dissolvable
-    Shape = 'Square'
+    Shape = 'Disk'
     if Shape == 'Square' :
         Dimension_mean = 420 #µm length
     elif Shape == 'Disk' :
@@ -136,6 +136,23 @@ def All_parameters():
     }
 
     #---------------------------------------------------------------------------
+    #External sollicitations
+
+    Vertical_Confinement_Linear_Force = Y*2*R_mean/1000 #µN/µm used to compute the Vertical_Confinement_Force
+    Vertical_Confinement_Force = Vertical_Confinement_Linear_Force*(x_box_max-x_box_min) #µN
+    gravity = 0 #µm/s2
+
+    #Add energy to dissolved grain
+    Dissolution_Energy = 0.2
+
+    #write dict
+    dict_sollicitations = {
+    'Dissolution_Energy' : Dissolution_Energy,
+    'Vertical_Confinement_Force' : Vertical_Confinement_Force,
+    'gravity' : gravity
+    }
+
+    #---------------------------------------------------------------------------
     #Algorithm parameters
 
     #Phase field
@@ -187,8 +204,8 @@ def All_parameters():
     i_print_plot = 200 #frenquency of the print and plot (if Debug_DEM) in DEM step
     clean_memory = True #delete Data, Input, Output at the end of the simulation
     SaveData = True #save simulation
-    main_folder_name = 'Data_AC_'+Shape #where data are saved
-    template_simulation_name = 'frac_'+str(int(100*frac_dissolved))+'_run_' #template of the simulation name
+    main_folder_name = 'Data_AC_Force' #where data are saved
+    template_simulation_name = Shape + '_Fconf_'+str(int(Vertical_Confinement_Force/10**6))+'_run_' #template of the simulation name
 
     #write dict
     dict_algorithm = {
@@ -247,23 +264,6 @@ def All_parameters():
     'i_print_plot_IC' : i_print_plot_IC,
     'factor_neighborhood_IC' : factor_neighborhood_IC,
     'N_test_max' : N_test_max
-    }
-
-    #---------------------------------------------------------------------------
-    #External sollicitations
-
-    Vertical_Confinement_Linear_Force = Y*2*R_mean/1000 #µN/µm used to compute the Vertical_Confinement_Force
-    Vertical_Confinement_Force = Vertical_Confinement_Linear_Force*(x_box_max-x_box_min) #µN
-    gravity = 0 #µm/s2
-
-    #Add energy to dissolved grain
-    Dissolution_Energy = 0.2
-
-    #write dict
-    dict_sollicitations = {
-    'Dissolution_Energy' : Dissolution_Energy,
-    'Vertical_Confinement_Force' : Vertical_Confinement_Force,
-    'gravity' : gravity
     }
 
     #---------------------------------------------------------------------------
