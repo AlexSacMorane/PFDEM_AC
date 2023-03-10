@@ -161,7 +161,6 @@ def main_iteration_until_pf(dict_algorithm, dict_geometry, dict_material, dict_s
                 print('Delta k0',round(max(k0_xmin_window) - min(k0_xmin_window),3),'/',dict_algorithm['dk0_stop'],'('+str(int((max(k0_xmin_window)-min(k0_xmin_window))/dict_algorithm['dk0_stop']*100))+' %)')
                 print('Delta y_max',round(max(y_box_max_window) - min(y_box_max_window),3),'/',dict_algorithm['dy_box_max_stop'],'('+str(int((max(y_box_max_window)-min(y_box_max_window))/dict_algorithm['dy_box_max_stop']*100))+' %)')
 
-
             if not dict_algorithm['clean_memory'] :
                 Owntools.save_DEM_tempo(dict_algorithm,dict_sample,dict_sollicitations,dict_tracker)
 
@@ -202,13 +201,21 @@ def main_iteration_until_pf(dict_algorithm, dict_geometry, dict_material, dict_s
     # Compute Vertical and horizontal sollicitations to compute k0
     #-----------------------------------------------------------------------------
 
-    Owntools.Control_y_max_NR(dict_sample,dict_sollicitations)
-    Owntools.Compute_k0(dict_sample,dict_sollicitations)
-    simulation_report.write('k0_xmin : '+str(round(dict_sample['k0_xmin'],2))+' / k0_xmax : '+str(round(dict_sample['k0_xmax'],2))+'\n')
-    #Update element in dict
-    dict_tracker['k0_xmin_L'].append(dict_sample['k0_xmin'])
-    dict_tracker['k0_xmax_L'].append(dict_sample['k0_xmax'])
-    dict_tracker['y_box_max_L'].append(dict_sample['y_box_max'])
+    if dict_algorithm['dk0_stop'] < 0.06 :
+        Owntools.Control_y_max_NR(dict_sample,dict_sollicitations)
+        Owntools.Compute_k0(dict_sample,dict_sollicitations)
+        simulation_report.write('k0_xmin : '+str(round(dict_sample['k0_xmin'],2))+' / k0_xmax : '+str(round(dict_sample['k0_xmax'],2))+'\n')
+        #Update element in dict
+        dict_tracker['k0_xmin_L'].append(dict_sample['k0_xmin'])
+        dict_tracker['k0_xmax_L'].append(dict_sample['k0_xmax'])
+        dict_tracker['y_box_max_L'].append(dict_sample['y_box_max'])
+    else :
+        Owntools.Control_y_max_NR(dict_sample,dict_sollicitations)
+        simulation_report.write('k0 : '+str(round(np.mean(k0_xmin_window),2))+'\n')
+        #Update element in dict
+        dict_tracker['k0_xmin_L'].append(np.mean(k0_xmin_window))
+        dict_tracker['k0_xmax_L'].append(np.mean(k0_xmin_window))
+        dict_tracker['y_box_max_L'].append(dict_sample['y_box_max'])
 
     #-----------------------------------------------------------------------------
     # Contact distribution
