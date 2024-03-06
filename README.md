@@ -2,6 +2,9 @@
 
 Phase-Field Discrete Element Modelisation applied to granular material.
 
+This work is presented in the following paper : 
+Alexandre Sac-Morane, Manolis Veveakis, Hadrien Rattez. (2024). A Phase-Field Discrete Element Method to study chemo-mechanical coupling in granular materials. Computer Methods in Applied Mechanics and Engineering. https://doi.org/10.1016/j.cma.2024.116900
+
 ## Simulation presentation
 This simulation is about a 2D test under oedometrical conditions with an acid injection to dissolve a fraction of the particles.
 
@@ -46,7 +49,6 @@ Some next releases are presented here.
 - create AI or a guide to select algorithm parameters (as neighborhood update frequency, time step, stop criteria, etc...)
 - add some quick tests to check the script
 - correct the functions P_is_inside() because if the coordinate y = the coordinate of the vertex, the point is considered outside (even  if it is not the case)
-- publish an article about the simulation and result
 
 ## Understand User.py
 
