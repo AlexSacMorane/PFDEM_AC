@@ -2,7 +2,7 @@
 
 Phase-Field Discrete Element Modelisation applied to granular material.
 
-This work is presented in the following paper : 
+This work is presented in the following paper: 
 Alexandre Sac-Morane, Manolis Veveakis, Hadrien Rattez. (2024). A Phase-Field Discrete Element Method to study chemo-mechanical coupling in granular materials. Computer Methods in Applied Mechanics and Engineering. https://doi.org/10.1016/j.cma.2024.116900
 
 ## Simulation presentation
